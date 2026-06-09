@@ -50,7 +50,7 @@ public class StratumRoofDef : RoofDef
       if (hp < maxHp && maxHp > 0)
       {
         float pct = (float)hp / maxHp;
-        label += $" ({pct.ToStringPercent("F0")})";
+        label += $" ({hp} / {maxHp} {pct.ToStringPercent("F0")})";
       }
 
       if (RoofStatCache.GetSolarEfficiency(this) > 0f)
