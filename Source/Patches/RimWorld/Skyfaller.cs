@@ -9,9 +9,9 @@ namespace SolarWeb.Stratum.Patches;
 [HarmonyPatch]
 public static class Skyfaller_Patch
 {
-  [HarmonyPatch(typeof(Skyfaller), "Impact")]
+  [HarmonyPatch(typeof(Skyfaller), "HitRoof")]
   [HarmonyPrefix]
-  public static bool Impact_Prefix(Skyfaller __instance)
+  public static bool HitRoof_Prefix(Skyfaller __instance)
   {
     var map = __instance.Map;
     if (map == null) return true;
@@ -24,7 +24,7 @@ public static class Skyfaller_Patch
       var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
       if (integrityGrid != null)
       {
-        var skyfallerHealth = (__instance.def.BaseMaxHitPoints < 300) ? __instance.def.BaseMaxHitPoints : 300;
+        var skyfallerHealth =  __instance.def.BaseMaxHitPoints;
 
         integrityGrid.TakeDamage(pos, skyfallerHealth);
 
