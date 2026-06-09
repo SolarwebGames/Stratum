@@ -1,0 +1,5 @@
+0.0.6:
+  Feature: Show roof hitpoints along with health percentage when damaged.
+  Feature: Drop pod raids will attempt to find a nearby safe spot to land, so that drop pod raids remain relevant even with high-tier reinforced roofing. You should still expect drop pods to impact your roofs.
+  Bug fix: Switched placeholder sound effect for thatch roof impacts.
+  Bug fix: Corrected skyfaller impacts to properly impact against roofs.
