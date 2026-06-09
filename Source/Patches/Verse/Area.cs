@@ -1,0 +1,31 @@
+using HarmonyLib;
+using RimWorld;
+using Verse;
+
+namespace SolarWeb.Stratum.Patches;
+
+[HarmonyPatch]
+public static class Area_Patch
+{
+  [HarmonyPatch(typeof(Area), "Set")]
+  [HarmonyPrefix]
+  public static bool Set_Prefix(Area __instance, IntVec3 c, bool val)
+  {
+    if (__instance.Map != null && __instance == __instance.Map.areaManager.BuildRoof)
+    {
+      return false;
+    }
+    return true;
+  }
+
+  [HarmonyPatch(typeof(Area), "Set")]
+  [HarmonyPostfix]
+  public static void Set_Postfix(Area __instance, IntVec3 c, ref bool val)
+  {
+    if (__instance.Map != null && __instance == __instance.Map.areaManager.NoRoof)
+    {
+      StratumLog.Debug($"Dirtying roof mesh at {c} due to NoRoof area change.");
+      __instance.Map.mapDrawer.MapMeshDirty(c, MapMeshFlagDefOf.Roofs);
+    }
+  }
+}

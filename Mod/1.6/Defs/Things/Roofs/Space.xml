@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-HullPlating_Buildable</defName>
+    <label>hull plating</label>
+    <description>Simple, airtight metal plates used for basic spacecraft hull construction. It is perfectly impermeable but lacks the structural reinforcement of higher-tier plating.</description>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>800</WorkToBuild>
+      <Beauty>0.5</Beauty>
+    </statBases>
+    <costList>
+      <Steel>20</Steel>
+    </costList>
+    <uiOrder>2200</uiOrder>
+    <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>Fabrication</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+    <defName>SolarWeb-Stratum-HullPlating</defName>
+    <label>hull plating</label>
+    <description>Simple, airtight metal plates used for basic spacecraft hull construction. It is perfectly impermeable but lacks the structural reinforcement of higher-tier plating.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-HullPlating_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <isSeamless>true</isSeamless>
+          <color>(0.37, 0.37, 0.37)</color>
+          <edgeData>
+            <color>(0.3, 0.3, 0.3)</color>
+          </edgeData>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Hull Plating</Name>
+        <Properties>
+          <ThermalCapacity>1500</ThermalCapacity>
+          <ThermalConductivity>0.05</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>1200</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-ReinforcedHullPlating_Buildable</defName>
+    <label>reinforced hull plating</label>
+    <description>Heavy-duty, double-layered metal plates with internal structural supports. Designed to withstand significant pressure differentials and micrometeoroid impacts.</description>
+    <statBases>
+      <MaxHitPoints>325</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Beauty>1.0</Beauty>
+    </statBases>
+    <costList>
+      <Steel>25</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2210</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>Fabrication</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+    <defName>SolarWeb-Stratum-ReinforcedHullPlating</defName>
+    <label>reinforced hull plating</label>
+    <description>Heavy-duty, double-layered metal plates with internal structural supports. Designed to withstand significant pressure differentials and micrometeoroid impacts.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-ReinforcedHullPlating_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/ReinforcedHullPlating</texPath>
+          <color>(0.25, 0.25, 0.25)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Reinforced Hull Plating</Name>
+        <Properties>
+          <ThermalCapacity>3000</ThermalCapacity>
+          <ThermalConductivity>0.02</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>2000</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-SolarHullPlate_Buildable</defName>
+    <label>reinforced solar hull plating</label>
+    <description>Top-tier orbital roofing. Combines the structural integrity of reinforced hull plating with integrated solar collection cells. While expensive, it provides power while serving as a high-pressure seal.</description>
+    <statBases>
+      <MaxHitPoints>300</MaxHitPoints>
+      <WorkToBuild>1000</WorkToBuild>
+      <Beauty>1.0</Beauty>
+    </statBases>
+    <costList>
+      <Steel>35</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2220</uiOrder>
+    <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>AdvancedFabrication</li>
+      <li>SolarPanels</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+    <defName>SolarWeb-Stratum-SolarHullPlate</defName>
+    <label>reinforced solar hull plating</label>
+    <description>Top-tier orbital roofing. Combines the structural integrity of reinforced hull plating with integrated solar collection cells. While expensive, it provides power while serving as a high-pressure seal.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-SolarHullPlate_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/SolarReinforcedHullPlate</texPath>
+          <color>(0.15, 0.15, 0.25)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <solarEfficiency>0.5</solarEfficiency>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Solar Hull Plate</Name>
+        <Properties>
+          <ThermalCapacity>3500</ThermalCapacity>
+          <ThermalConductivity>0.02</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>2500</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-ReinforcedGlassPanel_Buildable</defName>
+    <label>reinforced glass panel</label>
+    <description>Thick, lead-lined glass panels held in a steel frame. Allows viewing the stars while maintaining an airtight seal, though it is less insulating and strong than solid hull plates.</description>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Beauty>2.0</Beauty>
+    </statBases>
+    <costList>
+      <Steel>10</Steel>
+    </costList>
+    <uiOrder>2230</uiOrder>
+    <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>AdvancedFabrication</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+    <defName>SolarWeb-Stratum-ReinforcedGlassPanel</defName>
+    <label>reinforced glass panel</label>
+    <description>Thick, lead-lined glass panels held in a steel frame. Allows viewing the stars while maintaining an airtight seal, though it is less insulating and strong than solid hull plates.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-ReinforcedGlassPanel_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.8, 0.9, 1.0)</color>
+          <skylightFrameWidth>0.1</skylightFrameWidth>
+          <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <isSkylight>true</isSkylight>
+        <transparency>0.8</transparency>
+        <glassTint>(0.8, 0.9, 1.0)</glassTint>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Glass Panel</Name>
+        <Properties>
+          <ThermalCapacity>1000</ThermalCapacity>
+          <ThermalConductivity>0.5</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>1000</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+</Defs>

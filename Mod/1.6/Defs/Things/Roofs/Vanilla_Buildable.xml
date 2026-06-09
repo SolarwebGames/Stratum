@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <!-- Standard Constructed Roof -->
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofStandard_Buildable</defName>
+    <label>standard roof</label>
+    <description>The standard roof used by most colonies. It is durable and airtight, providing reliable protection against the elements.</description>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <Beauty>0</Beauty>
+      <MarketValue>10</MarketValue>
+    </statBases>
+  </ThingDef>
+
+  <!-- Thin Rock Roof -->
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofThinRock_Buildable</defName>
+    <label>thin rock roof</label>
+    <description>A natural roof of thin stone. While sturdy, it is rough and unattractive.</description>
+    <statBases>
+      <MaxHitPoints>400</MaxHitPoints>
+      <Beauty>-2</Beauty>
+    </statBases>
+  </ThingDef>
+
+  <!-- Overhead Mountain -->
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofOverheadMountain_Buildable</defName>
+    <label>overhead mountain</label>
+    <description>A massive thickness of solid rock. Practically indestructible and offers perfect insulation.</description>
+    <statBases>
+      <MaxHitPoints>2000</MaxHitPoints>
+      <Beauty>-2</Beauty>
+    </statBases>
+  </ThingDef>
+
+</Defs>

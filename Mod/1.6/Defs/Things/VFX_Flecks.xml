@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <FleckDef>
+    <defName>SolarWeb-Stratum-Sunbeam</defName>
+    <fleckSystemClass>FleckSystemStatic</fleckSystemClass>
+    <graphicData>
+      <graphicClass>Graphic_Fleck</graphicClass>
+      <texPath>Things/Mote/FireGlow</texPath>
+      <shaderType>MoteGlow</shaderType>
+      <color>(1, 1, 0.8, 0.3)</color>
+      <drawSize>(1.2, 1.2)</drawSize>
+    </graphicData>
+    <altitudeLayer>MoteOverhead</altitudeLayer>
+    <fadeInTime>5</fadeInTime>
+    <solidTime>10.0</solidTime>
+    <fadeOutTime>5</fadeOutTime>
+  </FleckDef>
+</Defs>

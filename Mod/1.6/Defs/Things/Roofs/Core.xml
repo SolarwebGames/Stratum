@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofThatch_Buildable</defName>
+    <label>thatch roof</label>
+    <description>A primitive roof made from bundled hay or straw. It is extremely cheap and quick to assemble, but it leaks air badly and offers almost no protection against extreme temperatures.</description>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>100</WorkToBuild>
+      <Beauty>-1.0</Beauty>
+    </statBases>
+    <uiOrder>2000</uiOrder>
+    <constructionSkillPrerequisite>0</constructionSkillPrerequisite>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RoofThatch</defName>
+    <label>thatch roof</label>
+    <description>A primitive roof made from bundled hay or straw. It is extremely cheap and quick to assemble, but it leaks air badly and offers almost no protection against extreme temperatures.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>Pawn_Melee_Punch_HitBuilding_Wood</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RoofThatch_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/Thatch</texPath>
+            <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <transparency>0.2</transparency>
+        <glassTint>(0.4, 0.3, 0.1)</glassTint>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Thatch Roof</Name>
+        <Properties>
+          <ThermalCapacity>200</ThermalCapacity>
+          <ThermalConductivity>0.3</ThermalConductivity>
+          <FaceGasPermeability>0.8</FaceGasPermeability>
+          <MaxPressureDeltaKpa>10</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofShingle_Buildable</defName>
+    <label>shingle roof</label>
+    <description>Simple shingles made from various materials. Provides a solid, airtight seal and durable protection.</description>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>200</WorkToBuild>
+      <Beauty>0</Beauty>
+    </statBases>
+    <stuffCategories>
+      <li>Metallic</li>
+      <li>Woody</li>
+      <li>Stony</li>
+    </stuffCategories>
+    <costStuffCount>6</costStuffCount>
+    <uiOrder>2020</uiOrder>
+    <constructionSkillPrerequisite>3</constructionSkillPrerequisite>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RoofShingle</defName>
+    <label>shingle roof</label>
+    <description>Simple shingles made from various materials. Provides a solid, airtight seal and durable protection.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RoofShingle_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/ShingleRoof</texPath>
+          <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Shingle Roof</Name>
+        <Properties>
+          <ThermalCapacity>1200</ThermalCapacity>
+          <ThermalConductivity>0.1</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>200</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofGlass_Buildable</defName>
+    <label>skylight panel</label>
+    <description>Standard glass panels set in a light frame. Useful for greenhouses, but fragile and poor at insulating.</description>
+    <statBases>
+      <MaxHitPoints>50</MaxHitPoints>
+      <WorkToBuild>800</WorkToBuild>
+      <Beauty>2.0</Beauty>
+    </statBases>
+    <costList>
+      <Steel>10</Steel>
+    </costList>
+    <uiOrder>2040</uiOrder>
+    <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RoofGlass</defName>
+    <label>skylight panel</label>
+    <description>Standard glass panels set in a light frame. Useful for greenhouses, but fragile and poor at insulating.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RoofGlass_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.7, 0.85, 1.0)</color>
+          <skylightFrameWidth>0.1</skylightFrameWidth>
+          <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <isSkylight>true</isSkylight>
+        <transparency>0.7</transparency>
+        <glassTint>(0.7, 0.85, 1.0)</glassTint>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Glass Roof</Name>
+        <Properties>
+          <ThermalCapacity>500</ThermalCapacity>
+          <ThermalConductivity>0.8</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>50</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofSolarShingles_Buildable</defName>
+    <label>solar shingle roof</label>
+    <description>Modern roofing shingles with integrated photovoltaics. While less efficient than dedicated solar arrays, they provide clean energy without occupying ground space.</description>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>500</WorkToBuild>
+      <Beauty>0.5</Beauty>
+    </statBases>
+    <costList>
+      <Steel>12</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2050</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>SolarPanels</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RoofSolarShingles</defName>
+    <label>solar shingle roof</label>
+    <description>Modern roofing shingles with integrated photovoltaics. While less efficient than dedicated solar arrays, they provide clean energy without occupying ground space.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RoofSolarShingles_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/SolarShingles</texPath>
+          <isSeamless>true</isSeamless>
+          <color>(0.1, 0.1, 0.2)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <isSkylight>false</isSkylight>
+        <solarEfficiency>0.2</solarEfficiency>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Solar Shingles</Name>
+        <Properties>
+          <ThermalCapacity>1500</ThermalCapacity>
+          <ThermalConductivity>0.2</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>150</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+</Defs>

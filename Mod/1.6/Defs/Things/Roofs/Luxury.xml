@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-LuxuryGlassPanel_Buildable</defName>
+    <label>luxury glass panel</label>
+    <description>The ultimate in base luxury. Amethyst-tinted lead glass held within a pure metal frame. This connected skylight provides unparalleled beauty and OPEN views of the stars.</description>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <WorkToBuild>2500</WorkToBuild>
+      <Beauty>25.0</Beauty>
+    </statBases>
+    <costStuffCount>100</costStuffCount>
+    <stuffCategories>
+      <li>Metallic</li>
+    </stuffCategories>
+
+    <uiOrder>2140</uiOrder>
+    <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-LuxuryGlassPanel</defName>
+    <label>luxury glass panel</label>
+    <description>The ultimate in base luxury. Amethyst-tinted lead glass held within a pure metal frame. This skylight provides unparalleled beauty and open views of the stars.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-LuxuryGlassPanel_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.6, 0.4, 1)</color>
+          <skylightFrameWidth>0.05</skylightFrameWidth>
+          <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <isSkylight>true</isSkylight>
+        <transparency>0.5</transparency>
+        <glassTint>(0.6, 0.4, 1)</glassTint>
+        <allowedStuff>
+          <li>Gold</li>
+          <li>Silver</li>
+          <li>Jade</li>
+        </allowedStuff>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Luxury Glass Panel</Name>
+        <Properties>
+          <ThermalCapacity>1200</ThermalCapacity>
+          <ThermalConductivity>0.4</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>1500</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-SterileTiledRoof_Buildable</defName>
+    <label>sterile tiled roof</label>
+    <description>Roof tiles with a special silver-infused coating to inhibit microbial growth. Essential for high-tech hospitals and laboratories.</description>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>1600</WorkToBuild>
+      <Beauty>-1.0</Beauty>
+      <Cleanliness>0.6</Cleanliness>
+      <MarketValue>38</MarketValue>
+    </statBases>
+    <costList>
+      <Steel>7</Steel>
+      <Silver>25</Silver>
+    </costList>
+    <uiOrder>2110</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>SterileMaterials</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-SterileTiledRoof</defName>
+    <label>sterile tiled roof</label>
+    <description>Roof tiles with a special silver-infused coating to inhibit microbial growth. Essential for high-tech hospitals and laboratories.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-SterileTiledRoof_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.71, 0.71, 0.71)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Sterile Tiled Roof</Name>
+        <Properties>
+          <ThermalCapacity>1500</ThermalCapacity>
+          <ThermalConductivity>0.05</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>800</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+</Defs>

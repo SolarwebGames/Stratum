@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <Stratum_Roof>roof</Stratum_Roof>
+  <Stratum_RoofFrameLabel>{0} frame</Stratum_RoofFrameLabel>
+  <Stratum_ConstructionProgress>Construction progress: {0}</Stratum_ConstructionProgress>
+  <Stratum_SolarPowerStats>Power - Cell: {0}W / {1}W / Grid: {2}W / {3}W</Stratum_SolarPowerStats>
+</LanguageData>
