@@ -217,6 +217,21 @@ public class SolarRoofMapComponent : MapComponent
 
     isCalculating = true;
 
+    // Collect PowerNets on the main thread safely
+    var cellToNetMap = new Dictionary<int, PowerNet>();
+    foreach (var net in snapshot)
+    {
+      foreach (var cellInfo in net.cells)
+      {
+        IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
+        var pNet = map.powerNetGrid.TransmittedPowerNetAt(pos);
+        if (pNet != null)
+        {
+          cellToNetMap[cellInfo.cellIdx] = pNet;
+        }
+      }
+    }
+
     Task.Run(() =>
     {
       try
@@ -233,13 +248,15 @@ public class SolarRoofMapComponent : MapComponent
 
           foreach (var cellInfo in net.cells)
           {
-            IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
-            var pNet = map.powerNetGrid.TransmittedPowerNetAt(pos);
-            if (pNet != null) touchedNets.Add(pNet);
+            if (cellToNetMap.TryGetValue(cellInfo.cellIdx, out var pNet))
+            {
+              touchedNets.Add(pNet);
+            }
 
             float curEff = cellInfo.baseEfficiency;
             if (cellInfo.maxHP > 0)
             {
+              IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
               short hp = integrityGrid.GetHitPoints(pos);
               curEff *= (float)hp / cellInfo.maxHP;
             }

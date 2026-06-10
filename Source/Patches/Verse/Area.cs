@@ -24,7 +24,6 @@ public static class Area_Patch
   {
     if (__instance.Map != null && __instance == __instance.Map.areaManager.NoRoof)
     {
-      StratumLog.Debug($"Dirtying roof mesh at {c} due to NoRoof area change.");
       __instance.Map.mapDrawer.MapMeshDirty(c, MapMeshFlagDefOf.Roofs);
     }
   }

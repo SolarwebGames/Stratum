@@ -159,7 +159,8 @@
       <Beauty>2.0</Beauty>
     </statBases>
     <costList>
-      <Steel>10</Steel>
+      <Steel>5</Steel>
+      <Plasteel>5</Plasteel>
     </costList>
     <uiOrder>2230</uiOrder>
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>

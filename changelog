@@ -1,3 +1,15 @@
+0.0.16:
+  Bug Fix: Fixed a bug where destroyed roofs could continue to be tracked behind the scenes.
+  Bug Fix: Added full support for gravships, fixing a bug where gravship roofs would lose their stuff and hitpoints.
+  Bug Fix: Changed the cost of reinforced glass to include a plasteel cost, fixing a problem where reinforced glass had the same cost as regular glass.
+  Bug Fix: Lowered the stuff cost of luxury glass panels from 100 to 25, substantially reducing the cost.
+  Bug Fix: Show skylight percentage without rounding.
+  Bug Fix: Room stats weren't being marked as dirty after a room was built, resulting in stats lagging behind construction.
+  Bug Fix: Updated Skyfaller roof impact logic to damage roofs in a radius, matching base game behavior.
+  Bug Fix: Fixed a potential crash in SolarRoofMapComponent by ensuring PowerNet lookups occur on the main thread.
+  Bug Fix: Added missing grid bounds checks in RoofIntegrityGrid to prevent IndexOutOfRangeException.
+  Bug Fix: Fixed a bug where removing a roof would return base materials instead of the stuff it was built with.
+
 0.0.6:
   Feature: Show roof hitpoints along with health percentage when damaged.
   Feature: Drop pod raids will attempt to find a nearby safe spot to land, so that drop pod raids remain relevant even with high-tier reinforced roofing. You should still expect drop pods to impact your roofs.

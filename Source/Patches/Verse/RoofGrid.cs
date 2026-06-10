@@ -1,6 +1,4 @@
 using HarmonyLib;
-using RimWorld;
-using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
 using Verse;
@@ -46,7 +44,6 @@ public static class RoofGrid_Patch
     var solar = ___map.GetComponent<SolarRoofMapComponent>();
     solar?.Notify_RoofChanged(c);
 
-    // Force invalidation of Room and District roof caches
     var room = c.GetRoom(___map);
     if (room != null)
     {
@@ -56,10 +53,9 @@ public static class RoofGrid_Patch
       }
     }
 
+    var integrity = ___map.GetComponent<RoofIntegrityGrid>();
     if (def != null && RoofStatCache.IsCustomRoof(def))
     {
-      var integrity = ___map.GetComponent<RoofIntegrityGrid>();
-
       ThingDef? stuff = null;
       if (DebugSettings.godMode)
       {
@@ -67,7 +63,28 @@ public static class RoofGrid_Patch
         if (designator != null) stuff = designator.StuffDef;
       }
 
-      integrity?.InitializeRoof(c, def, stuff);
+      if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
+      {
+        var local = c - GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingRoot;
+        if (GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData != null && 
+            GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
+        {
+          stuff = cellData.stuff;
+          integrity?.InitializeRoof(c, def, stuff, cellData.hitPoints);
+        }
+        else
+        {
+          integrity?.InitializeRoof(c, def, stuff);
+        }
+      }
+      else
+      {
+        integrity?.InitializeRoof(c, def, stuff);
+      }
+    }
+    else
+    {
+      integrity?.RemoveRoof(c);
     }
   }
 }

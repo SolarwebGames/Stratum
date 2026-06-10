@@ -9,7 +9,7 @@
       <WorkToBuild>2500</WorkToBuild>
       <Beauty>25.0</Beauty>
     </statBases>
-    <costStuffCount>100</costStuffCount>
+    <costStuffCount>25</costStuffCount>
     <stuffCategories>
       <li>Metallic</li>
     </stuffCategories>

@@ -91,4 +91,9 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
       RemoveRecord(cell);
     }
   }
+
+  public void RestoreRecord(IntVec3 cell, ConstructionRecord record)
+  {
+    records[cell] = record;
+  }
 }

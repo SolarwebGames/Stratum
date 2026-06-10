@@ -73,19 +73,26 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     }
   }
 
-  public void InitializeRoof(IntVec3 cell, RoofDef def, ThingDef? stuff = null)
+  public void InitializeRoof(IntVec3 cell, RoofDef def, ThingDef? stuff = null, short? currentHP = null)
   {
+    if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     if (RoofStatCache.IsCustomRoof(def))
     {
-      hitPoints[index] = (short)RoofStatCache.GetMaxHitPoints(def, stuff);
+      short maxHP = (short)RoofStatCache.GetMaxHitPoints(def, stuff);
+      hitPoints[index] = currentHP ?? maxHP;
       stuffDefs[index] = stuff;
-      roofsNeedingRepair.Remove(index);
+      
+      if (hitPoints[index] < maxHP)
+        roofsNeedingRepair.Add(index);
+      else
+        roofsNeedingRepair.Remove(index);
     }
   }
 
   public void RemoveRoof(IntVec3 cell)
   {
+    if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     hitPoints[index] = 0;
     stuffDefs[index] = null;
@@ -94,11 +101,13 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public short GetHitPoints(IntVec3 cell)
   {
+    if (!cell.InBounds(map)) return 0;
     return hitPoints[map.cellIndices.CellToIndex(cell)];
   }
 
   public short GetMaxHitPoints(IntVec3 cell)
   {
+    if (!cell.InBounds(map)) return 0;
     var roof = map.roofGrid.RoofAt(cell);
     if (roof == null) return 0;
     return (short)RoofStatCache.GetMaxHitPoints(roof, GetStuff(cell));
@@ -106,11 +115,13 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public ThingDef? GetStuff(IntVec3 cell)
   {
+    if (!cell.InBounds(map)) return null;
     return stuffDefs[map.cellIndices.CellToIndex(cell)];
   }
 
   public void TakeDamage(IntVec3 cell, int amount)
   {
+    if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     if (hitPoints[index] <= 0) return;
 

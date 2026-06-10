@@ -24,22 +24,28 @@ public static class JobDriver_RemoveRoof_Patch
     var extension = roof.GetModExtension<BuildableRoofExtension>();
     var bDef = extension?.buildableDef;
 
-    map.GetComponent<MapComponents.RoofIntegrityGrid>()?.RemoveRoof(cell);
+    var integrityGrid = map.GetComponent<MapComponents.RoofIntegrityGrid>();
+    var stuff = integrityGrid?.GetStuff(cell);
+    integrityGrid?.RemoveRoof(cell);
     map.areaManager.NoRoof[cell] = false;
     map.areaManager.NoRoof.MarkForDraw();
     map.areaManager.BuildRoof[cell] = false;
     map.areaManager.BuildRoof.MarkForDraw();
 
-    if (bDef != null && !bDef.CostList.NullOrEmpty())
+    if (bDef != null)
     {
-      float fraction = bDef.resourcesFractionWhenDeconstructed;
-      foreach (var cost in bDef.CostList)
+      var costList = bDef.CostListAdjusted(stuff);
+      if (!costList.NullOrEmpty())
       {
-        int count = GenMath.RoundRandom(cost.count * fraction);
-        if (count <= 0) continue;
-        var thing = ThingMaker.MakeThing(cost.thingDef);
-        thing.stackCount = count;
-        GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near);
+        float fraction = bDef.resourcesFractionWhenDeconstructed;
+        foreach (var cost in costList)
+        {
+          int count = GenMath.RoundRandom(cost.count * fraction);
+          if (count <= 0) continue;
+          var thing = ThingMaker.MakeThing(cost.thingDef);
+          thing.stackCount = count;
+          GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near);
+        }
       }
     }
 
