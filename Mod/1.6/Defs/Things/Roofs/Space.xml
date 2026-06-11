@@ -19,7 +19,7 @@
     </researchPrerequisites>
   </ThingDef>
 
-  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-HullPlating</defName>
     <label>hull plating</label>
     <description>Simple, airtight metal plates used for basic spacecraft hull construction. It is perfectly impermeable but lacks the structural reinforcement of higher-tier plating.</description>
@@ -71,7 +71,7 @@
     </researchPrerequisites>
   </ThingDef>
 
-  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-ReinforcedHullPlating</defName>
     <label>reinforced hull plating</label>
     <description>Heavy-duty, double-layered metal plates with internal structural supports. Designed to withstand significant pressure differentials and micrometeoroid impacts.</description>
@@ -120,7 +120,7 @@
     </researchPrerequisites>
   </ThingDef>
 
-  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-SolarHullPlate</defName>
     <label>reinforced solar hull plating</label>
     <description>Top-tier orbital roofing. Combines the structural integrity of reinforced hull plating with integrated solar collection cells. While expensive, it provides power while serving as a high-pressure seal.</description>

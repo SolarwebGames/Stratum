@@ -1,3 +1,6 @@
+0.1.1:
+  Bug Fix: Removed unnecessary requirements for Odyssey on hull plating.
+
 0.1.0:
   Feature: Many people have pointed out that thatch can actually be a very effective roofing material. A superior thatch roof is now available at the cost of hay, with primitive thatch remaining a free, basic construction option.
   Feature: Skylights are now tintable! After selecting a skylight to build, look for the "Set Glass Tint" button above the build panel.
