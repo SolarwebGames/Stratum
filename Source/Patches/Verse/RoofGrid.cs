@@ -57,10 +57,15 @@ public static class RoofGrid_Patch
     if (def != null && RoofStatCache.IsCustomRoof(def))
     {
       ThingDef? stuff = null;
+      UnityEngine.Color? tint = null;
       if (DebugSettings.godMode)
       {
         var designator = Find.DesignatorManager.SelectedDesignator as AI.Designators.BuildCustomRoof;
-        if (designator != null) stuff = designator.StuffDef;
+        if (designator != null)
+        {
+          stuff = designator.StuffDef;
+          tint = designator.SelectedTint;
+        }
       }
 
       if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
@@ -70,16 +75,16 @@ public static class RoofGrid_Patch
             GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
         {
           stuff = cellData.stuff;
-          integrity?.InitializeRoof(c, def, stuff, cellData.hitPoints);
+          integrity?.InitializeRoof(c, def, stuff, cellData.glassTint, cellData.hitPoints);
         }
         else
         {
-          integrity?.InitializeRoof(c, def, stuff);
+          integrity?.InitializeRoof(c, def, stuff, tint);
         }
       }
       else
       {
-        integrity?.InitializeRoof(c, def, stuff);
+        integrity?.InitializeRoof(c, def, stuff, tint);
       }
     }
     else

@@ -11,6 +11,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 {
   private readonly short[] hitPoints = new short[map.cellIndices.NumGridCells];
   private readonly ThingDef?[] stuffDefs = new ThingDef[map.cellIndices.NumGridCells];
+  private readonly UnityEngine.Color?[] glassTints = new UnityEngine.Color?[map.cellIndices.NumGridCells];
   private readonly HashSet<int> roofsNeedingRepair = [];
   public bool hasScanned;
 
@@ -21,14 +22,16 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   {
     base.ExposeData();
 
-    // We only save cells that have missing hitpoints to save space.
+    // We only save cells that have missing hitpoints or custom data to save space.
     Dictionary<int, short>? damagedCells = null;
     Dictionary<int, ThingDef>? savedStuff = null;
+    Dictionary<int, UnityEngine.Color>? savedTints = null;
 
     if (Scribe.mode == LoadSaveMode.Saving)
     {
       damagedCells = [];
       savedStuff = [];
+      savedTints = [];
       for (int i = 0; i < hitPoints.Length; i++)
       {
         if (roofsNeedingRepair.Contains(i))
@@ -36,11 +39,15 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
         if (stuffDefs[i] != null)
           savedStuff[i] = stuffDefs[i]!;
+
+        if (glassTints[i] != null)
+          savedTints[i] = glassTints[i]!.Value;
       }
     }
 
     Scribe_Collections.Look(ref damagedCells, "damagedCells", LookMode.Value, LookMode.Value);
     Scribe_Collections.Look(ref savedStuff, "savedStuff", LookMode.Value, LookMode.Def);
+    Scribe_Collections.Look(ref savedTints, "savedTints", LookMode.Value, LookMode.Value);
 
     if (Scribe.mode == LoadSaveMode.LoadingVars)
     {
@@ -60,6 +67,14 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
           stuffDefs[kvp.Key] = kvp.Value;
         }
       }
+
+      if (savedTints != null)
+      {
+        foreach (var kvp in savedTints)
+        {
+          glassTints[kvp.Key] = kvp.Value;
+        }
+      }
     }
   }
 
@@ -73,7 +88,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     }
   }
 
-  public void InitializeRoof(IntVec3 cell, RoofDef def, ThingDef? stuff = null, short? currentHP = null)
+  public void InitializeRoof(IntVec3 cell, RoofDef def, ThingDef? stuff = null, UnityEngine.Color? glassTint = null, short? currentHP = null)
   {
     if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
@@ -82,6 +97,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       short maxHP = (short)RoofStatCache.GetMaxHitPoints(def, stuff);
       hitPoints[index] = currentHP ?? maxHP;
       stuffDefs[index] = stuff;
+      glassTints[index] = glassTint;
       
       if (hitPoints[index] < maxHP)
         roofsNeedingRepair.Add(index);
@@ -96,6 +112,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     int index = map.cellIndices.CellToIndex(cell);
     hitPoints[index] = 0;
     stuffDefs[index] = null;
+    glassTints[index] = null;
     roofsNeedingRepair.Remove(index);
   }
 
@@ -119,6 +136,12 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     return stuffDefs[map.cellIndices.CellToIndex(cell)];
   }
 
+  public UnityEngine.Color? GetGlassTint(IntVec3 cell)
+  {
+    if (!cell.InBounds(map)) return null;
+    return glassTints[map.cellIndices.CellToIndex(cell)];
+  }
+
   public void TakeDamage(IntVec3 cell, int amount)
   {
     if (!cell.InBounds(map)) return;
@@ -132,7 +155,9 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     {
       hitPoints[index] = 0;
       var stuff = stuffDefs[index];
+      var tint = glassTints[index];
       stuffDefs[index] = null;
+      glassTints[index] = null;
       roofsNeedingRepair.Remove(index);
 
       var roofDef = map.roofGrid.RoofAt(cell);
@@ -145,7 +170,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       {
         if (Find.PlaySettings.autoRebuild && map.areaManager.Home[cell])
         {
-          map.GetComponent<RoofConstructionTracker>()?.RebuildRoof(cell, roofDef, ext, stuff);
+          map.GetComponent<RoofConstructionTracker>()?.RebuildRoof(cell, roofDef, ext, stuff, tint);
         }
 
         var bDef = ext.buildableDef;

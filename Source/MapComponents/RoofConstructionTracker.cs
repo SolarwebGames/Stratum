@@ -15,6 +15,7 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
     public ThingDef? stuffDef;
     public float workDone;
     public float workTotal;
+    public UnityEngine.Color? glassTint;
 
     public void ExposeData()
     {
@@ -22,6 +23,7 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
       Scribe_Defs.Look(ref stuffDef, "stuffDef");
       Scribe_Values.Look(ref workDone, "workDone");
       Scribe_Values.Look(ref workTotal, "workTotal");
+      Scribe_Values.Look(ref glassTint, "glassTint");
     }
   }
 
@@ -34,12 +36,12 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
     records ??= [];
   }
 
-  public void AddRecord(IntVec3 cell, RoofDef def, float total, ThingDef? stuff = null)
+  public void AddRecord(IntVec3 cell, RoofDef def, float total, ThingDef? stuff = null, UnityEngine.Color? glassTint = null)
   {
-    records[cell] = new ConstructionRecord { roofDef = def, workTotal = total, stuffDef = stuff };
+    records[cell] = new ConstructionRecord { roofDef = def, workTotal = total, stuffDef = stuff, glassTint = glassTint };
   }
 
-  public void RebuildRoof(IntVec3 cell, RoofDef roofDef, BuildableRoofExtension ext, ThingDef? stuff = null)
+  public void RebuildRoof(IntVec3 cell, RoofDef roofDef, BuildableRoofExtension ext, ThingDef? stuff = null, UnityEngine.Color? glassTint = null)
   {
     RemoveRecord(cell);
 
@@ -50,10 +52,11 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
       workToBuild = bDef.statBases.GetStatValueFromList(StatDefOf.WorkToBuild, 1000f);
     }
 
-    AddRecord(cell, roofDef, workToBuild, stuff);
+    AddRecord(cell, roofDef, workToBuild, stuff, glassTint);
     var frame = (RoofFrame)ThingMaker.MakeThing(DefOf.ThingDefOf.RoofFrame);
     frame.targetRoofDef = roofDef;
     frame.targetRoofStuff = stuff;
+    frame.glassTint = glassTint;
     frame.SetFaction(Faction.OfPlayer);
     GenSpawn.Spawn(frame, cell, map);
   }
@@ -76,6 +79,11 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
     records.Remove(cell);
   }
 
+  public void RestoreRecord(IntVec3 cell, ConstructionRecord record)
+  {
+    records[cell] = record;
+  }
+
   public bool TryGetRecord(IntVec3 cell, out ConstructionRecord record)
   {
     return records.TryGetValue(cell, out record);
@@ -86,14 +94,9 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
     if (records.TryGetValue(cell, out var rec))
     {
       map.roofGrid.SetRoof(cell, rec.roofDef);
-      map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, rec.roofDef, rec.stuffDef);
+      map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, rec.roofDef, rec.stuffDef, rec.glassTint);
 
       RemoveRecord(cell);
     }
-  }
-
-  public void RestoreRecord(IntVec3 cell, ConstructionRecord record)
-  {
-    records[cell] = record;
   }
 }

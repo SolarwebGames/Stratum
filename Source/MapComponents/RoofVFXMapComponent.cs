@@ -152,14 +152,14 @@ public class RoofVFXMapComponent : MapComponent
       if (Rand.Value > spawnChancePerCell) continue;
 
       int cellIdx = transparentCells[listIndex];
+      IntVec3 pos = map.cellIndices.IndexToCell(cellIdx);
       var roof = map.roofGrid.RoofAt(cellIdx);
       if (roof == null) continue;
 
       float transparency = RoofStatCache.GetTransparency(roof);
       if (transparency <= 0f) continue;
 
-      Color roofColor = RoofStatCache.GetGlassTint(roof);
-      IntVec3 pos = map.cellIndices.IndexToCell(cellIdx);
+      Color roofColor = RoofStatCache.GetGlassTint(roof, map, pos);
       Vector3 center = pos.ToVector3Shifted();
       center.y += 0.1f;
 

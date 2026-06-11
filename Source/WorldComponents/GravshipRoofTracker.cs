@@ -10,11 +10,13 @@ public class GravshipRoofTracker(World world) : WorldComponent(world)
   {
     public ThingDef? stuff;
     public short hitPoints = -1;
+    public UnityEngine.Color? glassTint;
 
     public void ExposeData()
     {
       Scribe_Defs.Look(ref stuff, "stuff");
       Scribe_Values.Look(ref hitPoints, "hp", (short)-1);
+      Scribe_Values.Look(ref glassTint, "glassTint");
     }
   }
 

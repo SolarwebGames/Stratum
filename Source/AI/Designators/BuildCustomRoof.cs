@@ -9,6 +9,7 @@ using SolarWeb.Stratum.Graphics;
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Things;
+using SolarWeb.Stratum.UI;
 
 namespace SolarWeb.Stratum.AI.Designators;
 
@@ -18,6 +19,9 @@ public class BuildCustomRoof : Designator_Cells
   private readonly BuildableRoofExtension ext;
   private ThingDef? stuffDef;
   private bool writeStuff;
+  private Color? selectedTint;
+
+  public Color? SelectedTint => selectedTint;
 
   public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Areas;
 
@@ -168,7 +172,7 @@ public class BuildCustomRoof : Designator_Cells
       Color frameColor = IconDrawColor;
       frameColor.a = 1f;
 
-      Color glassColor = gd.color;
+      Color glassColor = selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
       glassColor.a = glassAlpha;
 
       if (parms.lowLight)
@@ -244,6 +248,24 @@ public class BuildCustomRoof : Designator_Cells
 
   public override IEnumerable<FloatMenuOption> RightClickFloatMenuOptions => null!;
 
+  public override void DoExtraGuiControls(float leftX, float bottomY)
+  {
+    if (RoofStatCache.IsSkylight(roofDef))
+    {
+      Rect rect = new Rect(leftX, bottomY - 30f, 200f, 30f);
+      if (Widgets.ButtonText(rect, "Set Glass Tint"))
+      {
+        Color current = selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
+        Color defaultColor = RoofStatCache.GetGlassTint(roofDef);
+        
+        Find.WindowStack.Add(new SkylightTintPicker(current, defaultColor, color => 
+        {
+          selectedTint = color;
+        }));
+      }
+    }
+  }
+
   public override AcceptanceReport CanDesignateCell(IntVec3 c)
   {
     if (!c.InBounds(Map))
@@ -317,7 +339,7 @@ public class BuildCustomRoof : Designator_Cells
     if (DebugSettings.godMode)
     {
       Map.roofGrid.SetRoof(c, roofDef);
-      Map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(c, roofDef, StuffDef);
+      Map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(c, roofDef, StuffDef, selectedTint);
       return;
     }
 
@@ -332,10 +354,11 @@ public class BuildCustomRoof : Designator_Cells
       workToBuild = bDef.statBases.GetStatValueFromList(StatDefOf.WorkToBuild, 1000f);
     }
 
-    tracker.AddRecord(c, roofDef, workToBuild, StuffDef);
+    tracker.AddRecord(c, roofDef, workToBuild, StuffDef, selectedTint);
     var frame = (RoofFrame)ThingMaker.MakeThing(DefOf.ThingDefOf.RoofFrame);
     frame.targetRoofDef = roofDef;
     frame.targetRoofStuff = StuffDef;
+    frame.glassTint = selectedTint;
     frame.SetFaction(Faction.OfPlayer);
     GenSpawn.Spawn(frame, c, Map);
   }

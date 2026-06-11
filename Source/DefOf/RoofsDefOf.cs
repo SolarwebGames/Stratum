@@ -21,6 +21,9 @@ public static class RoofDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofThatch")]
   public static StratumRoofDef RoofThatch = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofThatchHay")]
+  public static StratumRoofDef RoofThatchHay = default!;
+
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofGlass")]
   public static StratumRoofDef RoofGlass = default!;
 

@@ -134,7 +134,7 @@ public class CustomRoofsRenderer : SectionLayer
     Color frameColor = RoofStatCache.GetColor(roof, stuff);
     frameColor.a = 1f;
 
-    Color glassColor = gd.color;
+    Color glassColor = RoofStatCache.GetGlassTint(roof, Map, c);
     glassColor.a = glassAlpha;
 
     Vector3 basePos = new Vector3(c.x, y, c.z);

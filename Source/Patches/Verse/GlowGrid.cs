@@ -65,8 +65,9 @@ public static class GlowGrid_Patch
       }
 
       var integrity = ___map.GetComponent<RoofIntegrityGrid>();
-      ThingDef? stuff = integrity?.GetStuff(___map.cellIndices.IndexToCell(index));
-      Color glassColor = RoofStatCache.GetGlassTint(roof);
+      IntVec3 cell = ___map.cellIndices.IndexToCell(index);
+      ThingDef? stuff = integrity?.GetStuff(cell);
+      Color glassColor = RoofStatCache.GetGlassTint(roof, ___map, cell);
 
       // Add tinted sky light to the visual result
       float addedR = glassColor.r * skyGlow * transparency * 255f;
@@ -78,7 +79,7 @@ public static class GlowGrid_Patch
       int b = __result.b + (int)addedB;
 
       int max = Mathf.Max(r, Mathf.Max(g, b));
-      
+
       // Ensure alpha is at least 100 (standard roof ambient) or the new brightness
       int finalA = Mathf.Max(100, max);
 

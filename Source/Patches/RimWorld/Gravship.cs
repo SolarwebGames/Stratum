@@ -5,6 +5,7 @@ using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.WorldComponents;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace SolarWeb.Stratum.Patches;
@@ -45,7 +46,8 @@ public static class Gravship_Patch
         roofs[local] = new GravshipRoofTracker.RoofCellData
         {
           stuff = integrity.GetStuff(cell),
-          hitPoints = integrity.GetHitPoints(cell)
+          hitPoints = integrity.GetHitPoints(cell),
+          glassTint = integrity.GetGlassTint(cell)
         };
       }
 

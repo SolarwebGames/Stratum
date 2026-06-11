@@ -17,6 +17,7 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
   public ThingOwner<Thing> resourceContainer = null!;
   public RoofDef targetRoofDef = null!;
   public ThingDef? targetRoofStuff = null;
+  public UnityEngine.Color? glassTint;
 
   private Material? cachedCornerMat;
   private Material? cachedTileMat;
@@ -88,7 +89,14 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
     }
   }
 
-  public override Color DrawColor => RoofStatCache.GetColor(targetRoofDef, targetRoofStuff);
+  public override Color DrawColor
+  {
+    get
+    {
+      if (glassTint.HasValue) return glassTint.Value;
+      return RoofStatCache.GetColor(targetRoofDef, targetRoofStuff);
+    }
+  }
 
   public bool CanCancel => Faction == Faction.OfPlayer;
 
@@ -180,6 +188,7 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
     base.ExposeData();
     Scribe_Defs.Look(ref targetRoofDef, "targetRoofDef");
     Scribe_Defs.Look(ref targetRoofStuff, "targetRoofStuff");
+    Scribe_Values.Look(ref glassTint, "glassTint");
     Scribe_Deep.Look(ref resourceContainer, "resourceContainer", this);
   }
 

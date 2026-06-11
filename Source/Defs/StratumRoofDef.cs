@@ -31,7 +31,7 @@ public class StratumRoofDef : RoofDef
       if (map == null)
         return base.LabelCap;
 
-      var cell = UI.MouseCell();
+      var cell = Verse.UI.MouseCell();
       if (!cell.InBounds(map) || map.roofGrid.RoofAt(cell) != this)
         return base.LabelCap;
 

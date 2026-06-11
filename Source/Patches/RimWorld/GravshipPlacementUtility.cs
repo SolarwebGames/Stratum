@@ -22,15 +22,18 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
   {
     CurrentLandingGravship = gravship;
     CurrentLandingRoot = root;
-    CurrentRoofData = [];
-    CurrentConstructionData = null;
-
     if (Find.World.GetComponent<GravshipRoofTracker>().TryGetRoofData(gravship.ID, out var data))
     {
-      CurrentConstructionData = data!.construction;
-      foreach (var kvp in data.roofs)
+      CurrentRoofData = [];
+      foreach (var kvp in data!.roofs)
       {
         CurrentRoofData[PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation)] = kvp.Value;
+      }
+
+      CurrentConstructionData = [];
+      foreach (var kvp in data.construction)
+      {
+        CurrentConstructionData[PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation)] = kvp.Value;
       }
     }
   }

@@ -178,8 +178,13 @@ public static class RoofStatCache
     return colorCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
   }
 
-  public static Color GetGlassTint(RoofDef def)
+  public static Color GetGlassTint(RoofDef def, Map? map = null, IntVec3 cell = default)
   {
+    if (map != null && cell.IsValid)
+    {
+      var tint = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetGlassTint(cell);
+      if (tint.HasValue) return tint.Value;
+    }
     return glassTintCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
   }
 
