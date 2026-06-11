@@ -2,7 +2,7 @@
 <Defs>
   <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
     <defName>SolarWeb-Stratum-RoofThatch_Buildable</defName>
-    <label>thatch roof</label>
+    <label>primitive thatch roof</label>
     <description>A primitive roof made from bundled hay or straw. It is extremely cheap and quick to assemble, but it leaks air badly and offers almost no protection against extreme temperatures.</description>
     <statBases>
       <MaxHitPoints>40</MaxHitPoints>
@@ -15,7 +15,7 @@
 
   <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-RoofThatch</defName>
-    <label>thatch roof</label>
+    <label>primitive thatch roof</label>
     <description>A primitive roof made from bundled hay or straw. It is extremely cheap and quick to assemble, but it leaks air badly and offers almost no protection against extreme temperatures.</description>
     <isThickRoof>false</isThickRoof>
     <filthLeaving>Filth_RubbleBuilding</filthLeaving>
@@ -32,12 +32,59 @@
         <glassTint>(0.4, 0.3, 0.1)</glassTint>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
-        <Name>Thatch Roof</Name>
+        <Name>Primitive Thatch Roof</Name>
         <Properties>
           <ThermalCapacity>200</ThermalCapacity>
           <ThermalConductivity>0.3</ThermalConductivity>
           <FaceGasPermeability>0.8</FaceGasPermeability>
           <MaxPressureDeltaKpa>10</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RoofThatchHay_Buildable</defName>
+    <label>thatch roof</label>
+    <description>A more substantial thatch roof made from cultivated hay. Advanced building techniques make this an effective roof option for the discerning thatcher.</description>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>150</WorkToBuild>
+      <Beauty>-0.5</Beauty>
+    </statBases>
+    <costList>
+      <Hay>10</Hay>
+    </costList>
+    <uiOrder>2005</uiOrder>
+    <constructionSkillPrerequisite>2</constructionSkillPrerequisite>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RoofThatchHay</defName>
+    <label>thatch roof</label>
+    <description>A more substantial thatch roof made from cultivated hay. Advanced building techniques make this an effective roof option for the discerning thatcher.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>Pawn_Melee_Punch_HitBuilding_Wood</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RoofThatchHay_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/Thatch</texPath>
+          <isSeamless>true</isSeamless>
+          <color>(0.9, 0.8, 0.5)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <transparency>0.1</transparency>
+        <glassTint>(0.5, 0.4, 0.2)</glassTint>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Hay Thatch Roof</Name>
+        <Properties>
+          <ThermalCapacity>400</ThermalCapacity>
+          <ThermalConductivity>0.2</ThermalConductivity>
+          <FaceGasPermeability>0.5</FaceGasPermeability>
+          <MaxPressureDeltaKpa>25</MaxPressureDeltaKpa>
         </Properties>
       </li>
     </modExtensions>
