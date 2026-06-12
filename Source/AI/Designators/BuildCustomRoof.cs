@@ -10,6 +10,7 @@ using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Things;
 using SolarWeb.Stratum.UI;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.AI.Designators;
 
@@ -22,62 +23,16 @@ public class BuildCustomRoof : Designator_Cells
   private Color? selectedTint;
 
   public Color? SelectedTint => selectedTint;
-
   public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Areas;
-
   protected override DesignationDef Designation => null!;
-
   public BuildableDef PlacingDef => ext.buildableDef!;
-
-  private int GetAccessibleStuffCount(ThingDef stuff)
-  {
-    int count = 0;
-    foreach (var t in Map.listerThings.ThingsOfDef(stuff))
-    {
-      if (!t.IsForbidden(Faction.OfPlayer))
-      {
-        count += t.stackCount;
-      }
-    }
-    return count;
-  }
 
   public ThingDef? StuffDef
   {
     get
     {
       if (stuffDef != null) return stuffDef;
-      if (PlacingDef is ThingDef { MadeFromStuff: true } thingDef && Map != null)
-      {
-        ThingDef? cheapestStuff = null;
-        float minVal = float.MaxValue;
-
-        foreach (var stuff in GenStuff.AllowedStuffsFor(thingDef))
-        {
-          if (ext.allowedStuff != null && !ext.allowedStuff.Contains(stuff)) continue;
-          
-          if (GetAccessibleStuffCount(stuff) >= thingDef.CostStuffCount)
-          {
-            float val = stuff.BaseMarketValue;
-            if (val < minVal)
-            {
-              minVal = val;
-              cheapestStuff = stuff;
-            }
-          }
-        }
-
-        if (cheapestStuff != null)
-        {
-          stuffDef = cheapestStuff;
-        }
-        else
-        {
-          stuffDef = GenStuff.DefaultStuffFor(thingDef);
-          if (stuffDef != null && ext.allowedStuff != null && !ext.allowedStuff.Contains(stuffDef))
-            stuffDef = ext.allowedStuff.FirstOrDefault();
-        }
-      }
+      stuffDef = RoofStuffUtility.GetCheapestAvailableStuff(PlacingDef, ext, Map);
       return stuffDef;
     }
   }
@@ -96,6 +51,10 @@ public class BuildCustomRoof : Designator_Cells
   {
     get
     {
+      if (RoofStatCache.IsSkylight(roofDef))
+      {
+        return selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
+      }
       var stuff = StuffDef;
       if (stuff != null)
       {
@@ -135,20 +94,7 @@ public class BuildCustomRoof : Designator_Cells
       defaultDesc = roofDef.description ?? "Stratum_BuildRoofDesc".Translate(roofDef.label);
     }
 
-    // Use atlased texture for icon if available
-    if (gd != null && RoofAtlasManager.TryGetUv(gd.texPath, out var uvs, out var mat))
-    {
-      icon = mat!.mainTexture;
-      if (uvs != null && uvs.Length >= 4)
-      {
-        // UVs are BL, TL, TR, BR
-        float minU = uvs[0].x;
-        float minV = uvs[0].y;
-        float maxU = uvs[2].x;
-        float maxV = uvs[2].y;
-        iconTexCoords = new Rect(minU, minV, maxU - minU, maxV - minV);
-      }
-    }
+    UpdateIcon();
 
     soundDragSustain = SoundDefOf.Designate_DragStandard;
     soundDragChanged = SoundDefOf.Designate_DragStandard_Changed;
@@ -156,62 +102,14 @@ public class BuildCustomRoof : Designator_Cells
     useMouseIcon = true;
   }
 
+  private void UpdateIcon()
+  {
+    RoofIconUtility.TryExtractIcon(roofDef, ext, ref icon, ref iconTexCoords);
+  }
+
   public override void DrawIcon(Rect rect, Material? buttonMat, GizmoRenderParms parms)
   {
-    if (icon == null) return;
-
-    var gd = RoofStatCache.GetGraphicData(roofDef);
-    Material? mat = overrideMaterial ?? buttonMat;
-
-    // If it's a framed skylight, we 9-slice the icon to show frame + glass
-    if (gd != null && RoofStatCache.IsSkylight(roofDef) && gd.skylightFrameWidth > 0f)
-    {
-      float f = gd.skylightFrameWidth;
-      float glassAlpha = 1f - RoofStatCache.GetTransparency(roofDef);
-
-      Color frameColor = IconDrawColor;
-      frameColor.a = 1f;
-
-      Color glassColor = selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
-      glassColor.a = glassAlpha;
-
-      if (parms.lowLight)
-      {
-        frameColor.a *= 0.6f;
-        glassColor.a *= 0.6f;
-      }
-
-      Rect tc = iconTexCoords;
-      float[] rx = { rect.xMin, rect.xMin + rect.width * f, rect.xMin + rect.width * (1f - f), rect.xMax };
-      float[] ry = { rect.yMin, rect.yMin + rect.height * f, rect.yMin + rect.height * (1f - f), rect.yMax };
-
-      // UVs: y loop 0 is top rect slice -> UV slice index 2 to 3
-      float[] ux = { tc.xMin, tc.xMin + tc.width * f, tc.xMin + tc.width * (1f - f), tc.xMax };
-      float[] uy = { tc.yMin, tc.yMin + tc.height * f, tc.yMin + tc.height * (1f - f), tc.yMax };
-
-      for (int x = 0; x < 3; x++)
-      {
-        for (int y = 0; y < 3; y++)
-        {
-          bool isCenter = (x == 1 && y == 1);
-          GUI.color = isCenter ? glassColor : frameColor;
-
-          Rect qRect = new Rect(rx[x], ry[y], rx[x + 1] - rx[x], ry[y + 1] - ry[y]);
-          Rect qUv = new Rect(ux[x], uy[2 - y], ux[x + 1] - ux[x], uy[2 - y + 1] - uy[2 - y]);
-
-          GUI.DrawTextureWithTexCoords(qRect, (Texture2D)icon, qUv);
-        }
-      }
-      GUI.color = Color.white;
-    }
-    else
-    {
-      GUI.color = IconDrawColor;
-      if (parms.lowLight) GUI.color = GUI.color.ToTransparent(0.6f);
-
-      Widgets.DrawTextureFitted(rect, icon, iconDrawScale * 0.85f, iconProportions, iconTexCoords, iconAngle, mat);
-      GUI.color = Color.white;
-    }
+    RoofIconUtility.DrawDesignatorIcon(rect, roofDef, StuffDef, selectedTint, defaultIconColor, icon, iconTexCoords, buttonMat, parms);
   }
 
   public override bool Visible
@@ -232,8 +130,8 @@ public class BuildCustomRoof : Designator_Cells
           foreach (var stuff in GenStuff.AllowedStuffsFor(thingDef))
           {
             if (ext.allowedStuff != null && !ext.allowedStuff.Contains(stuff)) continue;
-            
-            if (GetAccessibleStuffCount(stuff) > 0)
+
+            if (RoofStuffUtility.GetAccessibleStuffCount(stuff, Map) > 0)
             {
               anyStuff = true;
               break;
@@ -257,10 +155,11 @@ public class BuildCustomRoof : Designator_Cells
       {
         Color current = selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
         Color defaultColor = RoofStatCache.GetGlassTint(roofDef);
-        
-        Find.WindowStack.Add(new SkylightTintPicker(current, defaultColor, color => 
+
+        Find.WindowStack.Add(new SkylightTintPicker(current, defaultColor, color =>
         {
           selectedTint = color;
+          UpdateIcon();
         }));
       }
     }
@@ -300,33 +199,14 @@ public class BuildCustomRoof : Designator_Cells
 
     if (PlacingDef is ThingDef { MadeFromStuff: true } thingDef)
     {
-      var list = new List<FloatMenuOption>();
-      foreach (var item in GenStuff.AllowedStuffsFor(thingDef))
+      RoofStuffUtility.GenerateStuffSelectionMenu(thingDef, ext, Map, DebugSettings.godMode, (selected) =>
       {
-        if ((ext.allowedStuff == null || ext.allowedStuff.Contains(item)) && (DebugSettings.godMode || GetAccessibleStuffCount(item) > 0))
-        {
-          var localStuffDef = item;
-          string str = GenLabel.ThingLabel(thingDef, localStuffDef).CapitalizeFirst();
-          var floatMenuOption = new FloatMenuOption(str, delegate
-          {
-            base.ProcessInput(ev);
-            Find.DesignatorManager.Select(this);
-            stuffDef = localStuffDef;
-            writeStuff = true;
-          }, item);
-          list.Add(floatMenuOption);
-        }
-      }
-
-      if (list.Count == 0)
-      {
-        Messages.Message("NoStuffsToBuildWith".Translate(), MessageTypeDefOf.RejectInput, historical: false);
-        return;
-      }
-
-      var floatMenu = new FloatMenu(list) { onCloseCallback = () => writeStuff = true };
-      Find.WindowStack.Add(floatMenu);
-      Find.DesignatorManager.Select(this);
+        base.ProcessInput(ev);
+        Find.DesignatorManager.Select(this);
+        stuffDef = selected;
+        writeStuff = true;
+        UpdateIcon();
+      });
     }
     else
     {
