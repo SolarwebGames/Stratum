@@ -21,46 +21,46 @@ public class RepairCustomRoof : JobDriver
 
   protected override IEnumerable<Toil> MakeNewToils()
   {
-    this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.ClosestTouch, Danger.Deadly));
-    this.FailOn(() => pawn.Faction == Faction.OfPlayer && !pawn.Map.areaManager.Home[Cell]);
+    this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.Touch, Danger.Deadly));
+    this.FailOn(() => pawn.Faction == Faction.OfPlayer && !pawn.Map.areaManager.Home[Cell] && !job.playerForced);
 
-    yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.ClosestTouch);
+    yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.Touch);
 
-    Toil repair = new Toil();
-    repair.initAction = delegate
-    {
-      ticksToNextRepair = 80f;
-      cachedGrid = pawn.Map.GetComponent<RoofIntegrityGrid>();
-    };
-    repair.tickAction = delegate
-    {
-      Pawn actor = repair.actor;
-      actor.skills?.Learn(SkillDefOf.Construction, 0.05f);
-
-      float num = actor.GetStatValue(StatDefOf.ConstructionSpeed) * 1.7f;
-      ticksToNextRepair -= num;
-
-      if (ticksToNextRepair <= 0f)
-      {
-        ticksToNextRepair += TicksBetweenRepairs;
-
-        if (cachedGrid != null)
-        {
-          cachedGrid.Repair(Cell, 1);
-
-          if (cachedGrid.GetHitPoints(Cell) >= cachedGrid.GetMaxHitPoints(Cell))
-          {
-            actor.records.Increment(RecordDefOf.ThingsRepaired);
-            actor.jobs.EndCurrentJob(JobCondition.Succeeded);
-          }
-        }
-      }
-    };
-
-    repair.FailOnCannotTouch(TargetIndex.A, PathEndMode.ClosestTouch);
-    repair.WithEffect(EffecterDefOf.ConstructMetal, TargetIndex.A);
+    Toil repair = ToilMaker.MakeToil("MakeNewToils");
     repair.defaultCompleteMode = ToilCompleteMode.Never;
     repair.activeSkill = () => SkillDefOf.Construction;
+    repair.handlingFacing = true;
+    repair.initAction = delegate
+        {
+          ticksToNextRepair = 80f;
+          cachedGrid = pawn.Map.GetComponent<RoofIntegrityGrid>();
+        };
+    repair.tickAction = delegate
+        {
+          pawn.skills?.Learn(SkillDefOf.Construction, 0.05f);
+          pawn.rotationTracker.FaceCell(Cell);
+
+          float num = pawn.GetStatValue(StatDefOf.ConstructionSpeed) * 1.7f;
+          ticksToNextRepair -= num;
+
+          if (ticksToNextRepair <= 0f)
+          {
+            ticksToNextRepair += TicksBetweenRepairs;
+
+            if (cachedGrid != null)
+            {
+              cachedGrid.Repair(Cell, 1);
+
+              if (cachedGrid.GetHitPoints(Cell) >= cachedGrid.GetMaxHitPoints(Cell))
+              {
+                pawn.records.Increment(RecordDefOf.ThingsRepaired);
+                pawn.jobs.EndCurrentJob(JobCondition.Succeeded);
+              }
+            }
+          }
+        };
+    repair.FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
+    repair.WithEffect(EffecterDefOf.ConstructMetal, TargetIndex.A);
 
     yield return repair;
   }

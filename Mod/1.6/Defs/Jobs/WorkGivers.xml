@@ -13,6 +13,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
+    <canBeDoneByMechs>true</canBeDoneByMechs>
   </WorkGiverDef>
 
   <WorkGiverDef>
@@ -28,6 +29,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
+    <canBeDoneByMechs>true</canBeDoneByMechs>
   </WorkGiverDef>
 
   <WorkGiverDef>
@@ -43,5 +45,6 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
+    <canBeDoneByMechs>true</canBeDoneByMechs>
   </WorkGiverDef>
 </Defs>

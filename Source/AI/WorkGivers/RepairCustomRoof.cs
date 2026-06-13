@@ -34,7 +34,7 @@ public class RepairCustomRoof : WorkGiver_Scanner
   {
     var map = pawn.Map;
 
-    if (pawn.Faction == Faction.OfPlayer && !map.areaManager.Home[cell])
+    if (pawn.Faction == Faction.OfPlayer && !map.areaManager.Home[cell] && !forced)
     {
       JobFailReason.Is("NotInHomeArea".Translate());
       return false;
