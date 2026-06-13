@@ -55,6 +55,14 @@ public class LightPoolRenderer : SectionLayer
     RoofGrid roofGrid = map.roofGrid;
     CellRect cellRect = section.CellRect;
 
+    bool isCutscene = false;
+    CellRect captureBounds = default;
+    if (ModsConfig.OdysseyActive)
+    {
+      isCutscene = WorldComponent_GravshipController.CutsceneInProgress && !GravshipCapturer.IsGravshipRenderInProgress && map == Find.CurrentMap;
+      captureBounds = GravshipCapturer.GravshipCaptureBounds;
+    }
+
     float y = AltitudeLayer.Floor.AltitudeFor() + 0.01f;
 
     LayerSubMesh subMesh = GetSubMesh(PoolMat);
@@ -62,6 +70,8 @@ public class LightPoolRenderer : SectionLayer
 
     foreach (IntVec3 c in cellRect)
     {
+      if (isCutscene && captureBounds.Contains(c)) continue;
+
       RoofDef roof = roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
 

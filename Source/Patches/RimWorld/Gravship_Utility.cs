@@ -11,7 +11,7 @@ using Verse;
 namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch]
-public static class Gravship_Patch
+public static class GravshipUtility_Patch
 {
   private struct CapturedData
   {
@@ -74,3 +74,4 @@ public static class Gravship_Patch
     }
   }
 }
+
