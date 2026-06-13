@@ -37,8 +37,7 @@ public class RoofVFXMapComponent : MapComponent
     activeSections.Clear();
     transparentCells.Clear();
 
-    // Ensure we have our volatile state populated on load
-    ParallelMapScanner.ExecuteScan(map, force: true);
+    map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
   }
 
   internal void AddTransparentCellInternal(int cellIdx)
@@ -163,10 +162,8 @@ public class RoofVFXMapComponent : MapComponent
       Vector3 center = pos.ToVector3Shifted();
       center.y += 0.1f;
 
-      // Use a dramatic curve for visibility
       float effectivePower = sunGlow * Mathf.Sqrt(transparency);
 
-      // Sunbeam - Using the custom Stratum Def
       FleckCreationData data = FleckMaker.GetDataStatic(center + new Vector3(Rand.Range(-0.4f, 0.4f), 0, Rand.Range(-0.4f, 0.4f)), map, SolarWeb.Stratum.DefOf.FleckDefOf.Sunbeam);
       data.scale = Rand.Range(0.8f, 1.2f);
       Color beamColor = roofColor;
@@ -174,7 +171,6 @@ public class RoofVFXMapComponent : MapComponent
       data.instanceColor = beamColor;
       map.flecks.CreateFleck(data);
 
-      // Glow - Using the standard RimWorld Def
       FleckCreationData glowData = FleckMaker.GetDataStatic(center, map, RimWorld.FleckDefOf.HeatGlow);
       glowData.scale = Rand.Range(1.5f, 2.0f);
       Color glowColor = roofColor;

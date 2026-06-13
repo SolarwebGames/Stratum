@@ -34,21 +34,9 @@ public static class ParallelMapScanner
     }
   }
 
-  private static readonly object GlobalScanLock = new();
-
-  public static void ExecuteScan(Map map, bool force = false)
+  public static void ExecuteScan(RoofIntegrityGrid integrity, bool force = false)
   {
-    var integrity = map.GetComponent<RoofIntegrityGrid>();
-    if (integrity == null) return;
-
-    // Use a global lock to prevent concurrent scans on the same map
-    // This is safer than just locking on integrity for the flag check
-    lock (GlobalScanLock)
-    {
-      if (integrity.hasScanned && !force) return;
-      integrity.hasScanned = true;
-    }
-
+    Map map = integrity.map;
     var solar = map.GetComponent<SolarRoofMapComponent>();
     var vfx = map.GetComponent<RoofVFXMapComponent>();
 

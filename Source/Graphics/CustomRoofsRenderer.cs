@@ -18,9 +18,9 @@ public class CustomRoofsRenderer : SectionLayer
       if (defaultScratchMats == null)
       {
         defaultScratchMats = [
-          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.MetaOverlay),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.MetaOverlay),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.MetaOverlay)
+          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.Cutout),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.Cutout),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.Cutout)
         ];
       }
       return defaultScratchMats;
@@ -28,7 +28,7 @@ public class CustomRoofsRenderer : SectionLayer
   }
 
   private static Material? fallbackMat;
-  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.MetaOverlay, new Color(0.5f, 0.5f, 0.5f));
+  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.Cutout, new Color(0.5f, 0.5f, 0.5f));
   public CustomRoofsRenderer(Section section) : base(section)
   {
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.Buildings | (ulong)MapMeshFlagDefOf.FogOfWar;
@@ -54,20 +54,29 @@ public class CustomRoofsRenderer : SectionLayer
     var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
     if (integrityGrid != null && !integrityGrid.hasScanned && Visible)
     {
-      ParallelMapScanner.ExecuteScan(map);
+      integrityGrid.ExecuteScan();
     }
 
     RoofGrid roofGrid = map.roofGrid;
     FogGrid fogGrid = map.fogGrid;
     CellRect cellRect = section.CellRect;
 
-    // Use a slight positive offset from MetaOverlays to ensure we are above vanilla
-    float altitude = AltitudeLayer.MetaOverlays.AltitudeFor() + 0.05f;
+    bool isCutscene = false;
+    CellRect captureBounds = default;
+    if (ModsConfig.OdysseyActive)
+    {
+      isCutscene = WorldComponent_GravshipController.CutsceneInProgress && !GravshipCapturer.IsGravshipRenderInProgress && map == Find.CurrentMap;
+      captureBounds = GravshipCapturer.GravshipCaptureBounds;
+    }
+
+    // Use MoteOverhead to ensure we are below Skyfallers (30) but above Blueprints (26)
+    float altitude = AltitudeLayer.MoteOverhead.AltitudeFor();
 
     // PASS 1: Draw all roofs and damage scratches
     foreach (IntVec3 c in cellRect)
     {
       if (fogGrid.IsFogged(c)) continue;
+      if (isCutscene && captureBounds.Contains(c)) continue;
 
       RoofDef roof = roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsCustomRoof(roof)) continue;

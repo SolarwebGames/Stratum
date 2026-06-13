@@ -14,6 +14,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   private readonly UnityEngine.Color?[] glassTints = new UnityEngine.Color?[map.cellIndices.NumGridCells];
   private readonly HashSet<int> roofsNeedingRepair = [];
   public bool hasScanned;
+  private object scanLockInt = new();
 
   public HashSet<int> RoofsNeedingRepair => roofsNeedingRepair;
   internal short[] HitPointsArray => hitPoints;
@@ -21,6 +22,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void ExposeData()
   {
     base.ExposeData();
+    Scribe_Values.Look(ref hasScanned, "hasScanned", false);
 
     // We only save cells that have missing hitpoints or custom data to save space.
     Dictionary<int, short>? damagedCells = null;
@@ -76,16 +78,34 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         }
       }
     }
+    
+    if (Scribe.mode == LoadSaveMode.PostLoadInit)
+    {
+      scanLockInt = new object();
+    }
+  }
+
+  public override void FinalizeInit()
+  {
+    base.FinalizeInit();
+    if (!hasScanned)
+    {
+      ExecuteScan();
+    }
+  }
+
+  public void ExecuteScan(bool force = false)
+  {
+    lock (scanLockInt)
+    {
+      if (hasScanned && !force) return;
+      hasScanned = true;
+      ParallelMapScanner.ExecuteScan(this, force);
+    }
   }
 
   public override void MapComponentUpdate()
   {
-    // Defer scanning until the overlay is actually requested.
-    // This ensures map generation is completely finished.
-    if (!hasScanned && Find.PlaySettings.showRoofOverlay)
-    {
-      ParallelMapScanner.ExecuteScan(map);
-    }
   }
 
   public void InitializeRoof(IntVec3 cell, RoofDef def, ThingDef? stuff = null, UnityEngine.Color? glassTint = null, short? currentHP = null)
