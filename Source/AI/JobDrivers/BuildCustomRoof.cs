@@ -21,7 +21,7 @@ public class BuildCustomRoof : JobDriver
 
   protected override IEnumerable<Toil> MakeNewToils()
   {
-    this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.Touch, Danger.Deadly));
+    this.FailOn(() => !pawn.CanReach(TargetA, PathEndMode.Touch, Danger.Deadly));
     this.FailOn(() =>
     {
       var frame = Cell.GetFirstThing<RoofFrame>(pawn.Map);
@@ -30,7 +30,7 @@ public class BuildCustomRoof : JobDriver
     this.FailOn(() => !RoofCollapseUtility.WithinRangeOfRoofHolder(Cell, pawn.Map));
     this.FailOn(() => !RoofCollapseUtility.ConnectedToRoofHolder(Cell, pawn.Map, assumeRoofAtRoot: true));
 
-    yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.Touch);
+    yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.Touch);
 
     var build = ToilMaker.MakeToil("MakeNewToils");
     build.initAction = () =>
