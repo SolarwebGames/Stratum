@@ -18,9 +18,9 @@ public class CustomRoofsRenderer : SectionLayer
       if (defaultScratchMats == null)
       {
         defaultScratchMats = [
-          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.Cutout),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.Cutout),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.Cutout)
+          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.MetaOverlay),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.MetaOverlay),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.MetaOverlay)
         ];
       }
       return defaultScratchMats;
@@ -28,7 +28,7 @@ public class CustomRoofsRenderer : SectionLayer
   }
 
   private static Material? fallbackMat;
-  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.Cutout, new Color(0.5f, 0.5f, 0.5f));
+  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.MetaOverlay, new Color(0.5f, 0.5f, 0.5f));
   public CustomRoofsRenderer(Section section) : base(section)
   {
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.Buildings | (ulong)MapMeshFlagDefOf.FogOfWar;
