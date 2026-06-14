@@ -1,3 +1,9 @@
+0.3.3:
+  Feature: Some roofs (like thatch) are now flammable! This feature can be enabled or disabled via the mod options.
+  Graphics: Changed the frame on basic skylights to be grey, to reflect its steel construction material.
+  Bug Fix: Roofs can be built from diagonally adjacent cells.
+  Bug Fix: Roof damage should now render correctly.
+
 0.2.6:
   Bug Fix: The way some UI mods were handling caching was breaking building display. A compatibility fix has been implemented to fix this.
   Bug Fix: Fixed a minor issue where the "Deconstruct" button for roofs was not disabled under some circumstances.
