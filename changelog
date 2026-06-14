@@ -1,3 +1,10 @@
+0.2.4:
+  Feature: Roofs are selectable! When the roof layer is enabled, select a roof tile to view its stats.
+  Bug Fix: Fixed a bug where mechs (particularly constructoids) couldn't perform roof jobs.
+  Bug Fix: Changed roofs to be displayed as buildable items rather than designators. This should help with compatibility with UI mods.
+  Bug Fix: Slightly improved handling of roofs during gravship cutscenes when the roof layer is enabled.
+  Bug Fix: Added support for migrating existing saved games.
+
 0.1.2:
   Bug Fix: Create icons for roofs on the fly. This should greatly increase compatibility with mods that use custom menus.
 
