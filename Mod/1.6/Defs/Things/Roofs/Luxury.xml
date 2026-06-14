@@ -8,6 +8,7 @@
       <MaxHitPoints>120</MaxHitPoints>
       <WorkToBuild>2500</WorkToBuild>
       <Beauty>25.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.6</SolarWeb-Stratum-Insulation>
     </statBases>
     <costStuffCount>25</costStuffCount>
     <stuffCategories>
@@ -38,6 +39,8 @@
         <isSkylight>true</isSkylight>
         <transparency>0.5</transparency>
         <glassTint>(0.6, 0.4, 1)</glassTint>
+        <thermalConductivity>0.4</thermalConductivity>
+        <stuffInsulationMultiplier>0.2</stuffInsulationMultiplier>
         <allowedStuff>
           <li>Gold</li>
           <li>Silver</li>
@@ -66,6 +69,7 @@
       <Beauty>-1.0</Beauty>
       <Cleanliness>0.6</Cleanliness>
       <MarketValue>38</MarketValue>
+      <SolarWeb-Stratum-Insulation>0.95</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>7</Steel>
@@ -93,6 +97,7 @@
           <color>(0.71, 0.71, 0.71)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.05</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Sterile Tiled Roof</Name>

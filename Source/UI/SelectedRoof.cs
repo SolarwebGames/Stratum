@@ -72,6 +72,20 @@ public class SelectedRoof : ISelectable, IRenameable
       },
       hotKey = KeyBindingDefOf.Designator_Deconstruct
     };
+
+    if (map.areaManager.NoRoof[cell])
+    {
+      yield return new Command_Action
+      {
+        defaultLabel = "Stratum_CancelRoofRemoval".Translate(),
+        defaultDesc = "Stratum_CancelRoofRemovalDesc".Translate(),
+        icon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel"),
+        action = delegate
+        {
+          map.areaManager.NoRoof[cell] = false;
+        }
+      };
+    }
   }
 
   public string GetInspectString()
@@ -94,6 +108,11 @@ public class SelectedRoof : ISelectable, IRenameable
 
     float solarEff = RoofStatCache.GetSolarEfficiency(def);
     if (solarEff > 0) sb.AppendLine("Stratum_SolarEfficiency".Translate() + ": " + solarEff.ToStringPercent());
+
+    float conductivity = RoofStatCache.GetThermalConductivity(def, integrity?.GetStuff(cell));
+    float insulation = 1f - conductivity;
+    string insulationStr = insulation.ToString("P1");
+    sb.AppendLine(DefOf.StatDefOf.Insulation.LabelCap + ": " + insulationStr);
 
     return sb.ToString().TrimEndNewlines();
   }

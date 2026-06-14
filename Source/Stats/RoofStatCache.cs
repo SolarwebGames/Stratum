@@ -16,6 +16,7 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> cleanlinessCache = [];
   private static readonly Dictionary<int, float> solarEfficiencyCache = [];
   private static readonly Dictionary<int, float> transparencyCache = [];
+  private static readonly Dictionary<int, float> thermalConductivityCache = [];
   private static readonly Dictionary<int, float> flammabilityCache = [];
   private static readonly Dictionary<int, int> maxHitPointsCache = [];
   private static readonly Dictionary<int, RoofGraphicData> graphicDataCache = [];
@@ -38,6 +39,7 @@ public static class RoofStatCache
 
         if (ext.solarEfficiency > 0f) solarEfficiencyCache[hash] = ext.solarEfficiency;
         if (ext.transparency > 0f) transparencyCache[hash] = ext.transparency;
+        thermalConductivityCache[hash] = ext.thermalConductivity;
         if (ext.isSkylight) skylightCache.Add(hash);
         if (ext.glassTint.HasValue) glassTintCache[hash] = ext.glassTint.Value;
 
@@ -53,6 +55,17 @@ public static class RoofStatCache
           maxHitPointsCache[hash] = Mathf.RoundToInt(bDef.statBases.GetStatValueFromList(StatDefOf.MaxHitPoints, 100f));
           float flammability = bDef.statBases.GetStatValueFromList(StatDefOf.Flammability, 0f);
           if (flammability > 0f) flammabilityCache[hash] = flammability;
+
+          float insulation = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.Insulation, -1f);
+          if (insulation >= 0f)
+          {
+            if (insulation > 0.99f && !def.isThickRoof) insulation = 0.99f;
+            thermalConductivityCache[hash] = 1f - insulation;
+          }
+          else
+          {
+            thermalConductivityCache[hash] = ext.thermalConductivity;
+          }
 
           if (ext.graphicData == null && bDef is ThingDef tDef && tDef.graphicData != null)
           {
@@ -94,6 +107,7 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> roofStuffBeautyCache = [];
   private static readonly Dictionary<int, float> roofStuffWealthCache = [];
   private static readonly Dictionary<int, float> roofStuffFlammabilityCache = [];
+  private static readonly Dictionary<int, float> roofStuffThermalConductivityCache = [];
   private static readonly Dictionary<int, int> roofStuffMaxHitPointsCache = [];
 
   public static float GetBeauty(RoofDef def, ThingDef? stuff = null)
@@ -149,6 +163,34 @@ public static class RoofStatCache
   public static float GetTransparency(RoofDef def)
   {
     return transparencyCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+  }
+
+  public static float GetThermalConductivity(RoofDef def, ThingDef? stuff = null)
+  {
+    if (stuff == null) return thermalConductivityCache.TryGetValue(def.defNameHash, out float val) ? val : 0.1f;
+
+    int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
+    lock (CacheLock)
+    {
+      if (roofStuffThermalConductivityCache.TryGetValue(hashKey, out float conductivity)) return conductivity;
+
+      var ext = def.GetModExtension<BuildableRoofExtension>();
+      if (ext?.buildableDef != null)
+      {
+        float baseInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation);
+        float stuffInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation, stuff);
+        
+        float delta = stuffInsulation - baseInsulation;
+        float finalInsulation = baseInsulation + (delta * ext.stuffInsulationMultiplier);
+
+        if (finalInsulation > 0.99f && !def.isThickRoof) finalInsulation = 0.99f;
+        
+        conductivity = (float)System.Math.Round(1f - finalInsulation, 4);
+        roofStuffThermalConductivityCache[hashKey] = conductivity;
+        return conductivity;
+      }
+    }
+    return thermalConductivityCache.TryGetValue(def.defNameHash, out float v) ? v : 0.1f;
   }
 
   public static float GetFlammability(RoofDef def, ThingDef? stuff = null)

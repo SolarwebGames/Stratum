@@ -9,6 +9,7 @@
       <WorkToBuild>100</WorkToBuild>
       <Beauty>-1.0</Beauty>
       <Flammability>1.5</Flammability>
+      <SolarWeb-Stratum-Insulation>0.7</SolarWeb-Stratum-Insulation>
     </statBases>
     <uiOrder>2000</uiOrder>
     <constructionSkillPrerequisite>0</constructionSkillPrerequisite>
@@ -31,6 +32,7 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <transparency>0.2</transparency>
         <glassTint>(0.4, 0.3, 0.1)</glassTint>
+        <thermalConductivity>0.3</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Primitive Thatch Roof</Name>
@@ -53,6 +55,7 @@
       <WorkToBuild>150</WorkToBuild>
       <Beauty>-0.5</Beauty>
       <Flammability>1.5</Flammability>
+      <SolarWeb-Stratum-Insulation>0.8</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Hay>10</Hay>
@@ -79,6 +82,7 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <transparency>0.1</transparency>
         <glassTint>(0.5, 0.4, 0.2)</glassTint>
+        <thermalConductivity>0.2</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hay Thatch Roof</Name>
@@ -101,6 +105,7 @@
       <WorkToBuild>200</WorkToBuild>
       <Beauty>0</Beauty>
       <Flammability>1.0</Flammability>
+      <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
     </statBases>
     <stuffCategories>
       <li>Metallic</li>
@@ -127,6 +132,7 @@
           <isSeamless>true</isSeamless>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.1</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Shingle Roof</Name>
@@ -148,6 +154,7 @@
       <MaxHitPoints>50</MaxHitPoints>
       <WorkToBuild>800</WorkToBuild>
       <Beauty>2.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.2</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>10</Steel>
@@ -176,6 +183,7 @@
         <isSkylight>true</isSkylight>
         <transparency>0.7</transparency>
         <glassTint>(0.7, 0.85, 1.0)</glassTint>
+        <thermalConductivity>0.8</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Roof</Name>
@@ -197,6 +205,7 @@
       <MaxHitPoints>80</MaxHitPoints>
       <WorkToBuild>500</WorkToBuild>
       <Beauty>0.5</Beauty>
+      <SolarWeb-Stratum-Insulation>0.8</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>12</Steel>
@@ -227,6 +236,7 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>false</isSkylight>
         <solarEfficiency>0.2</solarEfficiency>
+        <thermalConductivity>0.2</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Shingles</Name>
@@ -235,6 +245,62 @@
           <ThermalConductivity>0.2</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
           <MaxPressureDeltaKpa>150</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-CompositeInsulatedPanel_Buildable</defName>
+    <label>composite insulated panel</label>
+    <description>Modern sandwich-style roofing panels. A durable steel frame holds thick layers of textile-based insulation batting. While expensive, it provides exceptional temperature stability.</description>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Beauty>0.5</Beauty>
+      <Flammability>1.0</Flammability>
+      <SolarWeb-Stratum-Insulation>0.88</SolarWeb-Stratum-Insulation>
+    </statBases>
+    <costList>
+      <Steel>8</Steel>
+    </costList>
+    <stuffCategories>
+      <li>Fabric</li>
+      <li>Leathery</li>
+    </stuffCategories>
+    <costStuffCount>5</costStuffCount>
+    <uiOrder>2060</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>Machining</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-CompositeInsulatedPanel</defName>
+    <label>composite insulated panel</label>
+    <description>Modern sandwich-style roofing panels. A durable steel frame holds thick layers of textile-based insulation batting. While expensive, it provides exceptional temperature stability.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-CompositeInsulatedPanel_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <isSeamless>true</isSeamless>
+          <color>(0.7, 0.7, 0.75)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.12</thermalConductivity>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Composite Panel</Name>
+        <Properties>
+          <ThermalCapacity>2000</ThermalCapacity>
+          <ThermalConductivity>0.12</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>500</MaxPressureDeltaKpa>
         </Properties>
       </li>
     </modExtensions>

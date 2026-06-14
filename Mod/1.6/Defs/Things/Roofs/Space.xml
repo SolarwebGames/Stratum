@@ -8,6 +8,7 @@
       <MaxHitPoints>150</MaxHitPoints>
       <WorkToBuild>800</WorkToBuild>
       <Beauty>0.5</Beauty>
+      <SolarWeb-Stratum-Insulation>0.95</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>20</Steel>
@@ -38,6 +39,7 @@
           </edgeData>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.05</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hull Plating</Name>
@@ -59,6 +61,7 @@
       <MaxHitPoints>325</MaxHitPoints>
       <WorkToBuild>1200</WorkToBuild>
       <Beauty>1.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>25</Steel>
@@ -86,6 +89,7 @@
           <color>(0.25, 0.25, 0.25)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.02</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Reinforced Hull Plating</Name>
@@ -107,6 +111,7 @@
       <MaxHitPoints>300</MaxHitPoints>
       <WorkToBuild>1000</WorkToBuild>
       <Beauty>1.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>35</Steel>
@@ -136,6 +141,7 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <solarEfficiency>0.5</solarEfficiency>
+        <thermalConductivity>0.02</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Hull Plate</Name>
@@ -157,6 +163,7 @@
       <MaxHitPoints>150</MaxHitPoints>
       <WorkToBuild>1200</WorkToBuild>
       <Beauty>2.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.5</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
       <Steel>5</Steel>
@@ -189,6 +196,7 @@
         <isSkylight>true</isSkylight>
         <transparency>0.8</transparency>
         <glassTint>(0.8, 0.9, 1.0)</glassTint>
+        <thermalConductivity>0.5</thermalConductivity>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Panel</Name>

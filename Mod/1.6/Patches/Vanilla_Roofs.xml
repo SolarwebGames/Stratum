@@ -19,6 +19,7 @@
             <isSeamless>true</isSeamless>
             <color>(0.55, 0.55, 0.55)</color>
           </graphicData>
+          <thermalConductivity>0.1</thermalConductivity>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Ancient Roof</Name>
@@ -44,6 +45,7 @@
             <color>(0.48, 0.4, 0.32)</color>
             <isSeamless>true</isSeamless>
           </graphicData>
+          <thermalConductivity>0.1</thermalConductivity>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Thin Rock Roof</Name>
@@ -69,6 +71,7 @@
             <color>(0.55, 0.55, 0.55)</color>
             <isSeamless>true</isSeamless>
           </graphicData>
+          <thermalConductivity>0.0</thermalConductivity>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Overhead Mountain</Name>

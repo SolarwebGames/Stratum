@@ -10,6 +10,7 @@
       <MaxHitPoints>100</MaxHitPoints>
       <Beauty>0</Beauty>
       <MarketValue>10</MarketValue>
+      <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
     </statBases>
   </ThingDef>
 
@@ -21,6 +22,7 @@
     <statBases>
       <MaxHitPoints>400</MaxHitPoints>
       <Beauty>-2</Beauty>
+      <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
     </statBases>
   </ThingDef>
 
@@ -32,6 +34,7 @@
     <statBases>
       <MaxHitPoints>2000</MaxHitPoints>
       <Beauty>-2</Beauty>
+      <SolarWeb-Stratum-Insulation>1.0</SolarWeb-Stratum-Insulation>
     </statBases>
   </ThingDef>
 

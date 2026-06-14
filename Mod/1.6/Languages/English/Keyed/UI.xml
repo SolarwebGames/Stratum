@@ -2,4 +2,6 @@
 <LanguageData>
   <Stratum_BuildRoofDesc>Build a {0}.</Stratum_BuildRoofDesc>
   <Stratum_AlreadyRemoving>This roof is already being removed.</Stratum_AlreadyRemoving>
+  <Stratum_CancelRoofRemoval>Cancel roof removal</Stratum_CancelRoofRemoval>
+  <Stratum_CancelRoofRemovalDesc>Cancel the removal of this roof.</Stratum_CancelRoofRemovalDesc>
 </LanguageData>
