@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
   <Stratum_BuildRoofDesc>Build a {0}.</Stratum_BuildRoofDesc>
+  <Stratum_AlreadyRemoving>This roof is already being removed.</Stratum_AlreadyRemoving>
 </LanguageData>

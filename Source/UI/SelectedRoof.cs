@@ -53,13 +53,17 @@ public class SelectedRoof : ISelectable, IRenameable
 
   public IEnumerable<Gizmo> GetGizmos()
   {
+    var disabled = def?.isThickRoof == true || map.areaManager.NoRoof[cell];
+    var disabledReason = def?.isThickRoof == true ? "MessageNothingCanRemoveThickRoofs".Translate()
+      : map.areaManager.NoRoof[cell] ? "Stratum_AlreadyRemoving".Translate() : null;
+
     yield return new Command_Action
     {
       defaultLabel = "DesignatorDeconstruct".Translate(),
       defaultDesc = "DesignatorDeconstructDesc".Translate(),
       icon = ContentFinder<Texture2D>.Get("UI/Designators/Deconstruct"),
-      Disabled = def?.isThickRoof == true,
-      disabledReason = def?.isThickRoof == true ? "MessageNothingCanRemoveThickRoofs".Translate() : null,
+      Disabled = disabled,
+      disabledReason = disabledReason,
       action = delegate
       {
         if (def?.isThickRoof == true) return;
