@@ -1,3 +1,7 @@
+0.2.6:
+  Bug Fix: The way some UI mods were handling caching was breaking building display. A compatibility fix has been implemented to fix this.
+  Bug Fix: Fixed a minor issue where the "Deconstruct" button for roofs was not disabled under some circumstances.
+
 0.2.4:
   Feature: Roofs are selectable! When the roof layer is enabled, select a roof tile to view its stats.
   Bug Fix: Fixed a bug where mechs (particularly constructoids) couldn't perform roof jobs.
