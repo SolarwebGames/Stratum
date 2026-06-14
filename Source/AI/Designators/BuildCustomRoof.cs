@@ -14,26 +14,27 @@ using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.AI.Designators;
 
-public class BuildCustomRoof : Designator_Cells
+public class BuildCustomRoof : Designator_Build
 {
   private readonly RoofDef roofDef;
   private readonly BuildableRoofExtension ext;
-  private ThingDef? stuffDef;
-  private bool writeStuff;
+  private ThingDef? customStuffDef;
+  private bool customWriteStuff;
   private Color? selectedTint;
 
   public Color? SelectedTint => selectedTint;
   public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Areas;
   protected override DesignationDef Designation => null!;
-  public BuildableDef PlacingDef => ext.buildableDef!;
 
-  public ThingDef? StuffDef
+  public override ThingDef? StuffDef
   {
     get
     {
-      if (stuffDef != null) return stuffDef;
-      stuffDef = RoofStuffUtility.GetCheapestAvailableStuff(PlacingDef, ext, Map);
-      return stuffDef;
+      var raw = StuffDefRaw;
+      if (raw != null) return raw;
+      if (customStuffDef != null) return customStuffDef;
+      customStuffDef = RoofStuffUtility.GetCheapestAvailableStuff(PlacingDef, ext, Map);
+      return customStuffDef;
     }
   }
 
@@ -41,8 +42,12 @@ public class BuildCustomRoof : Designator_Cells
   {
     get
     {
-      if (PlacingDef is ThingDef thingDef && writeStuff && stuffDef != null)
-        return GenLabel.ThingLabel(thingDef, stuffDef).CapitalizeFirst();
+      if (PlacingDef is ThingDef thingDef && (customWriteStuff || StuffDefRaw != null))
+      {
+        var stuff = StuffDef;
+        if (stuff != null)
+          return GenLabel.ThingLabel(thingDef, stuff).CapitalizeFirst();
+      }
       return base.Label;
     }
   }
@@ -55,16 +60,11 @@ public class BuildCustomRoof : Designator_Cells
       {
         return selectedTint ?? RoofStatCache.GetGlassTint(roofDef);
       }
-      var stuff = StuffDef;
-      if (stuff != null)
-      {
-        return PlacingDef.GetColorForStuff(stuff);
-      }
-      return defaultIconColor;
+      return base.IconDrawColor;
     }
   }
 
-  public BuildCustomRoof(RoofDef roofDef, BuildableRoofExtension ext)
+  public BuildCustomRoof(RoofDef roofDef, BuildableRoofExtension ext) : base(ext.buildableDef ?? ThingDefOf.Wall)
   {
     this.roofDef = roofDef;
     this.ext = ext;
@@ -201,10 +201,9 @@ public class BuildCustomRoof : Designator_Cells
     {
       RoofStuffUtility.GenerateStuffSelectionMenu(thingDef, ext, Map, DebugSettings.godMode, (selected) =>
       {
-        base.ProcessInput(ev);
         Find.DesignatorManager.Select(this);
-        stuffDef = selected;
-        writeStuff = true;
+        SetStuffDef(selected);
+        customWriteStuff = true;
         UpdateIcon();
       });
     }

@@ -10,6 +10,10 @@
     <drawerType>None</drawerType>
     <drawGUIOverlay>false</drawGUIOverlay>
     <pathCost>0</pathCost>
+    <graphicData>
+      <texPath>Things/Building/Production/LampSun</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
     <building>
       <isEdifice>false</isEdifice>
       <deconstructible>false</deconstructible>
