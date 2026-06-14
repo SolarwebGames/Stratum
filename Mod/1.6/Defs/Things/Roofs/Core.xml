@@ -165,7 +165,7 @@
         <buildableDef>SolarWeb-Stratum-RoofGlass_Buildable</buildableDef>
         <graphicData>
           <texPath>Roofs/GenericTile</texPath>
-          <color>(0.7, 0.85, 1.0)</color>
+          <color>(0.35, 0.35, 0.35)</color>
           <skylightFrameWidth>0.1</skylightFrameWidth>
           <isSeamless>true</isSeamless>
         </graphicData>
