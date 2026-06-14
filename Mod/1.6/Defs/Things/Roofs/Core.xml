@@ -8,6 +8,7 @@
       <MaxHitPoints>40</MaxHitPoints>
       <WorkToBuild>100</WorkToBuild>
       <Beauty>-1.0</Beauty>
+      <Flammability>1.5</Flammability>
     </statBases>
     <uiOrder>2000</uiOrder>
     <constructionSkillPrerequisite>0</constructionSkillPrerequisite>
@@ -51,6 +52,7 @@
       <MaxHitPoints>60</MaxHitPoints>
       <WorkToBuild>150</WorkToBuild>
       <Beauty>-0.5</Beauty>
+      <Flammability>1.5</Flammability>
     </statBases>
     <costList>
       <Hay>10</Hay>
@@ -98,6 +100,7 @@
       <MaxHitPoints>80</MaxHitPoints>
       <WorkToBuild>200</WorkToBuild>
       <Beauty>0</Beauty>
+      <Flammability>1.0</Flammability>
     </statBases>
     <stuffCategories>
       <li>Metallic</li>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <ThingDef>
+    <defName>SolarWeb-Stratum-RoofFire</defName>
+    <thingClass>SolarWeb.Stratum.Things.RoofFire</thingClass>
+    <label>fire (roof)</label>
+    <category>Attachment</category>
+    <tickerType>Normal</tickerType>
+    <altitudeLayer>Gas</altitudeLayer>
+    <useHitPoints>false</useHitPoints>
+    <drawerType>RealtimeOnly</drawerType>
+    <pathCost>0</pathCost>
+    <drawOffscreen>true</drawOffscreen>
+    <statBases>
+      <Flammability>0</Flammability>
+    </statBases>
+    <pathfinderDangerous>true</pathfinderDangerous>
+    <forceDebugSpawnable>true</forceDebugSpawnable>
+    <canInteractThroughCorners>true</canInteractThroughCorners>
+    <graphicData>
+      <texPath>Things/Special/Fire</texPath>
+      <graphicClass>Graphic_Flicker</graphicClass>
+      <shaderType>MetaOverlay</shaderType>
+    </graphicData> 
+    <comps>
+      <li Class="CompProperties_Glower">
+        <glowRadius>4</glowRadius>
+        <glowColor>(184,136,83,0)</glowColor>
+      </li>
+    </comps>
+  </ThingDef>
+</Defs>

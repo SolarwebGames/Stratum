@@ -16,6 +16,7 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> cleanlinessCache = [];
   private static readonly Dictionary<int, float> solarEfficiencyCache = [];
   private static readonly Dictionary<int, float> transparencyCache = [];
+  private static readonly Dictionary<int, float> flammabilityCache = [];
   private static readonly Dictionary<int, int> maxHitPointsCache = [];
   private static readonly Dictionary<int, RoofGraphicData> graphicDataCache = [];
   private static readonly Dictionary<int, Color> colorCache = [];
@@ -50,6 +51,8 @@ public static class RoofStatCache
         if (bDef != null)
         {
           maxHitPointsCache[hash] = Mathf.RoundToInt(bDef.statBases.GetStatValueFromList(StatDefOf.MaxHitPoints, 100f));
+          float flammability = bDef.statBases.GetStatValueFromList(StatDefOf.Flammability, 0f);
+          if (flammability > 0f) flammabilityCache[hash] = flammability;
 
           if (ext.graphicData == null && bDef is ThingDef tDef && tDef.graphicData != null)
           {
@@ -90,6 +93,7 @@ public static class RoofStatCache
 
   private static readonly Dictionary<int, float> roofStuffBeautyCache = [];
   private static readonly Dictionary<int, float> roofStuffWealthCache = [];
+  private static readonly Dictionary<int, float> roofStuffFlammabilityCache = [];
   private static readonly Dictionary<int, int> roofStuffMaxHitPointsCache = [];
 
   public static float GetBeauty(RoofDef def, ThingDef? stuff = null)
@@ -145,6 +149,26 @@ public static class RoofStatCache
   public static float GetTransparency(RoofDef def)
   {
     return transparencyCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+  }
+
+  public static float GetFlammability(RoofDef def, ThingDef? stuff = null)
+  {
+    if (stuff == null) return flammabilityCache.TryGetValue(def.defNameHash, out float f) ? f : 0f;
+
+    int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
+    lock (CacheLock)
+    {
+      if (roofStuffFlammabilityCache.TryGetValue(hashKey, out float flammability)) return flammability;
+
+      var ext = def.GetModExtension<BuildableRoofExtension>();
+      if (ext?.buildableDef != null)
+      {
+        flammability = ext.buildableDef.GetStatValueAbstract(StatDefOf.Flammability, stuff);
+        roofStuffFlammabilityCache[hashKey] = flammability;
+        return flammability;
+      }
+    }
+    return 0f;
   }
 
   public static int GetMaxHitPoints(RoofDef def, ThingDef? stuff = null)

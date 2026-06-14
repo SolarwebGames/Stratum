@@ -10,6 +10,9 @@
     <drawerType>None</drawerType>
     <drawGUIOverlay>false</drawGUIOverlay>
     <pathCost>0</pathCost>
+    <statBases>
+      <Flammability>0</Flammability>
+    </statBases>
     <graphicData>
       <texPath>Things/Building/Production/LampSun</texPath>
       <graphicClass>Graphic_Single</graphicClass>
