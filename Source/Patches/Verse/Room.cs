@@ -1,7 +1,7 @@
 using HarmonyLib;
 using Verse;
 
-namespace SolarWeb.Stratum.Patches.Verse;
+namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch]
 public static class Room_Patch

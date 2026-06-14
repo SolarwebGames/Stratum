@@ -2,7 +2,7 @@ using HarmonyLib;
 using RimWorld;
 using Verse;
 
-namespace SolarWeb.Stratum.Patches.RimWorld;
+namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch]
 public static class Designator_AreaNoRoof_Patch
@@ -18,7 +18,7 @@ public static class Designator_AreaNoRoof_Patch
     }
 
     var roofDef = __instance.Map.roofGrid.RoofAt(c);
-    if (roofDef != null && roofDef == RoofDefOf.RoofRockThick)
+    if (roofDef != null && roofDef.isThickRoof)
     {
       __result = "MessageNothingCanRemoveThickRoofs".Translate();
     }

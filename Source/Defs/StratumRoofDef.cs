@@ -53,20 +53,6 @@ public class StratumRoofDef : RoofDef
         label += $" ({hp} / {maxHp} {pct.ToStringPercent("F0")})";
       }
 
-      if (RoofStatCache.GetSolarEfficiency(this) > 0f)
-      {
-        var solarComp = map.GetComponent<MapComponents.SolarRoofMapComponent>();
-        if (solarComp != null && solarComp.TryGetSolarNetworkPower(cell, out var cellStats, out var netStats))
-        {
-          label += " - " + "Stratum_SolarPowerStats".Translate(
-            cellStats.currentPower.ToString("F0"),
-            cellStats.maxPower.ToString("F0"),
-            netStats.currentPower.ToString("F0"),
-            netStats.maxPower.ToString("F0")
-          );
-        }
-      }
-
       return label;
     }
   }

@@ -11,7 +11,7 @@ public static class AssetBundleManager
 
   static AssetBundleManager()
   {
-    var mod = LoadedModManager.RunningModsListForReading.FirstOrDefault(m => m.PackageId.ToLower() == "solarweb.stratum");
+    var mod = LoadedModManager.RunningModsListForReading.FirstOrDefault(m => m.PackageId.ToLower() == Stratum.Identifier.ToLower());
     if (mod == null)
     {
       StratumLog.Error("Could not find mod with PackageId 'solarweb.stratum'");

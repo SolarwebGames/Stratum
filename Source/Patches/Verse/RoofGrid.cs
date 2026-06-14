@@ -71,7 +71,7 @@ public static class RoofGrid_Patch
       if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
       {
         var local = c - GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingRoot;
-        if (GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData != null && 
+        if (GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData != null &&
             GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
         {
           stuff = cellData.stuff;
@@ -90,6 +90,20 @@ public static class RoofGrid_Patch
     else
     {
       integrity?.RemoveRoof(c);
+    }
+
+    if (Find.Selector.SelectedObjects.Count > 0)
+    {
+      for (int i = Find.Selector.SelectedObjects.Count - 1; i >= 0; i--)
+      {
+        if (Find.Selector.SelectedObjects[i] is UI.SelectedRoof sr && sr.map == ___map && sr.cell == c)
+        {
+          if (def == null || sr.def != def)
+          {
+            Find.Selector.Deselect(sr);
+          }
+        }
+      }
     }
   }
 }
