@@ -92,6 +92,9 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     {
       ExecuteScan();
     }
+
+    map.areaManager.BuildRoof?.Clear();
+    map.areaManager.NoRoof?.Clear();
   }
 
   public void ExecuteScan(bool force = false)
