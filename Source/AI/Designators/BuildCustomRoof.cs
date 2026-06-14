@@ -177,7 +177,7 @@ public class BuildCustomRoof : Designator_Build
       return AcceptanceReport.WasRejected;
 
     if (currentRoof != null && currentRoof.isThickRoof && currentRoof.isNatural)
-      return "MessageRoofIncapableOfRemoving".Translate(currentRoof.label);
+      return "MessageNothingCanRemoveThickRoofs".Translate(currentRoof.label);
 
     foreach (Thing thing in Map.thingGrid.ThingsAt(c))
     {
