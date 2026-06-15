@@ -8,6 +8,7 @@ using SolarWeb.Stratum.UI;
 namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch]
+[StaticConstructorOnStartup]
 public static class SelectionDrawer_Patch
 {
   private static readonly Material SelectionBracketMat = MaterialPool.MatFrom("UI/Overlays/SelectionBracket", ShaderDatabase.MetaOverlay);

@@ -9,8 +9,9 @@ using System;
 
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch(typeof(InspectPaneFiller), "DoPaneContentsFor")]
-public static class InspectPaneFiller_DoPaneContentsFor_Patch
+[HarmonyPatch(typeof(InspectPaneFiller))]
+[StaticConstructorOnStartup]
+public static class InspectPaneFiller_Patch
 {
   private static Texture2D? barBGTex;
   private static Texture2D BarBGTex => barBGTex ??= (Texture2D)AccessTools.Field(typeof(InspectPaneFiller), "BarBGTex").GetValue(null);
@@ -18,8 +19,9 @@ public static class InspectPaneFiller_DoPaneContentsFor_Patch
   private static Texture2D? healthTex;
   private static Texture2D HealthTex => healthTex ??= (Texture2D)AccessTools.Field(typeof(InspectPaneFiller), "HealthTex").GetValue(null);
 
+  [HarmonyPatch("DoPaneContentsFor")]
   [HarmonyPrefix]
-  public static bool Prefix(ISelectable sel, Rect rect)
+  public static bool DoPaneContentsFor_Prefix(ISelectable sel, Rect rect)
   {
     if (sel is SelectedRoof sr)
     {
@@ -38,7 +40,7 @@ public static class InspectPaneFiller_DoPaneContentsFor_Patch
       }
       catch (Exception arg)
       {
-        Log.ErrorOnce($"Error in DoPaneContentsFor SelectedRoof {sel}: {arg}", 754672);
+        StratumLog.Error($"Error in DoPaneContentsFor SelectedRoof {sel}: {arg}");
       }
       finally
       {

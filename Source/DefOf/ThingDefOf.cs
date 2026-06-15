@@ -12,6 +12,9 @@ public static class ThingDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofFire")]
   public static ThingDef RoofFire = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofExplosion")]
+  public static ThingDef RoofExplosion = default!;
+
   static ThingDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(ThingDefOf));

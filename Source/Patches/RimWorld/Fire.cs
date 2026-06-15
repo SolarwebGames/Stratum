@@ -7,6 +7,7 @@ using UnityEngine;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Things;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches.RimWorld;
 
@@ -119,7 +120,7 @@ public static class Fire_Patch
           float chance = groundFire.fireSize * flammability * 0.5f;
           if (Rand.Value < chance)
           {
-            SpawnRoofFire(pos, map, 0.1f, instigatorRef(groundFire));
+            RoofFireUtility.SpawnRoofFire(pos, map, 0.1f, instigatorRef(groundFire));
           }
         }
       }
@@ -145,27 +146,9 @@ public static class Fire_Patch
       {
         if (Rand.Value < flammability * 0.5f)
         {
-          SpawnRoofFire(target, map, 0.1f, instigatorRef(fire));
+          RoofFireUtility.SpawnRoofFire(target, map, 0.1f, instigatorRef(fire));
         }
       }
     }
-  }
-
-  public static bool ContainsRoofFire(this IntVec3 c, Map map)
-  {
-    List<Thing> list = map.thingGrid.ThingsListAt(c);
-    for (int i = 0; i < list.Count; i++)
-    {
-      if (list[i] is RoofFire) return true;
-    }
-    return false;
-  }
-
-  private static void SpawnRoofFire(IntVec3 c, Map map, float size, Thing instigator)
-  {
-    RoofFire fire = (RoofFire)ThingMaker.MakeThing(DefOf.ThingDefOf.RoofFire);
-    fireSizeRef(fire) = size;
-    instigatorRef(fire) = instigator;
-    GenSpawn.Spawn(fire, c, map, Rot4.North);
   }
 }

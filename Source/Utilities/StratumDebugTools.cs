@@ -10,6 +10,19 @@ namespace SolarWeb.Stratum.Utilities;
 
 public static class StratumDebugTools
 {
+  [DebugAction("Stratum", "Roof Explosion (Small)", false, false, false, false, false, 0, false, actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+  public static void RoofExplosionSmall()
+  {
+    GenRoofExplosion.DoExplosion(Verse.UI.MouseCell(), Find.CurrentMap, 0.9f, DamageDefOf.Bomb, null, 50);
+  }
+
+  [DebugAction("Stratum", "Roof Explosion (Large)", false, false, false, false, false, 0, false, actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
+  public static void RoofExplosionLarge()
+  {
+    GenRoofExplosion.DoExplosion(Verse.UI.MouseCell(), Find.CurrentMap, 1.9f, DamageDefOf.Bomb, null, 150);
+  }
+
+
   [DebugAction("Stratum", "Export Roof Graphics Data", false, false, false, false, false, 0, false)]
   public static void ExportRoofGraphicsData()
   {
