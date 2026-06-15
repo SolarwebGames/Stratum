@@ -1,3 +1,9 @@
+0.4.3:
+  Bug Fix: Removed custom stuff handling to improve compatibility with other mods.
+  Minor Feature: Added roof explosions and enabled lightning strikes on roofs. Lightning may now start your thatch roof on fire.
+  Balancing: Adjusted the beauty on luxury glass panels.
+  Graphics: Added special graphics for luxury glass panels.
+
 0.4.0:
   Feature: Roof selection now affects how well roofs retain heat. The insulation stat on roofs indicates how well that roof protects from the outside.
   Feature: New buildable roof - Composite Insulated Panels. These panels are stuffable with cloth or leather to provide different levels of insulation and flammability.
