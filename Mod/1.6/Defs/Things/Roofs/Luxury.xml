@@ -3,11 +3,11 @@
   <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
     <defName>SolarWeb-Stratum-LuxuryGlassPanel_Buildable</defName>
     <label>luxury glass panel</label>
-    <description>The ultimate in base luxury. Amethyst-tinted lead glass held within a pure metal frame. This connected skylight provides unparalleled beauty and OPEN views of the stars.</description>
+    <description>Lead glass decoratively arranged in a metal frame. Doesn't allow as much light through as a standard skylight, but greatly improves room aesthetics.</description>
     <statBases>
       <MaxHitPoints>120</MaxHitPoints>
       <WorkToBuild>2500</WorkToBuild>
-      <Beauty>25.0</Beauty>
+      <Beauty>5.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.6</SolarWeb-Stratum-Insulation>
     </statBases>
     <costStuffCount>25</costStuffCount>
@@ -22,7 +22,7 @@
   <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-LuxuryGlassPanel</defName>
     <label>luxury glass panel</label>
-    <description>The ultimate in base luxury. Amethyst-tinted lead glass held within a pure metal frame. This skylight provides unparalleled beauty and open views of the stars.</description>
+    <description>Lead glass decoratively arranged in a metal frame. Doesn't allow as much light through as a standard skylight, but greatly improves room aesthetics.</description>
     <isThickRoof>false</isThickRoof>
     <filthLeaving>Filth_RubbleBuilding</filthLeaving>
     <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
@@ -30,22 +30,17 @@
       <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
         <buildableDef>SolarWeb-Stratum-LuxuryGlassPanel_Buildable</buildableDef>
         <graphicData>
-          <texPath>Roofs/GenericTile</texPath>
+          <texPath>Roofs/StainedGlassPanels</texPath>
           <color>(0.6, 0.4, 1)</color>
-          <skylightFrameWidth>0.05</skylightFrameWidth>
+          <skylightFrameWidth>0.03</skylightFrameWidth>
           <isSeamless>true</isSeamless>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>true</isSkylight>
-        <transparency>0.5</transparency>
+        <transparency>0.6</transparency>
         <glassTint>(0.6, 0.4, 1)</glassTint>
         <thermalConductivity>0.4</thermalConductivity>
         <stuffInsulationMultiplier>0.2</stuffInsulationMultiplier>
-        <allowedStuff>
-          <li>Gold</li>
-          <li>Silver</li>
-          <li>Jade</li>
-        </allowedStuff>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Luxury Glass Panel</Name>

@@ -18,8 +18,6 @@ public class BuildCustomRoof : Designator_Build
 {
   private readonly RoofDef roofDef;
   private readonly BuildableRoofExtension ext;
-  private ThingDef? customStuffDef;
-  private bool customWriteStuff;
   private Color? selectedTint;
 
   public Color? SelectedTint => selectedTint;
@@ -32,9 +30,7 @@ public class BuildCustomRoof : Designator_Build
     {
       var raw = StuffDefRaw;
       if (raw != null) return raw;
-      if (customStuffDef != null) return customStuffDef;
-      customStuffDef = RoofStuffUtility.GetCheapestAvailableStuff(PlacingDef, ext, Map);
-      return customStuffDef;
+      return RoofStuffUtility.GetCheapestAvailableStuff(PlacingDef, Map);
     }
   }
 
@@ -42,7 +38,7 @@ public class BuildCustomRoof : Designator_Build
   {
     get
     {
-      if (PlacingDef is ThingDef thingDef && (customWriteStuff || StuffDefRaw != null))
+      if (PlacingDef is ThingDef thingDef && StuffDefRaw != null)
       {
         var stuff = StuffDef;
         if (stuff != null)
@@ -129,8 +125,6 @@ public class BuildCustomRoof : Designator_Build
           bool anyStuff = false;
           foreach (var stuff in GenStuff.AllowedStuffsFor(thingDef))
           {
-            if (ext.allowedStuff != null && !ext.allowedStuff.Contains(stuff)) continue;
-
             if (RoofStuffUtility.GetAccessibleStuffCount(stuff, Map) > 0)
             {
               anyStuff = true;
@@ -191,26 +185,6 @@ public class BuildCustomRoof : Designator_Build
     }
 
     return AcceptanceReport.WasAccepted;
-  }
-
-  public override void ProcessInput(Event ev)
-  {
-    if (!CheckCanInteract()) return;
-
-    if (PlacingDef is ThingDef { MadeFromStuff: true } thingDef)
-    {
-      RoofStuffUtility.GenerateStuffSelectionMenu(thingDef, ext, Map, DebugSettings.godMode, (selected) =>
-      {
-        Find.DesignatorManager.Select(this);
-        SetStuffDef(selected);
-        customWriteStuff = true;
-        UpdateIcon();
-      });
-    }
-    else
-    {
-      base.ProcessInput(ev);
-    }
   }
 
   public override void DesignateSingleCell(IntVec3 c)
