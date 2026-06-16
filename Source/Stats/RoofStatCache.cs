@@ -17,6 +17,7 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> solarEfficiencyCache = [];
   private static readonly Dictionary<int, float> transparencyCache = [];
   private static readonly Dictionary<int, float> thermalConductivityCache = [];
+  private static readonly Dictionary<int, bool> airtightCache = [];
   private static readonly Dictionary<int, float> flammabilityCache = [];
   private static readonly Dictionary<int, int> maxHitPointsCache = [];
   private static readonly Dictionary<int, RoofGraphicData> graphicDataCache = [];
@@ -40,6 +41,7 @@ public static class RoofStatCache
         if (ext.solarEfficiency > 0f) solarEfficiencyCache[hash] = ext.solarEfficiency;
         if (ext.transparency > 0f) transparencyCache[hash] = ext.transparency;
         thermalConductivityCache[hash] = ext.thermalConductivity;
+        airtightCache[hash] = ext.isAirtight;
         if (ext.isSkylight) skylightCache.Add(hash);
         if (ext.glassTint.HasValue) glassTintCache[hash] = ext.glassTint.Value;
 
@@ -162,7 +164,45 @@ public static class RoofStatCache
 
   public static float GetTransparency(RoofDef def)
   {
-    return transparencyCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+    if (def == null) return 0f;
+    float val = transparencyCache.TryGetValue(def.defNameHash, out float t) ? t : 0f;
+    return Mathf.Max(val, Utilities.StratumHooks.GetTransparencyOverride(def));
+  }
+
+  public static bool GetIsAirtight(RoofDef def, ThingDef? stuff = null)
+  {
+    if (def == null) return false;
+    if (Utilities.StratumHooks.IsAirtightOverride(def)) return true;
+
+    bool baseAirtight;
+    if (airtightCache.TryGetValue(def.defNameHash, out bool val))
+      baseAirtight = val;
+    else
+      baseAirtight = def == RoofDefOf.RoofConstructed || def == RoofDefOf.RoofRockThick;
+
+    if (!baseAirtight) return false;
+    if (stuff != null && !IsStuffAirtight(stuff)) return false;
+
+    return true;
+  }
+
+  internal static bool IsStuffAirtight(ThingDef stuff)
+  {
+    if (stuff.stuffProps == null) return true;
+    var categories = stuff.stuffProps.categories;
+    if (categories == null) return true;
+
+    foreach (var cat in categories)
+    {
+      if (cat.defName == "Fabric" || cat.defName == "Leathery" || cat.defName == "Woody" || cat.defName == "Stony")
+        return false;
+    }
+    return true;
+  }
+
+  public static float GetEffectiveInsulation(RoofDef def, ThingDef? stuff = null)
+  {
+    return 1f - GetThermalConductivity(def, stuff);
   }
 
   public static float GetThermalConductivity(RoofDef def, ThingDef? stuff = null)

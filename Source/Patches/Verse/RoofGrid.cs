@@ -36,13 +36,12 @@ public static class RoofGrid_Patch
 
   [HarmonyPatch(typeof(RoofGrid), nameof(RoofGrid.SetRoof))]
   [HarmonyPostfix]
-  public static void SetRoof_Postfix(IntVec3 c, RoofDef def, Map ___map)
+  public static void SetRoof_Postfix(IntVec3 c, RoofDef def, Map ___map, RoofDef? __state)
   {
-    var vfx = ___map.GetComponent<RoofVFXMapComponent>();
-    vfx?.Notify_RoofChanged(c);
+    var currentRoof = ___map.roofGrid.RoofAt(c);
+    if (currentRoof == __state) return;
 
-    var solar = ___map.GetComponent<SolarRoofMapComponent>();
-    solar?.Notify_RoofChanged(c);
+    Utilities.StratumHooks.Notify_RoofChanged(___map, c, __state, currentRoof);
 
     var room = c.GetRoom(___map);
     if (room != null)

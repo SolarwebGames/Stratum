@@ -30,7 +30,7 @@ public class SolarRoofMapComponent : MapComponent
   {
     base.FinalizeInit();
     dirty = true;
-    map.events.RoofChanged += Notify_RoofChanged;
+    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
   }
 
   internal void AddSolarCellInternal(int index)
@@ -48,7 +48,7 @@ public class SolarRoofMapComponent : MapComponent
       netToSolarPower.Clear();
       cellToPower.Clear();
     }
-    map.events.RoofChanged -= Notify_RoofChanged;
+    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
   }
 
   public override void MapComponentTick()
@@ -65,10 +65,15 @@ public class SolarRoofMapComponent : MapComponent
     }
   }
 
-  public void Notify_RoofChanged(IntVec3 c)
+  private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
+  {
+    if (m == map) Notify_RoofChanged(c, newRoof);
+  }
+
+  public void Notify_RoofChanged(IntVec3 c, RoofDef? roof = null)
   {
     int idx = map.cellIndices.CellToIndex(c);
-    var roof = map.roofGrid.RoofAt(idx);
+    if (roof == null) roof = map.roofGrid.RoofAt(idx);
 
     if (roof != null && RoofStatCache.GetSolarEfficiency(roof) > 0f)
     {
@@ -80,7 +85,6 @@ public class SolarRoofMapComponent : MapComponent
     }
 
     dirty = true;
-    map.GetComponent<RoofVFXMapComponent>()?.Notify_RoofChanged(c);
   }
 
   public float GetAdditionalPowerFor(PowerNet net)

@@ -6,35 +6,49 @@ using Verse;
 
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(JobDriver_RemoveRoof))]
 public static class JobDriver_RemoveRoof_Patch
 {
   public static PropertyInfo CellProperty = AccessTools.Property(typeof(JobDriver_RemoveRoof), "Cell");
 
-  [HarmonyPatch(typeof(JobDriver_RemoveRoof), "DoEffect")]
+  public struct RemovalState
+  {
+    public IntVec3 cell;
+    public Map map;
+    public RoofDef roof;
+    public ThingDef stuff;
+  }
+
+  [HarmonyPatch("DoEffect")]
   [HarmonyPrefix]
-  public static bool DoEffect_Prefix(JobDriver_RemoveRoof __instance)
+  public static void DoEffect_Prefix(JobDriver_RemoveRoof __instance, out RemovalState __state)
   {
     var map = __instance.pawn.Map;
     var cell = (IntVec3)CellProperty.GetValue(__instance);
-
     var roof = map.roofGrid.RoofAt(cell);
-    if (roof == null) return false;
+    var stuff = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetStuff(cell);
 
-    var extension = roof.GetModExtension<BuildableRoofExtension>();
+    __state = new RemovalState
+    {
+      cell = cell,
+      map = map,
+      roof = roof,
+      stuff = stuff!
+    };
+  }
+
+  [HarmonyPatch("DoEffect")]
+  [HarmonyPostfix]
+  public static void DoEffect_Postfix(RemovalState __state)
+  {
+    if (__state.roof == null) return;
+
+    var extension = __state.roof.GetModExtension<BuildableRoofExtension>();
     var bDef = extension?.buildableDef;
-
-    var integrityGrid = map.GetComponent<MapComponents.RoofIntegrityGrid>();
-    var stuff = integrityGrid?.GetStuff(cell);
-    integrityGrid?.RemoveRoof(cell);
-    map.areaManager.NoRoof[cell] = false;
-    map.areaManager.NoRoof.MarkForDraw();
-    map.areaManager.BuildRoof[cell] = false;
-    map.areaManager.BuildRoof.MarkForDraw();
 
     if (bDef != null)
     {
-      var costList = bDef.CostListAdjusted(stuff);
+      var costList = bDef.CostListAdjusted(__state.stuff);
       if (!costList.NullOrEmpty())
       {
         float fraction = bDef.resourcesFractionWhenDeconstructed;
@@ -44,13 +58,12 @@ public static class JobDriver_RemoveRoof_Patch
           if (count <= 0) continue;
           var thing = ThingMaker.MakeThing(cost.thingDef);
           thing.stackCount = count;
-          GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near);
+          GenPlace.TryPlaceThing(thing, __state.cell, __state.map, ThingPlaceMode.Near);
         }
       }
     }
 
-    map.roofGrid.SetRoof(cell, null);
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
-    return false;
+    __state.map.GetComponent<MapComponents.RoofIntegrityGrid>()?.RemoveRoof(__state.cell);
+    __state.map.mapDrawer.MapMeshDirty(__state.cell, MapMeshFlagDefOf.Roofs);
   }
 }

@@ -1,8 +1,7 @@
-using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 using SolarWeb.Stratum.Graphics;
-using UnityEngine;
 
 namespace SolarWeb.Stratum.DefModExtensions;
 
@@ -19,4 +18,5 @@ public class BuildableRoofExtension : DefModExtension
 
   public float thermalConductivity = 0.1f; // 0.1 = standard thin roof equivalent
   public float stuffInsulationMultiplier = 1f;
+  public bool isAirtight = true;
 }

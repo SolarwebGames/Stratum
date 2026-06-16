@@ -1,3 +1,6 @@
+0.5.0:
+  Feature: Added compatibility support for Save Our Ship 2.
+
 0.4.3:
   Bug Fix: Removed custom stuff handling to improve compatibility with other mods.
   Minor Feature: Added roof explosions and enabled lightning strikes on roofs. Lightning may now start your thatch roof on fire.

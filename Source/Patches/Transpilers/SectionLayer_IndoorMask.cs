@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using SolarWeb.Stratum.Stats;
@@ -8,10 +7,10 @@ using Verse;
 
 namespace SolarWeb.Stratum.Patches.Transpilers;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(SectionLayer_IndoorMask))]
 public static class SectionLayer_IndoorMask_Patch
 {
-  [HarmonyPatch(typeof(SectionLayer_IndoorMask), "HideCommon")]
+  [HarmonyPatch("HideCommon")]
   [HarmonyTranspiler]
   public static IEnumerable<CodeInstruction> HideCommon_Transpiler(IEnumerable<CodeInstruction> instructions)
   {
@@ -33,6 +32,11 @@ public static class SectionLayer_IndoorMask_Patch
 
   public static bool IsRoofedForMask(IntVec3 c, Map map)
   {
+    var roof = map.roofGrid.RoofAt(c);
+    if (roof != null && RoofStatCache.IsCustomRoof(roof) && RoofStatCache.GetTransparency(roof) > 0f)
+    {
+      return false;
+    }
     return map.roofGrid.Roofed(c);
   }
 }

@@ -33,6 +33,7 @@
         <transparency>0.2</transparency>
         <glassTint>(0.4, 0.3, 0.1)</glassTint>
         <thermalConductivity>0.3</thermalConductivity>
+        <isAirtight>false</isAirtight>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Primitive Thatch Roof</Name>
@@ -83,6 +84,7 @@
         <transparency>0.1</transparency>
         <glassTint>(0.5, 0.4, 0.2)</glassTint>
         <thermalConductivity>0.2</thermalConductivity>
+        <isAirtight>false</isAirtight>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hay Thatch Roof</Name>

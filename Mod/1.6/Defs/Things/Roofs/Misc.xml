@@ -20,6 +20,8 @@
     <canBeUsedUnderRoof>true</canBeUsedUnderRoof>
     <canInteractThroughCorners>true</canInteractThroughCorners>
     <neverMultiSelect>false</neverMultiSelect>
+    <blueprintDef>SolarWeb-Stratum-RoofFrame</blueprintDef>
+    <entityDefToBuild>SolarWeb-Stratum-RoofFrame</entityDefToBuild>
     <!-- Graphic is never rendered (DrawAt is overridden to do nothing),
          but a valid graphicData is required by the engine. -->
     <graphicData>

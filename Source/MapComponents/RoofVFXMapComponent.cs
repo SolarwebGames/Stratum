@@ -38,6 +38,19 @@ public class RoofVFXMapComponent : MapComponent
     transparentCells.Clear();
 
     map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
+
+    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+  }
+
+  public override void MapRemoved()
+  {
+    base.MapRemoved();
+    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+  }
+
+  private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
+  {
+    if (m == map) Notify_RoofChanged(c, newRoof);
   }
 
   internal void AddTransparentCellInternal(int cellIdx)
@@ -88,12 +101,12 @@ public class RoofVFXMapComponent : MapComponent
     }
   }
 
-  public void Notify_RoofChanged(IntVec3 c)
+  public void Notify_RoofChanged(IntVec3 c, RoofDef? roof = null)
   {
     if (cellToIndex == null) return;
 
     int idx = map.cellIndices.CellToIndex(c);
-    var roof = map.roofGrid.RoofAt(idx);
+    if (roof == null) roof = map.roofGrid.RoofAt(idx);
     bool isTransparent = roof != null && RoofStatCache.GetTransparency(roof) > 0f;
 
     int listIdx = cellToIndex[idx];

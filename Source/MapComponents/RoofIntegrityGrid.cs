@@ -78,7 +78,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         }
       }
     }
-    
+
     if (Scribe.mode == LoadSaveMode.PostLoadInit)
     {
       scanLockInt = new object();
@@ -92,9 +92,53 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     {
       ExecuteScan();
     }
-
+    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
     map.areaManager.BuildRoof?.Clear();
     map.areaManager.NoRoof?.Clear();
+  }
+
+  public override void MapRemoved()
+  {
+    base.MapRemoved();
+    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+  }
+
+  private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
+  {
+    if (m != map) return;
+
+    if (newRoof != null && RoofStatCache.IsCustomRoof(newRoof))
+    {
+      ThingDef? stuff = null;
+      UnityEngine.Color? tint = null;
+      if (DebugSettings.godMode)
+      {
+        var designator = Find.DesignatorManager.SelectedDesignator as AI.Designators.BuildCustomRoof;
+        if (designator != null)
+        {
+          stuff = designator.StuffDef;
+          tint = designator.SelectedTint;
+        }
+      }
+
+      if (stuff == null && Patches.GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
+      {
+        var local = c - Patches.GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingRoot;
+        if (Patches.GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData != null &&
+            Patches.GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
+        {
+          stuff = cellData.stuff;
+          InitializeRoof(c, newRoof, stuff, cellData.glassTint, cellData.hitPoints);
+          return;
+        }
+      }
+
+      InitializeRoof(c, newRoof, stuff, tint);
+    }
+    else
+    {
+      RemoveRoof(c);
+    }
   }
 
   public void ExecuteScan(bool force = false)
@@ -121,7 +165,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       hitPoints[index] = currentHP ?? maxHP;
       stuffDefs[index] = stuff;
       glassTints[index] = glassTint;
-      
+
       if (hitPoints[index] < maxHP)
         roofsNeedingRepair.Add(index);
       else
@@ -143,6 +187,14 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   {
     if (!cell.InBounds(map)) return 0;
     return hitPoints[map.cellIndices.CellToIndex(cell)];
+  }
+
+  public float GetEffectiveInsulation(IntVec3 cell)
+  {
+    if (!cell.InBounds(map)) return 0f;
+    var roof = map.roofGrid.RoofAt(cell);
+    if (roof == null) return 0f;
+    return RoofStatCache.GetEffectiveInsulation(roof, GetStuff(cell));
   }
 
   public short GetMaxHitPoints(IntVec3 cell)
