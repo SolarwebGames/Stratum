@@ -14,7 +14,9 @@
     <stuffCategories>
       <li>Metallic</li>
     </stuffCategories>
-
+    <researchPrerequisites>
+      <li>Fabrication</li>
+    </researchPrerequisites>
     <uiOrder>2140</uiOrder>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
   </ThingDef>
