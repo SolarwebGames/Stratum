@@ -40,6 +40,8 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <thermalConductivity>0.05</thermalConductivity>
+        <damageThreshold>8</damageThreshold>
+        <armorRating>0.35</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hull Plating</Name>
@@ -90,6 +92,8 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <thermalConductivity>0.02</thermalConductivity>
+        <damageThreshold>15</damageThreshold>
+        <armorRating>0.50</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Reinforced Hull Plating</Name>
@@ -142,6 +146,8 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <solarEfficiency>0.5</solarEfficiency>
         <thermalConductivity>0.02</thermalConductivity>
+        <damageThreshold>12</damageThreshold>
+        <armorRating>0.45</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Hull Plate</Name>
@@ -197,6 +203,8 @@
         <transparency>0.8</transparency>
         <glassTint>(0.8, 0.9, 1.0)</glassTint>
         <thermalConductivity>0.5</thermalConductivity>
+        <damageThreshold>5</damageThreshold>
+        <armorRating>0.20</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Panel</Name>

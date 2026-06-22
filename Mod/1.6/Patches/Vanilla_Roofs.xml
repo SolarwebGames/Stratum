@@ -20,6 +20,8 @@
             <color>(0.55, 0.55, 0.55)</color>
           </graphicData>
           <thermalConductivity>0.1</thermalConductivity>
+          <damageThreshold>5</damageThreshold>
+          <armorRating>0.20</armorRating>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Ancient Roof</Name>
@@ -46,6 +48,8 @@
             <isSeamless>true</isSeamless>
           </graphicData>
           <thermalConductivity>0.1</thermalConductivity>
+          <damageThreshold>10</damageThreshold>
+          <armorRating>0.40</armorRating>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Thin Rock Roof</Name>
@@ -72,6 +76,8 @@
             <isSeamless>true</isSeamless>
           </graphicData>
           <thermalConductivity>0.0</thermalConductivity>
+          <damageThreshold>50</damageThreshold>
+          <armorRating>0.90</armorRating>
         </li>
         <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
           <Name>Overhead Mountain</Name>

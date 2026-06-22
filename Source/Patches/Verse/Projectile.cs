@@ -6,10 +6,10 @@ using Verse.Sound;
 
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(Projectile))]
 public static class Projectile_Patch
 {
-  [HarmonyPatch(typeof(Projectile), "ImpactSomething")]
+  [HarmonyPatch("ImpactSomething")]
   [HarmonyPrefix]
   public static bool ImpactSomething_Prefix(Projectile __instance)
   {
@@ -37,14 +37,14 @@ public static class Projectile_Patch
                 var cRoof = map.roofGrid.RoofAt(c);
                 if (cRoof != null && cRoof.HasModExtension<BuildableRoofExtension>())
                 {
-                  integrityGrid.TakeDamage(c, damage);
+                  integrityGrid.TakeDamage(c, damage, 0f, new DamageInfo(__instance.def.projectile.damageDef, damage));
                 }
               }
             }
           }
           else
           {
-            integrityGrid.TakeDamage(pos, damage);
+            integrityGrid.TakeDamage(pos, damage, 0f, new DamageInfo(__instance.def.projectile.damageDef, damage));
           }
 
           if (!__instance.def.projectile.soundExplode.NullOrUndefined())

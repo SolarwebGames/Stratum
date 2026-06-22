@@ -19,4 +19,8 @@ public class BuildableRoofExtension : DefModExtension
   public float thermalConductivity = 0.1f; // 0.1 = standard thin roof equivalent
   public float stuffInsulationMultiplier = 1f;
   public bool isAirtight = true;
+
+  public float damageThreshold = 0f;
+  public float armorRating = 0f;
+  public float stuffArmorMultiplier = 1f;
 }

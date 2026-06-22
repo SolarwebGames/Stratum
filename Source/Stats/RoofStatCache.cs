@@ -19,6 +19,8 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> thermalConductivityCache = [];
   private static readonly Dictionary<int, bool> airtightCache = [];
   private static readonly Dictionary<int, float> flammabilityCache = [];
+  private static readonly Dictionary<int, float> damageThresholdCache = [];
+  private static readonly Dictionary<int, float> armorRatingCache = [];
   private static readonly Dictionary<int, int> maxHitPointsCache = [];
   private static readonly Dictionary<int, RoofGraphicData> graphicDataCache = [];
   private static readonly Dictionary<int, Color> colorCache = [];
@@ -44,6 +46,9 @@ public static class RoofStatCache
         airtightCache[hash] = ext.isAirtight;
         if (ext.isSkylight) skylightCache.Add(hash);
         if (ext.glassTint.HasValue) glassTintCache[hash] = ext.glassTint.Value;
+
+        damageThresholdCache[hash] = ext.damageThreshold;
+        armorRatingCache[hash] = ext.armorRating;
 
         if (ext.graphicData != null)
         {
@@ -110,6 +115,8 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> roofStuffWealthCache = [];
   private static readonly Dictionary<int, float> roofStuffFlammabilityCache = [];
   private static readonly Dictionary<int, float> roofStuffThermalConductivityCache = [];
+  private static readonly Dictionary<int, float> roofStuffDamageThresholdCache = [];
+  private static readonly Dictionary<int, float> roofStuffArmorRatingCache = [];
   private static readonly Dictionary<int, int> roofStuffMaxHitPointsCache = [];
 
   public static float GetBeauty(RoofDef def, ThingDef? stuff = null)
@@ -130,6 +137,65 @@ public static class RoofStatCache
       }
     }
     return 0f;
+  }
+
+  public static float GetDamageThreshold(RoofDef def, ThingDef? stuff = null)
+  {
+    if (stuff == null) return damageThresholdCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+
+    int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
+    lock (CacheLock)
+    {
+      if (roofStuffDamageThresholdCache.TryGetValue(hashKey, out float dt)) return dt;
+
+      var ext = def.GetModExtension<BuildableRoofExtension>();
+      if (ext?.buildableDef != null)
+      {
+        float baseDT = ext.damageThreshold;
+        float stuffHP = ext.buildableDef.GetStatValueAbstract(StatDefOf.MaxHitPoints, stuff);
+        float baseHP = ext.buildableDef.GetStatValueAbstract(StatDefOf.MaxHitPoints);
+
+        float hpRatio = baseHP > 0 ? stuffHP / baseHP : 1f;
+        dt = baseDT * hpRatio;
+
+        roofStuffDamageThresholdCache[hashKey] = dt;
+        return dt;
+      }
+    }
+    return damageThresholdCache.TryGetValue(def.defNameHash, out float v) ? v : 0f;
+  }
+
+  public static float GetArmorRating(RoofDef def, ThingDef? stuff = null)
+  {
+    if (stuff == null) return armorRatingCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+
+    int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
+    lock (CacheLock)
+    {
+      if (roofStuffArmorRatingCache.TryGetValue(hashKey, out float ar)) return ar;
+
+      var ext = def.GetModExtension<BuildableRoofExtension>();
+      if (ext?.buildableDef != null)
+      {
+        float baseAR = ext.armorRating;
+        float stuffAR = ext.buildableDef.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp, stuff);
+        float baseBaseAR = ext.buildableDef.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp);
+
+        if (baseBaseAR > 0)
+        {
+          float stuffRatio = stuffAR / baseBaseAR;
+          ar = baseAR * (1f + (stuffRatio - 1f) * ext.stuffArmorMultiplier);
+        }
+        else
+        {
+          ar = baseAR;
+        }
+
+        roofStuffArmorRatingCache[hashKey] = ar;
+        return ar;
+      }
+    }
+    return armorRatingCache.TryGetValue(def.defNameHash, out float v) ? v : 0f;
   }
 
   public static float GetCleanliness(RoofDef def)

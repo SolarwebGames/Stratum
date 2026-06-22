@@ -43,6 +43,8 @@
         <glassTint>(0.6, 0.4, 1)</glassTint>
         <thermalConductivity>0.4</thermalConductivity>
         <stuffInsulationMultiplier>0.2</stuffInsulationMultiplier>
+        <damageThreshold>2</damageThreshold>
+        <armorRating>0.10</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Luxury Glass Panel</Name>
@@ -95,6 +97,8 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <thermalConductivity>0.05</thermalConductivity>
+        <damageThreshold>7</damageThreshold>
+        <armorRating>0.30</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Sterile Tiled Roof</Name>

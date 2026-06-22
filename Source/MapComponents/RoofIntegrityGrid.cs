@@ -217,35 +217,69 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     return glassTints[map.cellIndices.CellToIndex(cell)];
   }
 
-  public void TakeDamage(IntVec3 cell, int amount)
+  public void TakeDamage(IntVec3 cell, float amount, float penetration = 0f, DamageInfo? dinfo = null)
   {
     if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     if (hitPoints[index] <= 0) return;
 
+    var roof = map.roofGrid.RoofAt(cell);
+    if (roof == null) return;
+
+    var stuff = stuffDefs[index];
+    float dt = RoofStatCache.GetDamageThreshold(roof, stuff);
+    float ar = RoofStatCache.GetArmorRating(roof, stuff);
+
+    float effectiveDamage = amount;
+
+    if (penetration > 0f && ar > 0f)
+    {
+      // We interpret AR as mm RHA equivalent if it's high, or scale it if it's low.
+      float effectiveArmor = ar > 2f ? ar : ar * 10f;
+
+      if (penetration > effectiveArmor)
+      {
+        effectiveDamage = amount * (1f - (effectiveArmor / (penetration * 2f)));
+      }
+      else
+      {
+        effectiveDamage = amount * 0.05f;
+      }
+    }
+    else
+    {
+      effectiveDamage -= dt;
+      if (effectiveDamage <= 0) return;
+
+      effectiveDamage *= (1f - ar);
+    }
+
+    if (effectiveDamage <= 0) return;
+
+    int finalDamage = GenMath.RoundRandom(effectiveDamage);
+    if (finalDamage <= 0) return;
+
     var maxHP = GetMaxHitPoints(cell);
-    hitPoints[index] -= (short)amount;
+    hitPoints[index] -= (short)finalDamage;
 
     if (hitPoints[index] <= 0)
     {
       hitPoints[index] = 0;
-      var stuff = stuffDefs[index];
       var tint = glassTints[index];
       stuffDefs[index] = null;
       glassTints[index] = null;
       roofsNeedingRepair.Remove(index);
 
-      var roofDef = map.roofGrid.RoofAt(cell);
       RoofCollapserImmediate.DropRoofInCells(cell, map);
 
       map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
 
-      var ext = roofDef.GetModExtension<BuildableRoofExtension>();
+      var ext = roof.GetModExtension<BuildableRoofExtension>();
       if (ext != null)
       {
         if (Find.PlaySettings.autoRebuild && map.areaManager.Home[cell])
         {
-          map.GetComponent<RoofConstructionTracker>()?.RebuildRoof(cell, roofDef, ext, stuff, tint);
+          map.GetComponent<RoofConstructionTracker>()?.RebuildRoof(cell, roof, ext, stuff, tint);
         }
 
         var bDef = ext.buildableDef;

@@ -85,6 +85,8 @@
         <glassTint>(0.5, 0.4, 0.2)</glassTint>
         <thermalConductivity>0.2</thermalConductivity>
         <isAirtight>false</isAirtight>
+        <damageThreshold>1</damageThreshold>
+        <armorRating>0.05</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hay Thatch Roof</Name>
@@ -135,6 +137,9 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <thermalConductivity>0.1</thermalConductivity>
+        <damageThreshold>3</damageThreshold>
+        <armorRating>0.15</armorRating>
+        <stuffArmorMultiplier>1.0</stuffArmorMultiplier>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Shingle Roof</Name>
@@ -186,6 +191,7 @@
         <transparency>0.7</transparency>
         <glassTint>(0.7, 0.85, 1.0)</glassTint>
         <thermalConductivity>0.8</thermalConductivity>
+        <armorRating>0.05</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Roof</Name>
@@ -239,6 +245,9 @@
         <isSkylight>false</isSkylight>
         <solarEfficiency>0.2</solarEfficiency>
         <thermalConductivity>0.2</thermalConductivity>
+        <damageThreshold>4</damageThreshold>
+        <armorRating>0.15</armorRating>
+        <stuffArmorMultiplier>0.5</stuffArmorMultiplier>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Shingles</Name>
@@ -295,6 +304,9 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <thermalConductivity>0.12</thermalConductivity>
+        <damageThreshold>6</damageThreshold>
+        <armorRating>0.25</armorRating>
+        <stuffArmorMultiplier>1.2</stuffArmorMultiplier>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Composite Panel</Name>
