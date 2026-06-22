@@ -1,3 +1,12 @@
+0.6.6:
+  Feature: Added compatibility for Combat Extended.
+  Balance: Added Fabrication as a research requirement for luxury glass roofs.
+  Balance: Reduced the material costs of many roofs.
+  Bug Fix: Deconstructed roofs could stay selected.
+  Bug Fix: Made the Cancel designator work for canceling roof deconstruction.
+  Bug Fix: Fixed an error that could arise when removing or destroying roofs.
+  Bug Fix: Vanilla "No Roof" areas were sometimes remaining after roof deconstruction.
+
 0.5.0:
   Feature: Added compatibility support for Save Our Ship 2.
 

@@ -3,7 +3,7 @@
   <name>Stratum</name>
   <packageId>SolarWeb.Stratum</packageId>
   <author>SolarWeb Studios</author>
-  <modVersion>0.5.0</modVersion>
+  <modVersion>0.6.6</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
@@ -19,6 +19,7 @@
   <loadAfter>
     <li>brrainz.harmony</li>
     <li>kentington.saveourship2</li>
+    <li>ceteam.combatextended</li>
   </loadAfter>
   <description>Stratum provides an enhanced roof building and damage system, along with a variety of new roof types that can be built from a wide variety of materials.</description>
 </ModMetaData>
