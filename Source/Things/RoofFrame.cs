@@ -98,7 +98,7 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
     }
   }
 
-  public bool CanCancel => Faction == Faction.OfPlayer;
+  public bool CanCancel => Faction == Faction.OfPlayer && !Destroyed;
 
   public void CancelByDesignator()
   {
@@ -194,6 +194,8 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
 
   public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
   {
+    if (Destroyed) return;
+
     if (mode != DestroyMode.Vanish && mode != DestroyMode.KillFinalize && Spawned)
     {
       var map = Map;
