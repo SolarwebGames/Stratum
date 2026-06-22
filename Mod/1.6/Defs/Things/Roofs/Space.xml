@@ -6,12 +6,12 @@
     <description>Simple, airtight metal plates used for basic spacecraft hull construction. It is perfectly impermeable but lacks the structural reinforcement of higher-tier plating.</description>
     <statBases>
       <MaxHitPoints>150</MaxHitPoints>
-      <WorkToBuild>800</WorkToBuild>
+      <WorkToBuild>300</WorkToBuild>
       <Beauty>0.5</Beauty>
       <SolarWeb-Stratum-Insulation>0.95</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
-      <Steel>20</Steel>
+      <Steel>8</Steel>
     </costList>
     <uiOrder>2200</uiOrder>
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
@@ -61,13 +61,13 @@
     <description>Heavy-duty, double-layered metal plates with internal structural supports. Designed to withstand significant pressure differentials and micrometeoroid impacts.</description>
     <statBases>
       <MaxHitPoints>325</MaxHitPoints>
-      <WorkToBuild>1200</WorkToBuild>
+      <WorkToBuild>400</WorkToBuild>
       <Beauty>1.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
-      <Steel>25</Steel>
-      <ComponentIndustrial>1</ComponentIndustrial>
+      <Steel>12</Steel>
+      <Plasteel>2</Plasteel>
     </costList>
     <uiOrder>2210</uiOrder>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
@@ -113,13 +113,13 @@
     <description>Top-tier orbital roofing. Combines the structural integrity of reinforced hull plating with integrated solar collection cells. While expensive, it provides power while serving as a high-pressure seal.</description>
     <statBases>
       <MaxHitPoints>300</MaxHitPoints>
-      <WorkToBuild>1000</WorkToBuild>
+      <WorkToBuild>500</WorkToBuild>
       <Beauty>1.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
-      <Steel>35</Steel>
-      <ComponentIndustrial>1</ComponentIndustrial>
+      <Steel>18</Steel>
+      <Plasteel>4</Plasteel>
     </costList>
     <uiOrder>2220</uiOrder>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
@@ -167,13 +167,13 @@
     <description>Thick, lead-lined glass panels held in a steel frame. Allows viewing the stars while maintaining an airtight seal, though it is less insulating and strong than solid hull plates.</description>
     <statBases>
       <MaxHitPoints>150</MaxHitPoints>
-      <WorkToBuild>1200</WorkToBuild>
+      <WorkToBuild>400</WorkToBuild>
       <Beauty>2.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.5</SolarWeb-Stratum-Insulation>
     </statBases>
     <costList>
-      <Steel>5</Steel>
-      <Plasteel>5</Plasteel>
+      <Steel>3</Steel>
+      <Plasteel>3</Plasteel>
     </costList>
     <uiOrder>2230</uiOrder>
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>

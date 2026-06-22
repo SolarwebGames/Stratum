@@ -21,7 +21,7 @@
     <description>A natural roof of thin stone. While sturdy, it is rough and unattractive.</description>
     <statBases>
       <MaxHitPoints>400</MaxHitPoints>
-      <Beauty>-2</Beauty>
+      <Beauty>-1</Beauty>
       <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
     </statBases>
   </ThingDef>
