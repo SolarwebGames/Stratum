@@ -35,6 +35,13 @@ public static class RoofGrid_Patch
   }
 
   [HarmonyPatch(typeof(RoofGrid), nameof(RoofGrid.SetRoof))]
+  [HarmonyPrefix]
+  public static void SetRoof_Prefix(IntVec3 c, Map ___map, out RoofDef? __state)
+  {
+    __state = ___map.roofGrid.RoofAt(c);
+  }
+
+  [HarmonyPatch(typeof(RoofGrid), nameof(RoofGrid.SetRoof))]
   [HarmonyPostfix]
   public static void SetRoof_Postfix(IntVec3 c, RoofDef def, Map ___map, RoofDef? __state)
   {
