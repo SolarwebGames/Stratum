@@ -9,7 +9,7 @@ using SolarWeb.Stratum.WorldComponents;
 
 namespace SolarWeb.Stratum.UI;
 
-public class SelectedRoof : ISelectable, IRenameable
+public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
 {
   public Map map = null!;
   public IntVec3 cell;
@@ -33,6 +33,8 @@ public class SelectedRoof : ISelectable, IRenameable
       return def.LabelCap;
     }
   }
+
+  public bool CanCancel => map.areaManager.NoRoof[cell];
 
   public SelectedRoof(Map map, IntVec3 cell, RoofDef def)
   {
@@ -77,9 +79,11 @@ public class SelectedRoof : ISelectable, IRenameable
     {
       yield return new Command_Action
       {
+        
         defaultLabel = "Stratum_CancelRoofRemoval".Translate(),
         defaultDesc = "Stratum_CancelRoofRemovalDesc".Translate(),
         icon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel"),
+        hotKey = KeyBindingDefOf.Designator_Cancel,
         action = delegate
         {
           map.areaManager.NoRoof[cell] = false;
@@ -127,5 +131,13 @@ public class SelectedRoof : ISelectable, IRenameable
   public override int GetHashCode()
   {
     return map.GetHashCode() ^ cell.GetHashCode();
+  }
+
+  public void CancelByDesignator()
+  {
+    if (map.areaManager.NoRoof[cell])
+    {
+      map.areaManager.NoRoof[cell] = false;
+    }
   }
 }
