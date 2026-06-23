@@ -9,6 +9,7 @@
     <selectable>false</selectable>
     <drawerType>None</drawerType>
     <drawGUIOverlay>false</drawGUIOverlay>
+    <drawStyleCategory>Floors</drawStyleCategory>
     <pathCost>0</pathCost>
     <statBases>
       <Flammability>0</Flammability>

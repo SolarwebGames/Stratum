@@ -21,7 +21,7 @@ public class BuildCustomRoof : Designator_Build
   private Color? selectedTint;
 
   public Color? SelectedTint => selectedTint;
-  public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Areas;
+  public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Floors;
   protected override DesignationDef Designation => null!;
 
   public override ThingDef? StuffDef
