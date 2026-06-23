@@ -9,7 +9,7 @@ namespace SolarWeb.Stratum.Utilities;
 public static class GenRoofExplosion
 {
   public static void DoExplosion(
-    IntVec3 center, Map map, float radius, DamageDef damType, Thing instigator, 
+    IntVec3 center, Map map, float radius, DamageDef damType, Thing? instigator, 
     int damAmount = -1, float armorPenetration = -1f, SoundDef? explosionSound = null, 
     ThingDef? weapon = null, ThingDef? projectile = null, Thing? intendedTarget = null, 
     ThingDef? postExplosionSpawnThingDef = null, float postExplosionSpawnChance = 0f, 

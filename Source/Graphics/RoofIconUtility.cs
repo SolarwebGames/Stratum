@@ -15,6 +15,11 @@ public static class RoofIconUtility
 
     if ((icon == null || icon == BaseContent.BadTex || bDef?.uiIcon == icon) && gd != null && RoofAtlasManager.TryGetUv(gd.texPath, out var uvs, out var mat))
     {
+      if (mat == null)
+      {
+        mat = MaterialPool.MatFrom(gd.texPath, ShaderDatabase.Cutout, gd.color);
+      }
+
       if (uvs != null && uvs.Length >= 4)
       {
         float minU = uvs[0].x;
@@ -23,8 +28,8 @@ public static class RoofIconUtility
         float maxV = uvs[2].y;
 
         RenderTexture rt = RenderTexture.GetTemporary(64, 64, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
-        Vector2 scale = new Vector2(maxU - minU, maxV - minV);
-        Vector2 offset = new Vector2(minU, minV);
+        Vector2 scale = new(maxU - minU, maxV - minV);
+        Vector2 offset = new(minU, minV);
         UnityEngine.Graphics.Blit(mat.mainTexture, rt, scale, offset);
 
         RenderTexture prev = RenderTexture.active;
