@@ -1,3 +1,7 @@
+0.6.8: 
+  Bug Fix: Updated Selector patch types to make them less fragile - this should hopefully address some crash possibilities.
+  Bug Fix: Adjusted roof draw style category to floors (it makes sense, trust me). This will hopefully fix issues with drawing roof construction areas.
+
 0.6.6:
   Feature: Added compatibility for Combat Extended.
   Balance: Added Fabrication as a research requirement for luxury glass roofs.
