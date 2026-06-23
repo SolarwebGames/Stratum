@@ -15,8 +15,10 @@ public static class Selector_Patch
 {
   [HarmonyPatch(typeof(Selector), "SelectableObjectsUnderMouse")]
   [HarmonyPostfix]
-  public static IEnumerable<object> SelectableObjectsUnderMouse_Postfix(IEnumerable<object> __result)
+  public static void SelectableObjectsUnderMouse_Postfix(ref IEnumerable<object> __result)
   {
+    if (__result == null) return;
+
     if (Find.PlaySettings.showRoofOverlay)
     {
       IntVec3 cell = Verse.UI.MouseCell();
@@ -26,18 +28,20 @@ public static class Selector_Patch
         RoofDef roof = map.roofGrid.RoofAt(cell);
         if (RoofStatCache.IsCustomRoof(roof))
         {
-          yield return Find.World.GetComponent<RoofSelectionPool>().Get(map, cell, roof);
+          var list = new List<object> { Find.World.GetComponent<RoofSelectionPool>().Get(map, cell, roof) };
+          list.AddRange(__result);
+          __result = list;
         }
       }
     }
-
-    foreach (var obj in __result) yield return obj;
   }
 
   [HarmonyPatch(typeof(Selector), "SelectableObjectsAt")]
   [HarmonyPostfix]
-  public static IEnumerable<object> SelectableObjectsAt_Postfix(IEnumerable<object> __result, IntVec3 c, Map map)
+  public static void SelectableObjectsAt_Postfix(ref IEnumerable<object> __result, IntVec3 c, Map map)
   {
+    if (__result == null) return;
+
     if (Find.PlaySettings.showRoofOverlay)
     {
       if (c.InBounds(map))
@@ -45,12 +49,12 @@ public static class Selector_Patch
         RoofDef roof = map.roofGrid.RoofAt(c);
         if (RoofStatCache.IsCustomRoof(roof))
         {
-          yield return Find.World.GetComponent<RoofSelectionPool>().Get(map, c, roof);
+          var list = new List<object> { Find.World.GetComponent<RoofSelectionPool>().Get(map, c, roof) };
+          list.AddRange(__result);
+          __result = list;
         }
       }
     }
-
-    foreach (var obj in __result) yield return obj;
   }
 
   [HarmonyPatch(typeof(Selector), "SelectInternal")]
