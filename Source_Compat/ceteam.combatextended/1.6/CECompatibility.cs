@@ -1,10 +1,12 @@
 using CombatExtended;
 using CombatExtended.Compatibility;
+using RimWorld;
 using Verse;
 using Verse.Sound;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.MapComponents;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches.CE;
 
@@ -35,6 +37,7 @@ public static class CECompatibility
         {
           float damage = projectile.DamageAmount;
           float penetration = projectile.PenetrationAmount;
+          var damageDef = projectile.def.projectile.damageDef;
 
           float radius = projectile.def.projectile.explosionRadius;
           if (radius > 0f)
@@ -47,14 +50,14 @@ public static class CECompatibility
                 var cRoof = map.roofGrid.RoofAt(c);
                 if (cRoof != null && cRoof.HasModExtension<BuildableRoofExtension>())
                 {
-                  ApplyCEDamage(integrityGrid, c, cRoof, damage, penetration);
+                  ApplyCEDamage(integrityGrid, map, c, cRoof, damage, penetration, damageDef, projectile);
                 }
               }
             }
           }
           else
           {
-            ApplyCEDamage(integrityGrid, pos, roof, damage, penetration);
+            ApplyCEDamage(integrityGrid, map, pos, roof, damage, penetration, damageDef, projectile);
           }
 
           if (!projectile.def.projectile.soundExplode.NullOrUndefined())
@@ -72,9 +75,13 @@ public static class CECompatibility
     return false;
   }
 
-  private static void ApplyCEDamage(RoofIntegrityGrid grid, IntVec3 cell, RoofDef roof, float damage, float penetration)
+  private static void ApplyCEDamage(RoofIntegrityGrid grid, Map map, IntVec3 cell, RoofDef roof, float damage, float penetration, DamageDef damageDef, Thing instigator)
   {
-    grid.TakeDamage(cell, damage, penetration);
+    grid.TakeDamage(cell, damage, penetration, new DamageInfo(damageDef, damage));
+    if (damageDef != null && (damageDef.igniteCellChance > 0f || damageDef == DamageDefOf.Flame || damageDef == DamageDefOf.Burn))
+    {
+      RoofFireUtility.TryIgniteRoofAt(cell, map, instigator);
+    }
   }
 }
 

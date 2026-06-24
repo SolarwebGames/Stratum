@@ -1,6 +1,7 @@
 using HarmonyLib;
 using Verse;
 using SolarWeb.Stratum.Things;
+using SolarWeb.Stratum.Explosions;
 
 namespace SolarWeb.Stratum.Patches;
 

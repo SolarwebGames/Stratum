@@ -5,6 +5,7 @@ using RimWorld;
 using Verse;
 using SolarWeb.Stratum.Graphics;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Explosions;
 
 namespace SolarWeb.Stratum.Utilities;
 
@@ -13,13 +14,29 @@ public static class StratumDebugTools
   [DebugAction("Stratum", "Roof Explosion (Small)", false, false, false, false, false, 0, false, actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
   public static void RoofExplosionSmall()
   {
-    GenRoofExplosion.DoExplosion(Verse.UI.MouseCell(), Find.CurrentMap, 0.9f, DamageDefOf.Bomb, null, 50);
+    GenRoofExplosion.DoExplosion(new ExplosionConfig
+    {
+      center = Verse.UI.MouseCell(),
+      map = Find.CurrentMap,
+      radius = 0.9f,
+      damType = DamageDefOf.Bomb,
+      instigator = null,
+      damAmount = 50
+    });
   }
 
   [DebugAction("Stratum", "Roof Explosion (Large)", false, false, false, false, false, 0, false, actionType = DebugActionType.ToolMap, allowedGameStates = AllowedGameStates.PlayingOnMap)]
   public static void RoofExplosionLarge()
   {
-    GenRoofExplosion.DoExplosion(Verse.UI.MouseCell(), Find.CurrentMap, 1.9f, DamageDefOf.Bomb, null, 150);
+    GenRoofExplosion.DoExplosion(new ExplosionConfig
+    {
+      center = Verse.UI.MouseCell(),
+      map = Find.CurrentMap,
+      radius = 1.9f,
+      damType = DamageDefOf.Bomb,
+      instigator = null,
+      damAmount = 150
+    });
   }
 
 
@@ -85,7 +102,7 @@ public static class StratumDebugTools
     }
 
     string path = System.IO.Path.Combine(GenFilePaths.ConfigFolderPath, "Stratum_RoofGraphicsDebug.xml");
-    XDocument doc = new XDocument(root);
+    var doc = new XDocument(root);
     doc.Save(path);
     Messages.Message("Exported roof graphics data to " + path, MessageTypeDefOf.TaskCompletion, false);
   }

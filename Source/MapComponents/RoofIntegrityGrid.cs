@@ -219,6 +219,8 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public void TakeDamage(IntVec3 cell, float amount, float penetration = 0f, DamageInfo? dinfo = null)
   {
+    if (dinfo != null && !dinfo.Value.Def.harmsHealth) return;
+
     if (!cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     if (hitPoints[index] <= 0) return;

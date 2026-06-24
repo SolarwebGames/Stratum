@@ -32,7 +32,7 @@
 
   <ThingDef>
     <defName>SolarWeb-Stratum-RoofExplosion</defName>
-    <thingClass>SolarWeb.Stratum.Things.RoofExplosion</thingClass>
+    <thingClass>SolarWeb.Stratum.Explosions.RoofExplosion</thingClass>
     <category>Ethereal</category>
     <tickerType>Normal</tickerType>
     <altitudeLayer>MetaOverlays</altitudeLayer>
