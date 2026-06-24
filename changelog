@@ -1,3 +1,10 @@
+0.8.3:
+  Feature: Retractable roofs. Build a set of retractable roofs and a Retractable Roof Console to allow a room to open up to the skies at will.
+  Feature: Thermal Radiator roofs. These roofs actively cool a room, and can be controlled by a Thermostat placed in the room.
+  Bug Fix: Improved various Harmony patches.
+  Bug Fix: Explosions that impact roofs will now respect damage types.
+  Bug Fix: Many stats were migrated to traditional RimWorld stats. You can now see more information by inspecting roofs.
+
 0.6.8: 
   Bug Fix: Updated Selector patch types to make them less fragile - this should hopefully address some crash possibilities.
   Bug Fix: Adjusted roof draw style category to floors (it makes sense, trust me). This will hopefully fix issues with drawing roof construction areas.
