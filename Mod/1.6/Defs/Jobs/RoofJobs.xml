@@ -23,4 +23,12 @@
     <casualInterruptible>false</casualInterruptible>
     <allowOpportunisticPrefix>false</allowOpportunisticPrefix>
   </JobDef>
+  
+  <JobDef>
+    <defName>SolarWeb-Stratum-OperateRetractableRoofConsole</defName>
+    <driverClass>SolarWeb.Stratum.AI.JobDrivers.OperateRetractableRoofConsole</driverClass>
+    <reportString>operating retractable roof console.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+    <allowOpportunisticPrefix>false</allowOpportunisticPrefix>
+  </JobDef>
 </Defs>

@@ -47,4 +47,19 @@
     </requiredCapacities>
     <canBeDoneByMechs>true</canBeDoneByMechs>
   </WorkGiverDef>
+  
+  <WorkGiverDef>
+    <defName>SolarWeb-Stratum-OperateRetractableRoofConsole</defName>
+    <label>operate retractable roof console</label>
+    <giverClass>SolarWeb.Stratum.AI.WorkGivers.OperateRetractableRoofConsole</giverClass>
+    <workType>Construction</workType>
+    <priorityInType>110</priorityInType> <!-- High priority in construction so pawns respond quickly -->
+    <verb>operate roof console</verb>
+    <gerund>operating roof console</gerund>
+    <scanThings>true</scanThings>
+    <scanCells>false</scanCells>
+    <requiredCapacities>
+      <li>Manipulation</li>
+    </requiredCapacities>
+  </WorkGiverDef>
 </Defs>

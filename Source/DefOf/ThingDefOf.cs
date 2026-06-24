@@ -15,6 +15,9 @@ public static class ThingDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofExplosion")]
   public static ThingDef RoofExplosion = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}RetractableRoofConsole")]
+  public static ThingDef RetractableRoofConsole = default!;
+
   static ThingDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(ThingDefOf));

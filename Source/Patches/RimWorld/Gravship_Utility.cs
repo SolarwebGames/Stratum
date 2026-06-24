@@ -1,12 +1,12 @@
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
+using Verse;
+
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.WorldComponents;
-using System.Collections.Generic;
-using UnityEngine;
-using Verse;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -41,7 +41,26 @@ public static class GravshipUtility_Patch
     {
       var local = cell - origin;
       var roof = map.roofGrid.RoofAt(cell);
-      if (RoofStatCache.IsCustomRoof(roof))
+
+      if (roof == null)
+      {
+        var rTracker = map.GetComponent<RetractableRoofTracker>();
+        if (rTracker != null)
+        {
+          int index = map.cellIndices.CellToIndex(cell);
+          if (rTracker.PeekOpenRoof(index, out var retractedDef, out var rStuff, out var rTint, out var rHp))
+          {
+            roofs[local] = new GravshipRoofTracker.RoofCellData
+            {
+              roofDef = retractedDef,
+              stuff = rStuff,
+              hitPoints = rHp,
+              glassTint = rTint
+            };
+          }
+        }
+      }
+      else if (RoofStatCache.IsCustomRoof(roof))
       {
         roofs[local] = new GravshipRoofTracker.RoofCellData
         {

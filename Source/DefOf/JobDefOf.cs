@@ -15,6 +15,9 @@ public static class JobDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RepairCustomRoof")]
   public static JobDef RepairCustomRoof = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}OperateRetractableRoofConsole")]
+  public static JobDef OperateRetractableRoofConsole = default!;
+
   static JobDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(JobDefOf));

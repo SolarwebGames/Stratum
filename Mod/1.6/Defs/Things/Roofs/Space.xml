@@ -217,5 +217,149 @@
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
+  
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RetractableRoof_Buildable</defName>
+    <label>heavy retractable canopy</label>
+    <description>A motorized, high-tech armored canopy segment. Retracts outward when authorized by a connected console. Requires extreme power when transitioning.</description>
+    <statBases>
+      <MaxHitPoints>180</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Beauty>2.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.90</SolarWeb-Stratum-Insulation>
+    </statBases>
+    <costList>
+      <Steel>10</Steel>
+      <Plasteel>5</Plasteel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2240</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>MicroelectronicsBasics</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RetractableRoof</defName>
+    <label>heavy retractable canopy</label>
+    <description>A motorized, high-tech armored canopy segment. Retracts outward when authorized by a connected console. Requires extreme power when transitioning.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RetractableRoof_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.28, 0.28, 0.28)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.10</thermalConductivity>
+        <damageThreshold>10</damageThreshold>
+        <armorRating>0.25</armorRating>
+        <isRetractable>true</isRetractable>
+        <transitionTicksPerRing>120</transitionTicksPerRing>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-RetractableRoofLight_Buildable</defName>
+    <label>light retractable canopy</label>
+    <description>A lightweight, motorized canopy segment. Retracts outward quickly when authorized by a connected console. Requires less power and materials than the heavy variant, but offers minimal protection.</description>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Beauty>1.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.50</SolarWeb-Stratum-Insulation>
+    </statBases>
+    <costList>
+      <Steel>5</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2241</uiOrder>
+    <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>MicroelectronicsBasics</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-RetractableRoofLight</defName>
+    <label>light retractable canopy</label>
+    <description>A lightweight, motorized canopy segment. Retracts outward quickly when authorized by a connected console. Requires less power and materials than the heavy variant, but offers minimal protection.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-RetractableRoofLight_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/GenericTile</texPath>
+          <color>(0.4, 0.4, 0.45)</color>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <thermalConductivity>0.30</thermalConductivity>
+        <damageThreshold>5</damageThreshold>
+        <armorRating>0.05</armorRating>
+        <isRetractable>true</isRetractable>
+        <transitionTicksPerRing>45</transitionTicksPerRing>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-RetractableRoofConsole</defName>
+    <label>retractable canopy console</label>
+    <description>A command console that links to all retractable armored canopy segments in its room. Requires 200W of standby power, but draws 1500W while actively opening or closing the canopy. Pawns can operate this console to trigger a 1-second authorization sequence.</description>
+    <thingClass>SolarWeb.Stratum.Things.RetractableRoofConsole</thingClass>
+    <tickerType>Normal</tickerType>
+    <graphicData>
+      <texPath>Things/Building/Misc/CommsConsole</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <drawSize>(2,2)</drawSize>
+      <damageData>
+        <cornerTL>Damage/Corner</cornerTL>
+        <cornerTR>Damage/Corner</cornerTR>
+        <cornerBL>Damage/Corner</cornerBL>
+        <cornerBR>Damage/Corner</cornerBR>
+      </damageData>
+    </graphicData>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <blockWind>true</blockWind>
+    <fillPercent>0.5</fillPercent>
+    <canOverlapZones>false</canOverlapZones>
+    <statBases>
+      <MaxHitPoints>250</MaxHitPoints>
+      <WorkToBuild>2000</WorkToBuild>
+      <Mass>20</Mass>
+      <Flammability>0.5</Flammability>
+    </statBases>
+    <size>(2,2)</size>
+    <costList>
+      <Steel>100</Steel>
+      <Plasteel>30</Plasteel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+      <ComponentSpacer>1</ComponentSpacer>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>200</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Flickable" />
+    </comps>
+    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <hasInteractionCell>true</hasInteractionCell>
+    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
+    <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+    <researchPrerequisites>
+      <li>MicroelectronicsBasics</li>
+      <li>Fabrication</li>
+    </researchPrerequisites>
+  </ThingDef>
 
 </Defs>

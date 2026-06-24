@@ -55,6 +55,27 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
       }
     }
 
+    if (CurrentRoofData != null)
+    {
+      var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
+      foreach (var kvp in CurrentRoofData)
+      {
+         if (kvp.Value.roofDef != null)
+         {
+            var targetCell = root + PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation);
+            if (map.roofGrid.RoofAt(targetCell) == null)
+            {
+               map.roofGrid.SetRoof(targetCell, kvp.Value.roofDef);
+               
+               if (integrityGrid != null)
+               {
+                  integrityGrid.InitializeRoof(targetCell, kvp.Value.roofDef, kvp.Value.stuff, kvp.Value.glassTint ?? UnityEngine.Color.white, kvp.Value.hitPoints);
+               }
+            }
+         }
+      }
+    }
+
     CurrentLandingGravship = null;
     CurrentLandingRoot = IntVec3.Zero;
     CurrentRoofData = null;
