@@ -75,7 +75,7 @@ public class SolarRoofMapComponent : MapComponent
     int idx = map.cellIndices.CellToIndex(c);
     if (roof == null) roof = map.roofGrid.RoofAt(idx);
 
-    if (roof != null && RoofStatCache.GetSolarEfficiency(roof) > 0f)
+    if (roof != null && RoofStatCache.GetSolarOutput(roof) > 0f)
     {
       solarRoofCells.Add(idx);
     }
@@ -163,13 +163,13 @@ public class SolarRoofMapComponent : MapComponent
       var roof = map.roofGrid.RoofAt(currIdx);
       if (roof == null) continue;
 
-      float efficiency = RoofStatCache.GetSolarEfficiency(roof);
-      if (efficiency <= 0f) continue;
+      float output = RoofStatCache.GetSolarOutput(roof);
+      if (output <= 0f) continue;
 
       net.cells.Add(new SolarCellInfo
       {
         cellIdx = currIdx,
-        baseEfficiency = efficiency,
+        baseOutput = output,
         maxHP = RoofStatCache.GetMaxHitPoints(roof)
       });
 
@@ -242,7 +242,6 @@ public class SolarRoofMapComponent : MapComponent
       {
         var netResults = new Dictionary<PowerNet, float>();
         var cellResults = new Dictionary<int, SolarPowerStats>();
-        const float BasePowerPerCell = 100f;
 
         foreach (var net in snapshot)
         {
@@ -257,16 +256,16 @@ public class SolarRoofMapComponent : MapComponent
               touchedNets.Add(pNet);
             }
 
-            float curEff = cellInfo.baseEfficiency;
+            float curOut = cellInfo.baseOutput;
             if (cellInfo.maxHP > 0)
             {
               IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
               short hp = integrityGrid.GetHitPoints(pos);
-              curEff *= (float)hp / cellInfo.maxHP;
+              curOut *= (float)hp / cellInfo.maxHP;
             }
 
-            float cellCur = curEff * skyGlow * BasePowerPerCell;
-            float cellMax = cellInfo.baseEfficiency * BasePowerPerCell;
+            float cellCur = curOut * skyGlow;
+            float cellMax = cellInfo.baseOutput;
 
             cellResults[cellInfo.cellIdx] = new SolarPowerStats { currentPower = cellCur, maxPower = cellMax };
 
@@ -304,7 +303,7 @@ public class SolarRoofMapComponent : MapComponent
   private struct SolarCellInfo
   {
     public int cellIdx;
-    public float baseEfficiency;
+    public float baseOutput;
     public int maxHP;
   }
 

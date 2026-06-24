@@ -11,6 +11,9 @@
       <Beauty>0</Beauty>
       <MarketValue>10</MarketValue>
       <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.1</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>5</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.20</SolarWeb-Stratum-ArmorRating>
     </statBases>
   </ThingDef>
 
@@ -23,6 +26,9 @@
       <MaxHitPoints>400</MaxHitPoints>
       <Beauty>-1</Beauty>
       <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.1</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>10</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.40</SolarWeb-Stratum-ArmorRating>
     </statBases>
   </ThingDef>
 
@@ -35,6 +41,9 @@
       <MaxHitPoints>2000</MaxHitPoints>
       <Beauty>-2</Beauty>
       <SolarWeb-Stratum-Insulation>1.0</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.0</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>50</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.90</SolarWeb-Stratum-ArmorRating>
     </statBases>
   </ThingDef>
 

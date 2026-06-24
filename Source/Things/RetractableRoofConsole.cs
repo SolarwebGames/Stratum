@@ -321,7 +321,7 @@ public class RetractableRoofConsole : Building
     {
       var flick = GetComp<CompFlickable>();
       if (flick != null && !flick.SwitchIsOn) return;
-      
+
       var breakdown = GetComp<CompBreakdownable>();
       if (breakdown != null && breakdown.BrokenDown) return;
     }
@@ -359,9 +359,15 @@ public class RetractableRoofConsole : Building
         var ext = rDef.GetModExtension<BuildableRoofExtension>();
         if (ext != null && ext.isRetractable)
         {
-          if (ext.transitionTicksPerRing > animationDuration)
+          int ticks = 30;
+          if (ext.buildableDef != null)
           {
-            animationDuration = ext.transitionTicksPerRing;
+            ticks = Mathf.RoundToInt(ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.TransitionSpeed));
+          }
+
+          if (ticks > animationDuration)
+          {
+            animationDuration = ticks;
           }
         }
       }
@@ -431,8 +437,8 @@ public class RetractableRoofConsole : Building
                 {
                   Vector3 start = cell.ToVector3Shifted();
                   Vector3 rawDir = (start - roomCentroid).normalized;
-                  Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z) 
-                    ? new Vector3(Mathf.Sign(rawDir.x), 0, 0) 
+                  Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z)
+                    ? new Vector3(Mathf.Sign(rawDir.x), 0, 0)
                     : new Vector3(0, 0, Mathf.Sign(rawDir.z));
                   Vector3 end = start + dir * 1f;
 
@@ -470,8 +476,8 @@ public class RetractableRoofConsole : Building
                   {
                     Vector3 end = cell.ToVector3Shifted();
                     Vector3 rawDir = (end - roomCentroid).normalized;
-                    Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z) 
-                      ? new Vector3(Mathf.Sign(rawDir.x), 0, 0) 
+                    Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z)
+                      ? new Vector3(Mathf.Sign(rawDir.x), 0, 0)
                       : new Vector3(0, 0, Mathf.Sign(rawDir.z));
                     Vector3 start = end + dir * 1f;
 

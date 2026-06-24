@@ -110,8 +110,8 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
     float transparency = RoofStatCache.GetTransparency(def);
     if (transparency > 0) sb.AppendLine("Stratum_Transparency".Translate() + ": " + transparency.ToStringPercent());
 
-    float solarEff = RoofStatCache.GetSolarEfficiency(def);
-    if (solarEff > 0) sb.AppendLine("Stratum_SolarEfficiency".Translate() + ": " + solarEff.ToStringPercent());
+    float solarOut = RoofStatCache.GetSolarOutput(def);
+    if (solarOut > 0) sb.AppendLine(DefOf.StatDefOf.SolarOutput.LabelCap + ": " + solarOut.ToString("F1") + " W");
 
     float conductivity = RoofStatCache.GetThermalConductivity(def, integrity?.GetStuff(cell));
     float insulation = 1f - conductivity;

@@ -9,6 +9,9 @@
       <WorkToBuild>300</WorkToBuild>
       <Beauty>0.5</Beauty>
       <SolarWeb-Stratum-Insulation>0.95</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.05</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>8</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.35</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
       <Steel>8</Steel>
@@ -39,9 +42,6 @@
           </edgeData>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <thermalConductivity>0.05</thermalConductivity>
-        <damageThreshold>8</damageThreshold>
-        <armorRating>0.35</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hull Plating</Name>
@@ -64,6 +64,9 @@
       <WorkToBuild>400</WorkToBuild>
       <Beauty>1.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.02</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>15</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.50</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
       <Steel>12</Steel>
@@ -91,9 +94,6 @@
           <color>(0.25, 0.25, 0.25)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <thermalConductivity>0.02</thermalConductivity>
-        <damageThreshold>15</damageThreshold>
-        <armorRating>0.50</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Reinforced Hull Plating</Name>
@@ -116,6 +116,10 @@
       <WorkToBuild>500</WorkToBuild>
       <Beauty>1.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.98</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-SolarOutput>50</SolarWeb-Stratum-SolarOutput>
+      <SolarWeb-Stratum-ThermalConductivity>0.02</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>12</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.45</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
       <Steel>18</Steel>
@@ -144,10 +148,6 @@
           <color>(0.15, 0.15, 0.25)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <solarEfficiency>0.5</solarEfficiency>
-        <thermalConductivity>0.02</thermalConductivity>
-        <damageThreshold>12</damageThreshold>
-        <armorRating>0.45</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Hull Plate</Name>
@@ -170,6 +170,10 @@
       <WorkToBuild>400</WorkToBuild>
       <Beauty>2.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.5</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-Transparency>0.8</SolarWeb-Stratum-Transparency>
+      <SolarWeb-Stratum-ThermalConductivity>0.5</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>5</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.20</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
       <Steel>3</Steel>
@@ -200,11 +204,7 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>true</isSkylight>
-        <transparency>0.8</transparency>
         <glassTint>(0.8, 0.9, 1.0)</glassTint>
-        <thermalConductivity>0.5</thermalConductivity>
-        <damageThreshold>5</damageThreshold>
-        <armorRating>0.20</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Panel</Name>
@@ -227,6 +227,10 @@
       <WorkToBuild>600</WorkToBuild>
       <Beauty>2.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.90</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.10</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>10</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.25</SolarWeb-Stratum-ArmorRating>
+      <SolarWeb-Stratum-TransitionSpeed>120</SolarWeb-Stratum-TransitionSpeed>
     </statBases>
     <costList>
       <Steel>10</Steel>
@@ -255,11 +259,7 @@
           <color>(0.28, 0.28, 0.28)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <thermalConductivity>0.10</thermalConductivity>
-        <damageThreshold>10</damageThreshold>
-        <armorRating>0.25</armorRating>
         <isRetractable>true</isRetractable>
-        <transitionTicksPerRing>120</transitionTicksPerRing>
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
@@ -273,6 +273,10 @@
       <WorkToBuild>300</WorkToBuild>
       <Beauty>1.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.50</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.30</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>5</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.05</SolarWeb-Stratum-ArmorRating>
+      <SolarWeb-Stratum-TransitionSpeed>45</SolarWeb-Stratum-TransitionSpeed>
     </statBases>
     <costList>
       <Steel>5</Steel>
@@ -300,11 +304,7 @@
           <color>(0.4, 0.4, 0.45)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <thermalConductivity>0.30</thermalConductivity>
-        <damageThreshold>5</damageThreshold>
-        <armorRating>0.05</armorRating>
         <isRetractable>true</isRetractable>
-        <transitionTicksPerRing>45</transitionTicksPerRing>
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>

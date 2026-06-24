@@ -80,7 +80,7 @@ public static class ParallelMapScanner
       }
     }
 
-    if (solar != null && RoofStatCache.GetSolarEfficiency(roof) > 0f)
+    if (solar != null && RoofStatCache.GetSolarOutput(roof) > 0f)
     {
       local.solar.Add(i);
     }

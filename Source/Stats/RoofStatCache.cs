@@ -14,7 +14,7 @@ public static class RoofStatCache
   private static readonly Dictionary<int, float> baseBeautyCache = [];
   private static readonly Dictionary<int, float> baseWealthCache = [];
   private static readonly Dictionary<int, float> cleanlinessCache = [];
-  private static readonly Dictionary<int, float> solarEfficiencyCache = [];
+  private static readonly Dictionary<int, float> solarOutputCache = [];
   private static readonly Dictionary<int, float> transparencyCache = [];
   private static readonly Dictionary<int, float> thermalConductivityCache = [];
   private static readonly Dictionary<int, bool> airtightCache = [];
@@ -40,15 +40,9 @@ public static class RoofStatCache
         int hash = def.defNameHash;
         buildableCache.Add(hash);
 
-        if (ext.solarEfficiency > 0f) solarEfficiencyCache[hash] = ext.solarEfficiency;
-        if (ext.transparency > 0f) transparencyCache[hash] = ext.transparency;
-        thermalConductivityCache[hash] = ext.thermalConductivity;
         airtightCache[hash] = ext.isAirtight;
         if (ext.isSkylight) skylightCache.Add(hash);
         if (ext.glassTint.HasValue) glassTintCache[hash] = ext.glassTint.Value;
-
-        damageThresholdCache[hash] = ext.damageThreshold;
-        armorRatingCache[hash] = ext.armorRating;
 
         if (ext.graphicData != null)
         {
@@ -71,8 +65,17 @@ public static class RoofStatCache
           }
           else
           {
-            thermalConductivityCache[hash] = ext.thermalConductivity;
+            thermalConductivityCache[hash] = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.ThermalConductivity, 0.1f);
           }
+
+          float transparency = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.Transparency, 0f);
+          if (transparency > 0f) transparencyCache[hash] = transparency;
+          
+          float solarOutput = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.SolarOutput, 0f);
+          if (solarOutput > 0f) solarOutputCache[hash] = solarOutput;
+          
+          damageThresholdCache[hash] = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.DamageThreshold, 0f);
+          armorRatingCache[hash] = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.ArmorRating, 0f);
 
           if (ext.graphicData == null && bDef is ThingDef tDef && tDef.graphicData != null)
           {
@@ -151,7 +154,7 @@ public static class RoofStatCache
       var ext = def.GetModExtension<BuildableRoofExtension>();
       if (ext?.buildableDef != null)
       {
-        float baseDT = ext.damageThreshold;
+        float baseDT = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.DamageThreshold);
         float stuffHP = ext.buildableDef.GetStatValueAbstract(StatDefOf.MaxHitPoints, stuff);
         float baseHP = ext.buildableDef.GetStatValueAbstract(StatDefOf.MaxHitPoints);
 
@@ -177,14 +180,15 @@ public static class RoofStatCache
       var ext = def.GetModExtension<BuildableRoofExtension>();
       if (ext?.buildableDef != null)
       {
-        float baseAR = ext.armorRating;
+        float baseAR = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.ArmorRating);
         float stuffAR = ext.buildableDef.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp, stuff);
         float baseBaseAR = ext.buildableDef.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp);
+        float stuffArmorMult = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.StuffArmorMultiplier);
 
         if (baseBaseAR > 0)
         {
           float stuffRatio = stuffAR / baseBaseAR;
-          ar = baseAR * (1f + (stuffRatio - 1f) * ext.stuffArmorMultiplier);
+          ar = baseAR * (1f + (stuffRatio - 1f) * stuffArmorMult);
         }
         else
         {
@@ -223,9 +227,9 @@ public static class RoofStatCache
     return 0f;
   }
 
-  public static float GetSolarEfficiency(RoofDef def)
+  public static float GetSolarOutput(RoofDef def)
   {
-    return solarEfficiencyCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
+    return solarOutputCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
   }
 
   public static float GetTransparency(RoofDef def)
@@ -285,9 +289,10 @@ public static class RoofStatCache
       {
         float baseInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation);
         float stuffInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation, stuff);
+        float stuffInsulationMult = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.StuffInsulationMultiplier);
         
         float delta = stuffInsulation - baseInsulation;
-        float finalInsulation = baseInsulation + (delta * ext.stuffInsulationMultiplier);
+        float finalInsulation = baseInsulation + (delta * stuffInsulationMult);
 
         if (finalInsulation > 0.99f && !def.isThickRoof) finalInsulation = 0.99f;
         

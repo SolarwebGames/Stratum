@@ -9,6 +9,11 @@
       <WorkToBuild>600</WorkToBuild>
       <Beauty>5.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.6</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-Transparency>0.6</SolarWeb-Stratum-Transparency>
+      <SolarWeb-Stratum-ThermalConductivity>0.4</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-StuffInsulationMultiplier>0.2</SolarWeb-Stratum-StuffInsulationMultiplier>
+      <SolarWeb-Stratum-DamageThreshold>2</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.10</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costStuffCount>12</costStuffCount>
     <stuffCategories>
@@ -39,12 +44,7 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>true</isSkylight>
-        <transparency>0.6</transparency>
         <glassTint>(0.6, 0.4, 1)</glassTint>
-        <thermalConductivity>0.4</thermalConductivity>
-        <stuffInsulationMultiplier>0.2</stuffInsulationMultiplier>
-        <damageThreshold>2</damageThreshold>
-        <armorRating>0.10</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Luxury Glass Panel</Name>
@@ -69,6 +69,9 @@
       <Cleanliness>0.6</Cleanliness>
       <MarketValue>38</MarketValue>
       <SolarWeb-Stratum-Insulation>0.95</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.05</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>7</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.30</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
       <Steel>3</Steel>
@@ -96,9 +99,6 @@
           <color>(0.71, 0.71, 0.71)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-        <thermalConductivity>0.05</thermalConductivity>
-        <damageThreshold>7</damageThreshold>
-        <armorRating>0.30</armorRating>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Sterile Tiled Roof</Name>
