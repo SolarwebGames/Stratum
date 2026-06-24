@@ -22,6 +22,7 @@ public static class Projectile_Patch
     if (__instance.def.projectile.flyOverhead)
     {
       var map = __instance.Map;
+      if (map == null || map.roofGrid == null) return true;
       var pos = __instance.Position;
       var roof = map.roofGrid.RoofAt(pos);
 

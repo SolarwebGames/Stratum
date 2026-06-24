@@ -50,6 +50,7 @@ public class CustomRoofsRenderer : SectionLayer
     ClearSubMeshes(MeshParts.All);
 
     Map map = base.Map;
+    if (map == null || map.roofGrid == null || map.fogGrid == null) return;
 
     var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
     if (integrityGrid != null && !integrityGrid.hasScanned && Visible)

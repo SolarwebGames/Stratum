@@ -38,6 +38,11 @@ public static class RoofGrid_Patch
   [HarmonyPrefix]
   public static void SetRoof_Prefix(IntVec3 c, Map ___map, out RoofDef? __state)
   {
+    if (___map == null || ___map.roofGrid == null)
+    {
+      __state = null;
+      return;
+    }
     __state = ___map.roofGrid.RoofAt(c);
   }
 
@@ -45,6 +50,7 @@ public static class RoofGrid_Patch
   [HarmonyPostfix]
   public static void SetRoof_Postfix(IntVec3 c, RoofDef def, Map ___map, RoofDef? __state)
   {
+    if (___map == null || ___map.roofGrid == null || ___map.areaManager == null) return;
     var currentRoof = ___map.roofGrid.RoofAt(c);
     if (currentRoof == __state) return;
 

@@ -14,6 +14,7 @@ public static class GlowGrid_Patch
   public static bool GroundGlowAt_Prefix(GlowGrid __instance, IntVec3 c, ref float __result, bool ignoreSky, Map ___map)
   {
     if (ignoreSky) return true;
+    if (___map == null || ___map.skyManager == null || ___map.roofGrid == null) return true;
 
     var roof = ___map.roofGrid.RoofAt(c);
     if (roof != null && RoofStatCache.IsCustomRoof(roof))
@@ -50,6 +51,7 @@ public static class GlowGrid_Patch
   [HarmonyPostfix]
   public static void VisualGlowAt_Postfix(int index, Map ___map, ref Color32 __result)
   {
+    if (___map == null || ___map.skyManager == null || ___map.roofGrid == null) return;
     var roof = ___map.roofGrid.RoofAt(index);
     if (roof == null) return;
 

@@ -227,6 +227,7 @@ public class SolarRoofMapComponent : MapComponent
       return;
     }
 
+    if (map.skyManager == null) return;
     float skyGlow = map.skyManager.CurSkyGlow;
     var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
     if (integrityGrid == null) return;
@@ -240,7 +241,7 @@ public class SolarRoofMapComponent : MapComponent
       foreach (var cellInfo in net.cells)
       {
         IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
-        var pNet = map.powerNetGrid.TransmittedPowerNetAt(pos);
+        var pNet = map.powerNetGrid?.TransmittedPowerNetAt(pos);
         if (pNet != null)
         {
           cellToNetMap[cellInfo.cellIdx] = pNet;

@@ -33,7 +33,7 @@ public class LightPoolRenderer : SectionLayer
     if (!Visible) return;
 
     var map = Map;
-    if (map == null) return;
+    if (map == null || map.skyManager == null) return;
 
     float skyGlow = map.skyManager.CurSkyGlow;
     if (skyGlow <= 0.01f) return;
@@ -52,6 +52,7 @@ public class LightPoolRenderer : SectionLayer
     ClearSubMeshes(MeshParts.All);
 
     Map map = base.Map;
+    if (map == null || map.roofGrid == null) return;
     RoofGrid roofGrid = map.roofGrid;
     CellRect cellRect = section.CellRect;
 
