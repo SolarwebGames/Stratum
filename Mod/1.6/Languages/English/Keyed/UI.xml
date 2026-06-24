@@ -10,4 +10,6 @@
   <Stratum_CloseCanopyDesc>Extend the roof canopy in this room.</Stratum_CloseCanopyDesc>
   <Stratum_CancelTransition>Cancel Transition</Stratum_CancelTransition>
   <Stratum_CancelTransitionDesc>Halt the canopy transition.</Stratum_CancelTransitionDesc>
+  <Stratum_ReconnectRoofNet>Reconnect Roof Net</Stratum_ReconnectRoofNet>
+  <Stratum_ReconnectRoofNetDesc>Cycle through available power networks for the connected radiator roofs.</Stratum_ReconnectRoofNetDesc>
 </LanguageData>

@@ -31,6 +31,7 @@ public class SolarRoofMapComponent : MapComponent
     base.FinalizeInit();
     dirty = true;
     Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+    Utilities.StratumHooks.OnCalculateEnergyGainRate += HandleEnergyGainRate;
   }
 
   internal void AddSolarCellInternal(int index)
@@ -49,6 +50,17 @@ public class SolarRoofMapComponent : MapComponent
       cellToPower.Clear();
     }
     Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+    Utilities.StratumHooks.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+  }
+
+  private void HandleEnergyGainRate(PowerNet net, ref float energyGainRate)
+  {
+    if (net.Map != map) return;
+    float solarPower = GetAdditionalPowerFor(net);
+    if (solarPower > 0f)
+    {
+      energyGainRate += solarPower / 60000f;
+    }
   }
 
   public override void MapComponentTick()

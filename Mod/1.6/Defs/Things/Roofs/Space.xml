@@ -352,7 +352,7 @@
       </li>
       <li Class="CompProperties_Flickable" />
     </comps>
-    <interactionCellOffset>(0,0,-1)</interactionCellOffset>
+    <interactionCellOffset>(0,0,1)</interactionCellOffset>
     <hasInteractionCell>true</hasInteractionCell>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>

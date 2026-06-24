@@ -27,6 +27,14 @@ public static class StratumHooks
   /// </summary>
   public static Func<RoofDef, float>? GlobalTransparencyCheck;
 
+  public delegate void PowerNetEnergyGainHandler(RimWorld.PowerNet net, ref float energyGainRate);
+
+  /// <summary>
+  /// Called after vanilla PowerNet.CurrentEnergyGainRate calculation.
+  /// Allows external components to safely add or subtract from the net's energy gain.
+  /// </summary>
+  public static PowerNetEnergyGainHandler? OnCalculateEnergyGainRate;
+
   internal static void Notify_RoofChanged(Map map, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
   {
     OnRoofChanged?.Invoke(map, c, oldRoof, newRoof);
