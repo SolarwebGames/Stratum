@@ -11,9 +11,16 @@ namespace SolarWeb.Stratum
       Log.Message($"[Stratum] {message}");
     }
 
-    public static void Error(string error)
+    public static void Error(string error, bool once = false)
     {
-      Log.Error($"[Stratum] {error}");
+      if (once)
+      {
+        Log.ErrorOnce($"[Stratum] {error}", error.GetHashCode());
+      }
+      else
+      {
+        Log.Error($"[Stratum] {error}");
+      }
     }
 
     public static void Message(string message)
