@@ -33,7 +33,7 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
       CurrentConstructionData = [];
       foreach (var kvp in data.construction)
       {
-        CurrentConstructionData[PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation)] = kvp.Value;
+        CurrentConstructionData[kvp.Key] = kvp.Value;
       }
     }
   }

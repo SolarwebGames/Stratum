@@ -52,12 +52,15 @@ public static class RoofGrid_Patch
     ___map.areaManager.NoRoof[c] = false;
     ___map.areaManager.BuildRoof[c] = false;
 
-    var room = c.GetRoom(___map);
-    if (room != null)
+    if (___map.regionAndRoomUpdater.Enabled)
     {
-      foreach (var district in room.Districts)
+      var room = c.GetRoom(___map);
+      if (room != null)
       {
-        district.Notify_RoofChanged();
+        foreach (var district in room.Districts)
+        {
+          district.Notify_RoofChanged();
+        }
       }
     }
 

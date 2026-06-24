@@ -8,17 +8,6 @@ namespace SolarWeb.Stratum.Patches;
 public static class Area_Patch
 {
   [HarmonyPatch(typeof(Area), "Set")]
-  [HarmonyPrefix]
-  public static bool Set_Prefix(Area __instance, IntVec3 c, bool val)
-  {
-    if (__instance.Map != null && __instance == __instance.Map.areaManager.BuildRoof)
-    {
-      return false;
-    }
-    return true;
-  }
-
-  [HarmonyPatch(typeof(Area), "Set")]
   [HarmonyPostfix]
   public static void Set_Postfix(Area __instance, IntVec3 c, ref bool val)
   {
