@@ -1,3 +1,6 @@
+0.8.6:
+  Bug Fix: Fixed an issue with forbidden roof frames when other roof frames are nearby and receiving resources.
+
 0.8.5:
   Minor: Added defensive null checks in many methods.
   Minor: Made roof frames forbiddable.
