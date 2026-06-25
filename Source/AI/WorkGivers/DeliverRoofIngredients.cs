@@ -88,7 +88,7 @@ public class DeliverRoofIngredients : WorkGiver_Scanner
         frame.Position, map, NearbyNeederScanRadius, useCenter: false))
       {
         if (totalNeeded >= totalAvailable) break;
-        if (!(other is RoofFrame otherFrame) || otherFrame == frame) continue;
+        if (!(other is RoofFrame otherFrame) || otherFrame == frame || otherFrame.IsForbidden(pawn)) continue;
 
         if (!pawn.CanReserveAndReach(otherFrame, PathEndMode.ClosestTouch, Danger.Deadly, 1, -1, null, forced)) continue;
 
