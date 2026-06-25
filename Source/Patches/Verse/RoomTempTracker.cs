@@ -24,6 +24,7 @@ public static class RoomTempTracker_Patch
   [HarmonyPostfix]
   public static void CalculateRoofCovereage_Postfix(RoomTempTracker __instance, Map map, Room ___room)
   {
+    if (___room == null || ___room.Cells == null || map == null) return;
     float totalConductivity = 0f;
     int count = 0;
 

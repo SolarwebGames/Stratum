@@ -59,13 +59,14 @@ public class SaveMigrationManager(World world) : WorldComponent(world)
     {
       ClearVanillaRoofAreas(map);
       map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
-      map.mapDrawer.WholeMapChanged((ulong)MapMeshFlagDefOf.Roofs);
+      map.mapDrawer?.WholeMapChanged((ulong)MapMeshFlagDefOf.Roofs);
     }
   }
 
   private static void ClearVanillaRoofAreas(Map map)
   {
     var areaManager = map.areaManager;
+    if (areaManager == null) return;
     areaManager.BuildRoof?.Clear();
     areaManager.NoRoof?.Clear();
   }

@@ -65,12 +65,18 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
   {
     if (records.Remove(cell))
     {
-      var frame = map.thingGrid.ThingAt<RoofFrame>(cell);
-      if (frame != null && !frame.Destroyed) frame.Destroy(mode);
-      map.areaManager.NoRoof[cell] = false;
-      map.areaManager.NoRoof.MarkForDraw();
-      map.areaManager.BuildRoof[cell] = false;
-      map.areaManager.BuildRoof.MarkForDraw();
+      if (map.thingGrid != null)
+      {
+        var frame = map.thingGrid.ThingAt<RoofFrame>(cell);
+        if (frame != null && !frame.Destroyed) frame.Destroy(mode);
+      }
+      if (map.areaManager != null)
+      {
+        map.areaManager.NoRoof[cell] = false;
+        map.areaManager.NoRoof.MarkForDraw();
+        map.areaManager.BuildRoof[cell] = false;
+        map.areaManager.BuildRoof.MarkForDraw();
+      }
     }
   }
 
@@ -93,7 +99,10 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
   {
     if (records.TryGetValue(cell, out var rec))
     {
-      map.roofGrid.SetRoof(cell, rec.roofDef);
+      if (map.roofGrid != null)
+      {
+        map.roofGrid.SetRoof(cell, rec.roofDef);
+      }
       map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, rec.roofDef, rec.stuffDef, rec.glassTint);
 
       RemoveRecord(cell);

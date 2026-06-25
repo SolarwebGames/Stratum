@@ -126,15 +126,19 @@ public class RoofVFXMapComponent : MapComponent
 
   public override void MapComponentTick()
   {
+    if (map.skyManager == null) return;
     float curSkyGlow = map.skyManager.CurSkyGlow;
 
     if (Mathf.Abs(curSkyGlow - lastSkyGlow) > 0.05f)
     {
       lastSkyGlow = curSkyGlow;
-      foreach (var section in activeSections)
+      if (map.mapDrawer != null)
       {
-        var sect = map.mapDrawer.SectionAt(new IntVec3(section.x * 17, 0, section.z * 17));
-        if (sect != null) sect.dirtyFlags |= MapMeshFlagDefOf.GroundGlow;
+        foreach (var section in activeSections)
+        {
+          var sect = map.mapDrawer.SectionAt(new IntVec3(section.x * 17, 0, section.z * 17));
+          if (sect != null) sect.dirtyFlags |= MapMeshFlagDefOf.GroundGlow;
+        }
       }
     }
 

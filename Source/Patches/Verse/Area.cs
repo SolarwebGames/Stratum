@@ -11,9 +11,9 @@ public static class Area_Patch
   [HarmonyPostfix]
   public static void Set_Postfix(Area __instance, IntVec3 c, ref bool val)
   {
-    if (__instance.Map != null && __instance == __instance.Map.areaManager.NoRoof)
+    if (__instance.Map != null && __instance.Map.areaManager != null && __instance == __instance.Map.areaManager.NoRoof)
     {
-      __instance.Map.mapDrawer.MapMeshDirty(c, MapMeshFlagDefOf.Roofs);
+      __instance.Map.mapDrawer?.MapMeshDirty(c, MapMeshFlagDefOf.Roofs);
     }
   }
 }

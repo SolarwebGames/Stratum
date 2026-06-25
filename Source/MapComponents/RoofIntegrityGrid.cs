@@ -93,8 +93,11 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       ExecuteScan();
     }
     Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
-    map.areaManager.BuildRoof?.Clear();
-    map.areaManager.NoRoof?.Clear();
+    if (map.areaManager != null)
+    {
+      map.areaManager.BuildRoof?.Clear();
+      map.areaManager.NoRoof?.Clear();
+    }
   }
 
   public override void MapRemoved()

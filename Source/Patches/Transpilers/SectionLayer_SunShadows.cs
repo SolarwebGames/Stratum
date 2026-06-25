@@ -12,8 +12,10 @@ public static class SectionLayer_SunShadows_Regenerate_Patch
   [HarmonyPostfix]
   public static void Regenerate_Postfix(SectionLayer __instance, Section ___section)
   {
+    if (___section == null || ___section.map == null) return;
     Map map = ___section.map;
     RoofGrid roofGrid = map.roofGrid;
+    if (roofGrid == null) return;
     CellRect cellRect = ___section.CellRect;
 
     LayerSubMesh subMesh = __instance.GetSubMesh(MatBases.SunShadow);

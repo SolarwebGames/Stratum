@@ -196,6 +196,7 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
   {
     powerDraws.Clear();
     if (radiatorCells.Count == 0) return;
+    if (map.powerNetGrid == null || map.mapTemperature == null) return;
 
     roomGroups.Clear();
     listPoolIndex = 0;

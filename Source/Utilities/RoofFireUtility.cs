@@ -25,6 +25,7 @@ public static class RoofFireUtility
 
   public static bool ContainsRoofFire(this IntVec3 c, Map map)
   {
+    if (map?.thingGrid == null) return false;
     List<Thing> list = map.thingGrid.ThingsListAt(c);
     for (int i = 0; i < list.Count; i++)
     {

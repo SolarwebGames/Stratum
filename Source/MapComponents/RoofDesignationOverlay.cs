@@ -15,6 +15,7 @@ public class RoofDesignationOverlay(Map map) : MapComponent(map)
   public override void MapComponentOnGUI()
   {
     if (!Find.PlaySettings.showRoofOverlay) return;
+    if (map.areaManager == null || map.roofGrid == null) return;
 
     var noRoof = map.areaManager.NoRoof;
     var roofGrid = map.roofGrid;

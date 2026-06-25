@@ -50,6 +50,7 @@ public class RetractableRoofAnimator : MapComponent
   {
     base.MapComponentUpdate();
     if (transitions.Count == 0 && pendingRoofs.Count == 0) return;
+    if (map == null || map.roofGrid == null) return;
 
     int currentTick = Find.TickManager.TicksGame;
     float altitude = AltitudeLayer.MoteOverhead.AltitudeFor() - 0.05f;

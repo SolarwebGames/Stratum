@@ -55,7 +55,7 @@ public class DeliverRoofIngredients : WorkGiver_Scanner
         PathEndMode.ClosestTouch,
         TraverseParms.For(pawn),
         9999f,
-        r => !r.IsForbidden(pawn) && HaulAIUtility.PawnCanAutomaticallyHaulFast(pawn, r, false));
+        r => !r.IsForbidden(pawn) && pawn.CanReserve(r));
 
       if (firstStack == null)
       {
