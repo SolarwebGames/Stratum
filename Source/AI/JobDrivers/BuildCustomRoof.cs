@@ -25,7 +25,7 @@ public class BuildCustomRoof : JobDriver
     this.FailOn(() =>
     {
       var frame = Cell.GetFirstThing<RoofFrame>(pawn.Map);
-      return frame == null || frame.Faction != pawn.Faction;
+      return frame == null || frame.Faction != pawn.Faction || frame.IsForbidden(pawn);
     });
     this.FailOn(() => !RoofCollapseUtility.WithinRangeOfRoofHolder(Cell, pawn.Map));
     this.FailOn(() => !RoofCollapseUtility.ConnectedToRoofHolder(Cell, pawn.Map, assumeRoofAtRoot: true));

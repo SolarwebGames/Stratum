@@ -170,6 +170,11 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
 
   public override IEnumerable<Gizmo> GetGizmos()
   {
+    foreach (var c in base.GetGizmos())
+    {
+      yield return c;
+    }
+
     yield return new Command_Action
     {
       defaultLabel = "CommandCancelConstructionLabel".Translate(),
@@ -295,6 +300,11 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
   public override string GetInspectString()
   {
     var sb = new StringBuilder();
+    string baseString = base.GetInspectString();
+    if (!baseString.NullOrEmpty())
+    {
+      sb.AppendLine(baseString);
+    }
 
     if (Spawned)
     {
