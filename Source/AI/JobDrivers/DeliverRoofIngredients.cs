@@ -4,6 +4,7 @@ using Verse;
 using Verse.AI;
 
 using SolarWeb.Stratum.Things;
+using RimWorld;
 
 namespace SolarWeb.Stratum.AI.JobDrivers;
 
