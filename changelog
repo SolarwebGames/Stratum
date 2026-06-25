@@ -1,3 +1,7 @@
+0.8.5:
+  Minor: Added defensive null checks in many methods.
+  Minor: Made roof frames forbiddable.
+
 0.8.3:
   Feature: Retractable roofs. Build a set of retractable roofs and a Retractable Roof Console to allow a room to open up to the skies at will.
   Feature: Thermal Radiator roofs. These roofs actively cool a room, and can be controlled by a Thermostat placed in the room.
