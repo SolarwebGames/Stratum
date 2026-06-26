@@ -370,21 +370,9 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         int debrisCount = Rand.RangeInclusive(1, 2);
         for (int i = 0; i < debrisCount; i++)
         {
-          ThingDef debrisDef;
-          if (stuff != null && stuff.stuffProps?.categories?.Contains(StuffCategoryDefOf.Stony) == true)
-          {
-            if (stuff.defName != null && stuff.defName.EndsWith("Sandstone")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSandstone;
-            else if (stuff.defName != null && stuff.defName.EndsWith("Granite")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkGranite;
-            else if (stuff.defName != null && stuff.defName.EndsWith("Limestone")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkLimestone;
-            else if (stuff.defName != null && stuff.defName.EndsWith("Slate")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSlate;
-            else if (stuff.defName != null && stuff.defName.EndsWith("Marble")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkMarble;
-            else debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSandstone;
-          }
-          else
-          {
-            debrisDef = ThingDefOf.ChunkSlagSteel;
-          }
-          var debris = ThingMaker.MakeThing(debrisDef);
+          if (roof.collapseLeavingThingDef == null) continue;
+
+          var debris = ThingMaker.MakeThing(roof.collapseLeavingThingDef);
           GenPlace.TryPlaceThing(debris, cell, map, ThingPlaceMode.Near);
         }
         var registry = MapHookRegistry.Get(map);
