@@ -4,6 +4,7 @@ using RimWorld;
 using Verse;
 
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -30,8 +31,12 @@ public class SolarRoofMapComponent : MapComponent
   {
     base.FinalizeInit();
     dirty = true;
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.OnRoofChanged += Notify_StratumRoofChanged;
+      registry.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+    }
   }
 
   internal void AddSolarCellInternal(int index)
@@ -49,9 +54,14 @@ public class SolarRoofMapComponent : MapComponent
       netToSolarPower.Clear();
       cellToPower.Clear();
     }
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.OnRoofChanged -= Notify_StratumRoofChanged;
+      registry.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+    }
   }
+
 
   private void HandleEnergyGainRate(PowerNet net, ref float energyGainRate)
   {
@@ -217,7 +227,7 @@ public class SolarRoofMapComponent : MapComponent
       return;
     }
 
-    if (map.gameConditionManager.ElectricityDisabled(map))
+    if (map.gameConditionManager != null && map.gameConditionManager.ElectricityDisabled(map))
     {
       lock (lockObject)
       {
@@ -305,6 +315,10 @@ public class SolarRoofMapComponent : MapComponent
           netToSolarPower = netResults;
           cellToPower = cellResults;
         }
+      }
+      catch (System.Exception ex)
+      {
+        StratumLog.Error($"Error in SolarRoofMapComponent background thread: {ex}");
       }
       finally
       {

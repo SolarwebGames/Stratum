@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+  <ThingDef ParentName="SunLamp">
+    <defName>SunLamp_Hanging</defName>
+    <label>hanging sun lamp</label>
+    <description>An industrial lamp which lights an area brightly enough to grow crops, but consumes a huge amount of power. Designed to hang from the underside of a roof ceiling.</description>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <placeWorkers Inherit="false">
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+      <li>PlaceWorker_GlowRadius</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Hanging</attachmentType>
+        <minifyOnRoofLoss>true</minifyOnRoofLoss>
+        <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>FireSprinkler_Hanging</defName>
+    <label>hanging fire sprinkler</label>
+    <description>An automated, powered fire sprinkler system that hangs from the ceiling. Scans the local area for fires every half-second and discharges water to extinguish them.</description>
+    <thingClass>SolarWeb.Stratum.Things.FireSprinkler</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Misc/FirefoamPopper</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>800</WorkToBuild>
+      <Flammability>0</Flammability>
+    </statBases>
+    <costList>
+      <Steel>30</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>30</basePowerConsumption>
+        <transmitsPower>false</transmitsPower>
+      </li>
+    </comps>
+    <designationCategory>Misc</designationCategory>
+    <uiOrder>2850</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Hanging</attachmentType>
+        <minifyOnRoofLoss>true</minifyOnRoofLoss>
+        <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+</Defs>

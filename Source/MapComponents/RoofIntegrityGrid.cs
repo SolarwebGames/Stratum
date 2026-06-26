@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using RimWorld;
 using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -92,7 +95,11 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     {
       ExecuteScan();
     }
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.OnRoofChanged += Notify_StratumRoofChanged;
+    }
     if (map.areaManager != null)
     {
       map.areaManager.BuildRoof?.Clear();
@@ -103,12 +110,59 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void MapRemoved()
   {
     base.MapRemoved();
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.OnRoofChanged -= Notify_StratumRoofChanged;
+    }
   }
 
   private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
   {
     if (m != map) return;
+
+    try
+    {
+      if (Find.Selector != null && Find.Selector.SelectedObjects != null && Find.Selector.SelectedObjects.Count > 0)
+      {
+        for (int i = Find.Selector.SelectedObjects.Count - 1; i >= 0; i--)
+        {
+          var obj = Find.Selector.SelectedObjects[i];
+          if (obj is UI.SelectedRoof sr && sr.map == map && sr.cell == c)
+          {
+            if (newRoof == null || sr.def != newRoof)
+            {
+              Find.Selector.Deselect(sr);
+            }
+          }
+        }
+      }
+    }
+    catch (Exception ex)
+    {
+      StratumLog.Error($"Error in RoofIntegrityGrid Notify_StratumRoofChanged selection cleanup: {ex}");
+    }
+
+    if (map.areaManager != null)
+    {
+      if (map.areaManager.NoRoof != null) map.areaManager.NoRoof[c] = false;
+      if (map.areaManager.BuildRoof != null) map.areaManager.BuildRoof[c] = false;
+    }
+
+    if (map.regionAndRoomUpdater != null && map.regionAndRoomUpdater.Enabled)
+    {
+      var room = c.GetRoom(map);
+      if (room != null && room.Districts != null)
+      {
+        foreach (var district in room.Districts)
+        {
+          if (district != null)
+          {
+            district.Notify_RoofChanged();
+          }
+        }
+      }
+    }
 
     if (newRoof != null && RoofStatCache.IsCustomRoof(newRoof))
     {
@@ -140,6 +194,32 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     }
     else
     {
+      if (oldRoof != null && RoofStatCache.IsCustomRoof(oldRoof))
+      {
+        if (RoofBuildings.isDeconstructingRoof)
+        {
+          var stuff = GetStuff(c);
+          var ext = oldRoof.GetModExtension<BuildableRoofExtension>();
+          if (ext != null && ext.buildableDef != null)
+          {
+            var costList = ext.buildableDef.CostListAdjusted(stuff);
+            if (costList != null)
+            {
+              float refundFraction = ext.buildableDef.resourcesFractionWhenDeconstructed;
+              foreach (var cost in costList)
+              {
+                int count = GenMath.RoundRandom(cost.count * refundFraction);
+                if (count > 0)
+                {
+                  var deconstructItem = ThingMaker.MakeThing(cost.thingDef);
+                  deconstructItem.stackCount = count;
+                  GenPlace.TryPlaceThing(deconstructItem, c, map, ThingPlaceMode.Near);
+                }
+              }
+            }
+          }
+        }
+      }
       RemoveRoof(c);
     }
   }
@@ -282,26 +362,35 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       var ext = roof.GetModExtension<BuildableRoofExtension>();
       if (ext != null)
       {
-        if (Find.PlaySettings.autoRebuild && map.areaManager.Home[cell])
+        if (Find.PlaySettings != null && Find.PlaySettings.autoRebuild && map.areaManager?.Home != null && map.areaManager.Home[cell])
         {
           map.GetComponent<RoofConstructionTracker>()?.RebuildRoof(cell, roof, ext, stuff, tint);
         }
 
-        var bDef = ext.buildableDef;
-        if (bDef != null && !bDef.CostList.NullOrEmpty())
+        int debrisCount = Rand.RangeInclusive(1, 2);
+        for (int i = 0; i < debrisCount; i++)
         {
-          float fraction = bDef.resourcesFractionWhenDeconstructed;
-          var costList = bDef.CostListAdjusted(stuff);
-          foreach (var cost in costList)
+          ThingDef debrisDef;
+          if (stuff != null && stuff.stuffProps?.categories?.Contains(StuffCategoryDefOf.Stony) == true)
           {
-            int count = GenMath.RoundRandom(cost.count * fraction);
-            if (count > 0)
-            {
-              var thing = ThingMaker.MakeThing(cost.thingDef);
-              thing.stackCount = count;
-              GenPlace.TryPlaceThing(thing, cell, map, ThingPlaceMode.Near);
-            }
+            if (stuff.defName != null && stuff.defName.EndsWith("Sandstone")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSandstone;
+            else if (stuff.defName != null && stuff.defName.EndsWith("Granite")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkGranite;
+            else if (stuff.defName != null && stuff.defName.EndsWith("Limestone")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkLimestone;
+            else if (stuff.defName != null && stuff.defName.EndsWith("Slate")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSlate;
+            else if (stuff.defName != null && stuff.defName.EndsWith("Marble")) debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkMarble;
+            else debrisDef = SolarWeb.Stratum.DefOf.ThingDefOf.ChunkSandstone;
           }
+          else
+          {
+            debrisDef = ThingDefOf.ChunkSlagSteel;
+          }
+          var debris = ThingMaker.MakeThing(debrisDef);
+          GenPlace.TryPlaceThing(debris, cell, map, ThingPlaceMode.Near);
+        }
+        var registry = MapHookRegistry.Get(map);
+        if (registry != null)
+        {
+          registry.Notify_RoofDebrisDropped(cell, roof, stuff);
         }
       }
     }
@@ -314,6 +403,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public void Repair(IntVec3 cell, int amount)
   {
+    if (map == null || !cell.InBounds(map)) return;
     int index = map.cellIndices.CellToIndex(cell);
     var maxHP = GetMaxHitPoints(cell);
 

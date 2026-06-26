@@ -29,11 +29,13 @@
         <buildableDef>SolarWeb-Stratum-RoofThatch_Buildable</buildableDef>
         <graphicData>
           <texPath>Roofs/Thatch</texPath>
-            <isSeamless>true</isSeamless>
+          <isSeamless>true</isSeamless>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <glassTint>(0.4, 0.3, 0.1)</glassTint>
         <isAirtight>false</isAirtight>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Primitive Thatch Roof</Name>
@@ -87,6 +89,8 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <glassTint>(0.5, 0.4, 0.2)</glassTint>
         <isAirtight>false</isAirtight>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Hay Thatch Roof</Name>
@@ -192,6 +196,8 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>true</isSkylight>
         <glassTint>(0.7, 0.85, 1.0)</glassTint>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Roof</Name>
@@ -248,6 +254,7 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>false</isSkylight>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Shingles</Name>

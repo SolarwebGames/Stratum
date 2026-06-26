@@ -148,6 +148,7 @@
           <color>(0.15, 0.15, 0.25)</color>
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Solar Hull Plate</Name>
@@ -217,7 +218,7 @@
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
-  
+
   <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
     <defName>SolarWeb-Stratum-RetractableRoof_Buildable</defName>
     <label>heavy retractable canopy</label>
@@ -260,6 +261,8 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isRetractable>true</isRetractable>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
@@ -305,6 +308,8 @@
         </graphicData>
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isRetractable>true</isRetractable>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>

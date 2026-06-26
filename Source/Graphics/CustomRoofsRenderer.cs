@@ -1,9 +1,11 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
+using System.Collections.Generic;
+
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.MapComponents;
-using System.Collections.Generic;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Graphics;
 
@@ -130,6 +132,12 @@ public class CustomRoofsRenderer : SectionLayer
           // Scratches slightly above roof (+0.05f)
           DrawDamageScratches(c, roof, myGraphicData, altitude + 0.05f, hp, maxHp, alpha);
         }
+      }
+
+      if (RoofBuildings.HasRoofBuildingAt(map, c))
+      {
+        // Warning indicator slightly above scratches (+0.08f)
+        DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.08f, c.z + 0.5f), Vector2.one, RoofBuildings.AttachmentIndicatorMat, Color.white, Rot4.North);
       }
     }
 

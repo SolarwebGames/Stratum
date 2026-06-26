@@ -18,6 +18,20 @@ public static class ThingDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RetractableRoofConsole")]
   public static ThingDef RetractableRoofConsole = default!;
 
+  public static ThingDef Filth_Water = default!;
+
+  public static ThingDef LightningRod_Rooftop = default!;
+
+  public static ThingDef ChunkSandstone = default!;
+
+  public static ThingDef ChunkGranite = default!;
+
+  public static ThingDef ChunkLimestone = default!;
+
+  public static ThingDef ChunkSlate = default!;
+
+  public static ThingDef ChunkMarble = default!;
+
   static ThingDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(ThingDefOf));

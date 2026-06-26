@@ -5,6 +5,7 @@ using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Graphics;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.Stats;
 
@@ -70,10 +71,10 @@ public static class RoofStatCache
 
           float transparency = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.Transparency, 0f);
           if (transparency > 0f) transparencyCache[hash] = transparency;
-          
+
           float solarOutput = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.SolarOutput, 0f);
           if (solarOutput > 0f) solarOutputCache[hash] = solarOutput;
-          
+
           damageThresholdCache[hash] = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.DamageThreshold, 0f);
           armorRatingCache[hash] = bDef.statBases.GetStatValueFromList(DefOf.StatDefOf.ArmorRating, 0f);
 
@@ -124,6 +125,7 @@ public static class RoofStatCache
 
   public static float GetBeauty(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0f;
     if (stuff == null) return baseBeautyCache.TryGetValue(def.defNameHash, out float b) ? b : 0f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -144,6 +146,7 @@ public static class RoofStatCache
 
   public static float GetDamageThreshold(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0f;
     if (stuff == null) return damageThresholdCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -170,6 +173,7 @@ public static class RoofStatCache
 
   public static float GetArmorRating(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0f;
     if (stuff == null) return armorRatingCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -204,11 +208,13 @@ public static class RoofStatCache
 
   public static float GetCleanliness(RoofDef def)
   {
+    if (def == null) return 0f;
     return cleanlinessCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
   }
 
   public static float GetWealth(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0f;
     if (stuff == null) return baseWealthCache.TryGetValue(def.defNameHash, out float w) ? w : 0f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -229,6 +235,7 @@ public static class RoofStatCache
 
   public static float GetSolarOutput(RoofDef def)
   {
+    if (def == null) return 0f;
     return solarOutputCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
   }
 
@@ -236,13 +243,13 @@ public static class RoofStatCache
   {
     if (def == null) return 0f;
     float val = transparencyCache.TryGetValue(def.defNameHash, out float t) ? t : 0f;
-    return Mathf.Max(val, Utilities.StratumHooks.GetTransparencyOverride(def));
+    return Mathf.Max(val, MapHookRegistry.GetTransparencyOverride(def));
   }
 
   public static bool GetIsAirtight(RoofDef def, ThingDef? stuff = null)
   {
     if (def == null) return false;
-    if (Utilities.StratumHooks.IsAirtightOverride(def)) return true;
+    if (MapHookRegistry.IsAirtightOverride(def)) return true;
 
     bool baseAirtight;
     if (airtightCache.TryGetValue(def.defNameHash, out bool val))
@@ -258,6 +265,7 @@ public static class RoofStatCache
 
   internal static bool IsStuffAirtight(ThingDef stuff)
   {
+    if (stuff == null) return true;
     if (stuff.stuffProps == null) return true;
     var categories = stuff.stuffProps.categories;
     if (categories == null) return true;
@@ -272,11 +280,13 @@ public static class RoofStatCache
 
   public static float GetEffectiveInsulation(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0.9f; // Safe default for insulated roof thermal conductivity (1 - 0.1)
     return 1f - GetThermalConductivity(def, stuff);
   }
 
   public static float GetThermalConductivity(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0.1f;
     if (stuff == null) return thermalConductivityCache.TryGetValue(def.defNameHash, out float val) ? val : 0.1f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -290,12 +300,12 @@ public static class RoofStatCache
         float baseInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation);
         float stuffInsulation = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.Insulation, stuff);
         float stuffInsulationMult = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.StuffInsulationMultiplier);
-        
+
         float delta = stuffInsulation - baseInsulation;
         float finalInsulation = baseInsulation + (delta * stuffInsulationMult);
 
         if (finalInsulation > 0.99f && !def.isThickRoof) finalInsulation = 0.99f;
-        
+
         conductivity = (float)System.Math.Round(1f - finalInsulation, 4);
         roofStuffThermalConductivityCache[hashKey] = conductivity;
         return conductivity;
@@ -306,6 +316,7 @@ public static class RoofStatCache
 
   public static float GetFlammability(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 0f;
     if (stuff == null) return flammabilityCache.TryGetValue(def.defNameHash, out float f) ? f : 0f;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -326,6 +337,7 @@ public static class RoofStatCache
 
   public static int GetMaxHitPoints(RoofDef def, ThingDef? stuff = null)
   {
+    if (def == null) return 100;
     if (stuff == null) return maxHitPointsCache.TryGetValue(def.defNameHash, out int val) ? val : 0;
 
     int hashKey = def.defNameHash ^ (stuff.defNameHash << 16 | stuff.defNameHash >> 16);
@@ -346,12 +358,14 @@ public static class RoofStatCache
 
   public static RoofGraphicData? GetGraphicData(RoofDef def)
   {
+    if (def == null) return null;
     return graphicDataCache.TryGetValue(def.defNameHash, out var val) ? val : null;
   }
 
   public static Color GetColor(RoofDef def, ThingDef? stuff = null)
   {
     if (stuff != null && stuff.stuffProps != null) return stuff.stuffProps.color;
+    if (def == null) return Color.white;
     return colorCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
   }
 
@@ -362,16 +376,19 @@ public static class RoofStatCache
       var tint = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetGlassTint(cell);
       if (tint.HasValue) return tint.Value;
     }
+    if (def == null) return Color.white;
     return glassTintCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
   }
 
   public static RoofEdgeGraphicData? GetEdgeGraphicData(RoofDef def)
   {
+    if (def == null) return null;
     return GetGraphicData(def)?.edgeData;
   }
 
   public static RoofEdgeGraphicData? GetSkylightEdgeGraphicData(RoofDef def)
   {
+    if (def == null) return null;
     return GetGraphicData(def)?.skylightEdgeData;
   }
 }

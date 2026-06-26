@@ -90,6 +90,7 @@ public class RetractableRoofConsole : Building
 
   public override string GetInspectString()
   {
+    if (Map == null || Map.roofGrid == null) return base.GetInspectString();
     string str = base.GetInspectString();
 
     if (canopyCells.Count == 0 && this.IsHashIntervalTick(60))
@@ -134,6 +135,7 @@ public class RetractableRoofConsole : Building
 
   public void InitiateTransition()
   {
+    if (Map == null) return;
     RecalculateRings();
     isTransitioning = true;
     jobPending = false;
@@ -160,6 +162,7 @@ public class RetractableRoofConsole : Building
 
   private bool RingIsAlreadyOpen(List<IntVec3> ring)
   {
+    if (Map == null || Map.roofGrid == null) return true;
     foreach (var cell in ring)
     {
       var roof = Map.roofGrid.RoofAt(cell);
@@ -171,6 +174,7 @@ public class RetractableRoofConsole : Building
 
   private bool RingIsAlreadyClosed(List<IntVec3> ring)
   {
+    if (Map == null || Map.roofGrid == null) return true;
     foreach (var cell in ring)
     {
       var roof = Map.roofGrid.RoofAt(cell);
@@ -182,6 +186,7 @@ public class RetractableRoofConsole : Building
 
   private void RecalculateRings()
   {
+    if (Map == null || Map.roofGrid == null) return;
     var tracker = Map.GetComponent<RetractableRoofTracker>();
     HashSet<IntVec3> validCells;
 
@@ -302,168 +307,131 @@ public class RetractableRoofConsole : Building
   protected override void Tick()
   {
     base.Tick();
+    if (Map == null || !Spawned || Map.roofGrid == null) return;
 
-    if (!isTransitioning)
+    try
     {
-      if (Find.Selector.IsSelected(this) && this.IsHashIntervalTick(60))
+      if (!isTransitioning)
       {
-        RecalculateRings();
+        if (Find.Selector.IsSelected(this) && this.IsHashIntervalTick(60))
+        {
+          RecalculateRings();
+        }
+
+        if (powerComp != null)
+        {
+          powerComp.PowerOutput = -200f;
+        }
+        return;
       }
+
+      if (powerComp != null && !powerComp.PowerOn)
+      {
+        var flick = GetComp<CompFlickable>();
+        if (flick != null && !flick.SwitchIsOn) return;
+
+        var breakdown = GetComp<CompBreakdownable>();
+        if (breakdown != null && breakdown.BrokenDown) return;
+      }
+
+      float desiredPower = GetActivePowerDraw();
 
       if (powerComp != null)
       {
-        powerComp.PowerOutput = -200f;
-      }
-      return;
-    }
-
-    if (powerComp != null && !powerComp.PowerOn)
-    {
-      var flick = GetComp<CompFlickable>();
-      if (flick != null && !flick.SwitchIsOn) return;
-
-      var breakdown = GetComp<CompBreakdownable>();
-      if (breakdown != null && breakdown.BrokenDown) return;
-    }
-
-    float desiredPower = GetActivePowerDraw();
-
-    if (powerComp != null)
-    {
-      powerComp.PowerOutput = -desiredPower;
-    }
-
-    if (transitionRings.Count == 0 ||
-       (isOpeningRequested && currentRingIndex >= transitionRings.Count) ||
-       (!isOpeningRequested && currentRingIndex < 0))
-    {
-      isTransitioning = false;
-      return;
-    }
-
-    int animationDuration = 1; // Default minimum to prevent div by 0
-    var tracker = Map.GetComponent<RetractableRoofTracker>();
-    var currentRing = transitionRings[currentRingIndex];
-    foreach (var cell in currentRing)
-    {
-      var rDef = Map.roofGrid.RoofAt(cell);
-
-      if (rDef == null && tracker != null)
-      {
-        int index = Map.cellIndices.CellToIndex(cell);
-        tracker.PeekOpenRoof(index, out rDef, out _, out _, out _);
+        powerComp.PowerOutput = -desiredPower;
       }
 
-      if (rDef != null)
+      if (transitionRings.Count == 0 ||
+         (isOpeningRequested && currentRingIndex >= transitionRings.Count) ||
+         (!isOpeningRequested && currentRingIndex < 0))
       {
-        var ext = rDef.GetModExtension<BuildableRoofExtension>();
-        if (ext != null && ext.isRetractable)
+        isTransitioning = false;
+        return;
+      }
+
+      int animationDuration = 1; // Default minimum to prevent div by 0
+      var tracker = Map.GetComponent<RetractableRoofTracker>();
+      var currentRing = transitionRings[currentRingIndex];
+      foreach (var cell in currentRing)
+      {
+        var rDef = Map.roofGrid.RoofAt(cell);
+
+        if (rDef == null && tracker != null)
         {
-          int ticks = 30;
-          if (ext.buildableDef != null)
-          {
-            ticks = Mathf.RoundToInt(ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.TransitionSpeed));
-          }
+          int index = Map.cellIndices.CellToIndex(cell);
+          tracker.PeekOpenRoof(index, out rDef, out _, out _, out _);
+        }
 
-          if (ticks > animationDuration)
+        if (rDef != null)
+        {
+          var ext = rDef.GetModExtension<BuildableRoofExtension>();
+          if (ext != null && ext.isRetractable)
           {
-            animationDuration = ticks;
+            int ticks = 30;
+            if (ext.buildableDef != null)
+            {
+              ticks = Mathf.RoundToInt(ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.TransitionSpeed));
+            }
+
+            if (ticks > animationDuration)
+            {
+              animationDuration = ticks;
+            }
           }
         }
       }
-    }
 
-    int ticksToNextRing = Mathf.Max(1, animationDuration / 6);
+      int ticksToNextRing = Mathf.Max(1, animationDuration / 6);
 
-    float speedMultiplier = 1f;
-    transitionProgress += speedMultiplier;
+      float speedMultiplier = 1f;
+      transitionProgress += speedMultiplier;
 
-    if (transitionProgress >= ticksToNextRing)
-    {
-      transitionProgress = 0f;
-
-      var ring = transitionRings[currentRingIndex];
-      var integrityGrid = Map.GetComponent<RoofIntegrityGrid>();
-
-      foreach (var cell in ring)
+      if (transitionProgress >= ticksToNextRing)
       {
-        int index = Map.cellIndices.CellToIndex(cell);
+        transitionProgress = 0f;
 
-        if (isOpeningRequested)
+        var ring = transitionRings[currentRingIndex];
+        var integrityGrid = Map.GetComponent<RoofIntegrityGrid>();
+
+        foreach (var cell in ring)
         {
-          var roof = Map.roofGrid.RoofAt(cell);
-          if (IsRetractableRoof(roof))
+          int index = Map.cellIndices.CellToIndex(cell);
+
+          if (isOpeningRequested)
           {
-            bool bordersEmptyAir = false;
-            for (int i = 0; i < 8; i++)
+            var roof = Map.roofGrid.RoofAt(cell);
+            if (IsRetractableRoof(roof))
             {
-              IntVec3 n = cell + GenAdj.AdjacentCells[i];
-              if (!n.InBounds(Map)) continue;
-
-              if (!canopyCells.Contains(n))
+              bool bordersEmptyAir = false;
+              for (int i = 0; i < 8; i++)
               {
-                bool hasRoof = Map.roofGrid.RoofAt(n) != null;
-                bool hasEdifice = n.GetEdifice(Map) != null;
-                if (!hasRoof && !hasEdifice)
+                IntVec3 n = cell + GenAdj.AdjacentCells[i];
+                if (!n.InBounds(Map)) continue;
+
+                if (!canopyCells.Contains(n))
                 {
-                  bordersEmptyAir = true;
-                  break;
-                }
-              }
-            }
-
-            if (bordersEmptyAir)
-            {
-              continue;
-            }
-
-            var stuff = integrityGrid?.GetStuff(cell);
-            var tint = integrityGrid?.GetGlassTint(cell);
-            var hp = integrityGrid?.GetHitPoints(cell) ?? (short)180;
-
-            tracker?.SaveOpenRoof(index, roof, stuff, tint, hp);
-
-            var gd = RoofStatCache.GetGraphicData(roof);
-            if (gd != null)
-            {
-              bool gotUv = gd.isSeamless
-                ? Graphics.RoofAtlasManager.TryGetSeamlessUv(gd.texPath, cell.x, cell.z, out var uvs, out var mat)
-                : Graphics.RoofAtlasManager.TryGetUv(gd.texPath, cell.GetHashCode(), out uvs, out mat);
-
-              if (gotUv)
-              {
-                var animator = Map.GetComponent<RetractableRoofAnimator>();
-                if (animator != null)
-                {
-                  Vector3 start = cell.ToVector3Shifted();
-                  Vector3 rawDir = (start - roomCentroid).normalized;
-                  Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z)
-                    ? new Vector3(Mathf.Sign(rawDir.x), 0, 0)
-                    : new Vector3(0, 0, Mathf.Sign(rawDir.z));
-                  Vector3 end = start + dir * 1f;
-
-                  Color color = RoofStatCache.GetColor(roof, stuff);
-                  if (RoofStatCache.IsSkylight(roof))
+                  bool hasRoof = Map.roofGrid.RoofAt(n) != null;
+                  bool hasEdifice = n.GetEdifice(Map) != null;
+                  if (!hasRoof && !hasEdifice)
                   {
-                    color.a = 1f - RoofStatCache.GetTransparency(roof);
+                    bordersEmptyAir = true;
+                    break;
                   }
-                  animator.AddTransition(start, end, animationDuration, mat!, color, uvs!);
                 }
               }
-            }
 
-            Map.roofGrid.SetRoof(cell, null);
-            FleckMaker.ThrowAirPuffUp(cell.ToVector3Shifted(), Map);
-          }
-        }
-        else
-        {
-          if (tracker != null && tracker.PopOpenRoof(index, out var rDef, out var stuff, out var tint, out var hp))
-          {
-            if (Map.roofGrid.RoofAt(cell) == null)
-            {
-              var gd = RoofStatCache.GetGraphicData(rDef);
-              var animator = Map.GetComponent<RetractableRoofAnimator>();
+              if (bordersEmptyAir)
+              {
+                continue;
+              }
+
+              var stuff = integrityGrid?.GetStuff(cell);
+              var tint = integrityGrid?.GetGlassTint(cell);
+              var hp = integrityGrid?.GetHitPoints(cell) ?? (short)180;
+
+              tracker?.SaveOpenRoof(index, roof, stuff, tint, hp);
+
+              var gd = RoofStatCache.GetGraphicData(roof);
               if (gd != null)
               {
                 bool gotUv = gd.isSeamless
@@ -472,46 +440,92 @@ public class RetractableRoofConsole : Building
 
                 if (gotUv)
                 {
+                  var animator = Map.GetComponent<RetractableRoofAnimator>();
                   if (animator != null)
                   {
-                    Vector3 end = cell.ToVector3Shifted();
-                    Vector3 rawDir = (end - roomCentroid).normalized;
+                    Vector3 start = cell.ToVector3Shifted();
+                    Vector3 rawDir = (start - roomCentroid).normalized;
                     Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z)
                       ? new Vector3(Mathf.Sign(rawDir.x), 0, 0)
                       : new Vector3(0, 0, Mathf.Sign(rawDir.z));
-                    Vector3 start = end + dir * 1f;
+                    Vector3 end = start + dir * 1f;
 
-                    Color color = RoofStatCache.GetColor(rDef, stuff);
-                    if (RoofStatCache.IsSkylight(rDef))
+                    Color color = RoofStatCache.GetColor(roof, stuff);
+                    if (RoofStatCache.IsSkylight(roof))
                     {
-                      color.a = 1f - RoofStatCache.GetTransparency(rDef);
+                      color.a = 1f - RoofStatCache.GetTransparency(roof);
                     }
                     animator.AddTransition(start, end, animationDuration, mat!, color, uvs!);
                   }
                 }
               }
 
-              if (animator != null)
+              Map.roofGrid.SetRoof(cell, null);
+              FleckMaker.ThrowAirPuffUp(cell.ToVector3Shifted(), Map);
+            }
+          }
+          else
+          {
+            if (tracker != null && tracker.PopOpenRoof(index, out var rDef, out var stuff, out var tint, out var hp))
+            {
+              if (Map.roofGrid.RoofAt(cell) == null)
               {
-                animator.AddPendingRoof(cell, rDef, stuff, tint ?? Color.white, hp, animationDuration);
-              }
-              else
-              {
-                Map.roofGrid.SetRoof(cell, rDef);
-                integrityGrid?.InitializeRoof(cell, rDef, stuff, tint, hp);
-                FleckMaker.ThrowAirPuffUp(cell.ToVector3Shifted(), Map);
+                var gd = RoofStatCache.GetGraphicData(rDef);
+                var animator = Map.GetComponent<RetractableRoofAnimator>();
+                if (gd != null)
+                {
+                  bool gotUv = gd.isSeamless
+                    ? Graphics.RoofAtlasManager.TryGetSeamlessUv(gd.texPath, cell.x, cell.z, out var uvs, out var mat)
+                    : Graphics.RoofAtlasManager.TryGetUv(gd.texPath, cell.GetHashCode(), out uvs, out mat);
+
+                  if (gotUv)
+                  {
+                    if (animator != null)
+                    {
+                      Vector3 end = cell.ToVector3Shifted();
+                      Vector3 rawDir = (end - roomCentroid).normalized;
+                      Vector3 dir = Mathf.Abs(rawDir.x) > Mathf.Abs(rawDir.z)
+                        ? new Vector3(Mathf.Sign(rawDir.x), 0, 0)
+                        : new Vector3(0, 0, Mathf.Sign(rawDir.z));
+                      Vector3 start = end + dir * 1f;
+
+                      Color color = RoofStatCache.GetColor(rDef, stuff);
+                      if (RoofStatCache.IsSkylight(rDef))
+                      {
+                        color.a = 1f - RoofStatCache.GetTransparency(rDef);
+                      }
+                      animator.AddTransition(start, end, animationDuration, mat!, color, uvs!);
+                    }
+                  }
+                }
+
+                if (animator != null)
+                {
+                  animator.AddPendingRoof(cell, rDef, stuff, tint ?? Color.white, hp, animationDuration);
+                }
+                else
+                {
+                  Map.roofGrid.SetRoof(cell, rDef);
+                  integrityGrid?.InitializeRoof(cell, rDef, stuff, tint, hp);
+                  FleckMaker.ThrowAirPuffUp(cell.ToVector3Shifted(), Map);
+                }
               }
             }
           }
         }
+
+        DefOf.SoundDefOf.DropPod_Open?.PlayOneShot(new TargetInfo(Position, Map));
+
+        if (isOpeningRequested)
+          currentRingIndex++;
+        else
+          currentRingIndex--;
       }
-
-      DefDatabase<SoundDef>.GetNamed("DropPod_Open", false)?.PlayOneShot(new TargetInfo(Position, Map));
-
-      if (isOpeningRequested)
-        currentRingIndex++;
-      else
-        currentRingIndex--;
+    }
+    catch (System.Exception ex)
+    {
+      StratumLog.Error($"Error in RetractableRoofConsole.Tick: {ex}");
+      isTransitioning = false;
     }
   }
 }
