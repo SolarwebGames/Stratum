@@ -55,10 +55,18 @@ public static class RoofGrid_Patch
     if (currentRoof == __state) return;
 
     Utilities.StratumHooks.Notify_RoofChanged(___map, c, __state, currentRoof);
-    ___map.areaManager.NoRoof[c] = false;
-    ___map.areaManager.BuildRoof[c] = false;
+    
+    if (___map.areaManager.NoRoof != null)
+    {
+      ___map.areaManager.NoRoof[c] = false;
+    }
+    
+    if (___map.areaManager.BuildRoof != null)
+    {
+      ___map.areaManager.BuildRoof[c] = false;
+    }
 
-    if (___map.regionAndRoomUpdater.Enabled)
+    if (___map.regionAndRoomUpdater != null && ___map.regionAndRoomUpdater.Enabled)
     {
       var room = c.GetRoom(___map);
       if (room != null)
