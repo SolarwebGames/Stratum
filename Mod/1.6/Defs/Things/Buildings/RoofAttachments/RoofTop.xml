@@ -1,39 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <ThingDef ParentName="SunLamp">
-    <defName>SunLamp_Hanging</defName>
-    <label>hanging sun lamp</label>
-    <description>An industrial lamp which lights an area brightly enough to grow crops, but consumes a huge amount of power. Designed to hang from the underside of a roof ceiling.</description>
-    <passability>Standable</passability>
-    <pathCost>0</pathCost>
-    <placeWorkers Inherit="false">
-      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
-      <li>PlaceWorker_GlowRadius</li>
-    </placeWorkers>
-    <modExtensions>
-      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
-        <attachmentType>Hanging</attachmentType>
-        <minifyOnRoofLoss>true</minifyOnRoofLoss>
-        <destroyOnRoofLoss>false</destroyOnRoofLoss>
-      </li>
-    </modExtensions>
-  </ThingDef>
-
   <ThingDef ParentName="BuildingBase">
-    <defName>LightningRod_Rooftop</defName>
+    <defName>SolarWeb-Stratum-LightningRod</defName>
     <label>rooftop lightning rod</label>
     <description>A copper rod mounted on top of a roof. Attracts lightning strikes within the colony, safely converting the electrical discharge into power stored directly in connected batteries.</description>
     <thingClass>Building</thingClass>
     <graphicData>
       <texPath>Things/Building/Misc/FirefoamPopper</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>(1,1)</drawSize>
+      <drawSize>(0.5, 1)</drawSize>
+      <color>(55, 55, 55)</color>
     </graphicData>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
     <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
     <statBases>
       <MaxHitPoints>150</MaxHitPoints>
       <WorkToBuild>1000</WorkToBuild>
@@ -45,7 +30,7 @@
     </costList>
     <comps>
       <li Class="CompProperties_Power">
-        <compClass>CompPower</compClass>
+        <compClass>CompPowerTransmitter</compClass>
         <basePowerConsumption>0</basePowerConsumption>
         <transmitsPower>true</transmitsPower>
       </li>
@@ -61,6 +46,54 @@
         <attachmentType>Rooftop</attachmentType>
         <minifyOnRoofLoss>false</minifyOnRoofLoss>
         <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-WindTurbine_Rooftop</defName>
+    <label>rooftop wind turbine</label>
+    <description>A compact vertical-axis wind turbine mounted on a roof. Generates power based on the map's wind speed, without requiring clear ground paths.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Power/SolarCollector</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>120</MaxHitPoints>
+      <WorkToBuild>1500</WorkToBuild>
+      <Flammability>0.1</Flammability>
+    </statBases>
+    <costList>
+      <Steel>100</Steel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>SolarWeb.Stratum.Things.RooftopWindTurbine</compClass>
+        <basePowerConsumption>0</basePowerConsumption>
+        <transmitsPower>true</transmitsPower>
+      </li>
+    </comps>
+    <designationCategory>Power</designationCategory>
+    <uiOrder>2120</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Rooftop</attachmentType>
+        <minifyOnRoofLoss>false</minifyOnRoofLoss>
+        <destroyOnRoofLoss>true</destroyOnRoofLoss>
       </li>
     </modExtensions>
   </ThingDef>

@@ -20,6 +20,29 @@ public static class PlaySettings_Patch
   [HarmonyPostfix]
   public static void DoMapControls_Postfix(WidgetRow row)
   {
-    MapHookRegistry.Notify_PlaySettingsDoMapControls(row);
+    var handlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.PlaySettingsDoMapControlsHandler>(MapHookRegistry.HookId.PlaySettingsDoMapControls);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          handlers[i](row);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in PlaySettingsDoMapControls subscriber: {ex}");
+        }
+      }
+    }
+
+    try
+    {
+      RoofBuildings.DoMapControls(row);
+    }
+    catch (System.Exception ex)
+    {
+      StratumLog.Error($"Error in built-in DoMapControls: {ex}");
+    }
   }
 }

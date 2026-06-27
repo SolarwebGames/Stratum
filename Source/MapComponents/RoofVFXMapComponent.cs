@@ -43,7 +43,7 @@ public class RoofVFXMapComponent : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged += Notify_StratumRoofChanged;
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
     }
   }
 
@@ -53,7 +53,7 @@ public class RoofVFXMapComponent : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged -= Notify_StratumRoofChanged;
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
     }
   }
 

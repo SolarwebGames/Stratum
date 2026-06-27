@@ -36,8 +36,8 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged += Notify_RoofChanged;
-      registry.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_RoofChanged);
+      registry.Register<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
     }
 
     foreach (var cell in map.AllCells)
@@ -58,8 +58,8 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged -= Notify_RoofChanged;
-      registry.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_RoofChanged);
+      registry.Unregister<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
     }
   }
 

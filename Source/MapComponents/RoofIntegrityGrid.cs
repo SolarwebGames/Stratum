@@ -21,11 +21,16 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public HashSet<int> RoofsNeedingRepair => roofsNeedingRepair;
   internal short[] HitPointsArray => hitPoints;
+  internal ThingDef?[] StuffDefsArray => stuffDefs;
 
   public override void ExposeData()
   {
     base.ExposeData();
     Scribe_Values.Look(ref hasScanned, "hasScanned", false);
+    if (Scribe.mode == LoadSaveMode.LoadingVars)
+    {
+      hasScanned = false;
+    }
 
     // We only save cells that have missing hitpoints or custom data to save space.
     Dictionary<int, short>? damagedCells = null;
@@ -98,7 +103,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged += Notify_StratumRoofChanged;
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
     }
     if (map.areaManager != null)
     {
@@ -113,7 +118,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged -= Notify_StratumRoofChanged;
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
     }
   }
 
@@ -378,7 +383,21 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         var registry = MapHookRegistry.Get(map);
         if (registry != null)
         {
-          registry.Notify_RoofDebrisDropped(cell, roof, stuff);
+          var handlers = registry.GetHandlers<MapHookRegistry.RoofDebrisDroppedHandler>(MapHookRegistry.HookId.RoofDebrisDropped);
+          if (handlers != null)
+          {
+            for (int i = 0; i < handlers.Count; i++)
+            {
+              try
+              {
+                handlers[i](map, cell, roof, stuff);
+              }
+              catch (Exception ex)
+              {
+                StratumLog.Error($"Error in RoofDebrisDropped subscriber: {ex}");
+              }
+            }
+          }
         }
       }
     }

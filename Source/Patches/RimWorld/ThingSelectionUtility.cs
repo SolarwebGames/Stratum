@@ -22,14 +22,36 @@ public static class ThingSelectionUtility_Patch
       var registry = MapHookRegistry.Get(map);
       if (registry != null)
       {
-        var res = registry.CheckRoofBuildingSelectable(t);
-        if (res.HasValue)
+        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingSelectableCheckHandler>(MapHookRegistry.HookId.RoofBuildingSelectableCheck);
+        if (handlers != null)
         {
-          __result = res.Value;
-          return false;
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              var res = handlers[i](t);
+              if (res.HasValue)
+              {
+                __result = res.Value;
+                return false;
+              }
+            }
+            catch (System.Exception ex)
+            {
+              StratumLog.Error($"Error in RoofBuildingSelectableCheck subscriber: {ex}");
+            }
+          }
         }
       }
     }
+
+    var fallback = RoofBuildings.CheckRoofBuildingSelectable(t);
+    if (fallback.HasValue)
+    {
+      __result = fallback.Value;
+      return false;
+    }
+
     return true;
   }
 }

@@ -1,3 +1,4 @@
+using System;
 using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
@@ -15,8 +16,22 @@ public class OnRoof : PlaceWorker
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      var res = registry.CheckRoofBuildingPlacement(checkingDef, loc);
-      if (res.HasValue) return res.Value;
+      var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingPlacementCheckHandler>(MapHookRegistry.HookId.RoofBuildingPlacementCheck);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            var res = handlers[i](checkingDef, loc, map);
+            if (res.HasValue) return res.Value;
+          }
+          catch (Exception ex)
+          {
+            StratumLog.Error($"Error in RoofBuildingPlacementCheck subscriber: {ex}");
+          }
+        }
+      }
     }
 
     var attachmentType = RoofBuildings.GetAttachmentType(checkingDef);

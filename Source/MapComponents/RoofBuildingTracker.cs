@@ -20,7 +20,7 @@ public class RoofBuildingTracker : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged += OnRoofChanged;
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, OnRoofChanged);
     }
   }
 
@@ -30,7 +30,7 @@ public class RoofBuildingTracker : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged -= OnRoofChanged;
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, OnRoofChanged);
     }
   }
 

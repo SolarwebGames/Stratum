@@ -20,9 +20,9 @@ public class CustomRoofsRenderer : SectionLayer
       if (defaultScratchMats == null)
       {
         defaultScratchMats = [
-          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.MetaOverlay),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.MetaOverlay),
-            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.MetaOverlay)
+          MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch1, ShaderDatabase.Cutout),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch2, ShaderDatabase.Cutout),
+            MaterialPool.MatFrom(RimWorldTextures.Damage.Scratch3, ShaderDatabase.Cutout)
         ];
       }
       return defaultScratchMats;
@@ -30,7 +30,7 @@ public class CustomRoofsRenderer : SectionLayer
   }
 
   private static Material? fallbackMat;
-  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.MetaOverlay, new Color(0.5f, 0.5f, 0.5f));
+  private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.Cutout, new Color(0.5f, 0.5f, 0.5f));
   public CustomRoofsRenderer(Section section) : base(section)
   {
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.Buildings | (ulong)MapMeshFlagDefOf.FogOfWar;
@@ -60,28 +60,31 @@ public class CustomRoofsRenderer : SectionLayer
       integrityGrid.ExecuteScan();
     }
 
-    RoofGrid roofGrid = map.roofGrid;
-    FogGrid fogGrid = map.fogGrid;
-    CellRect cellRect = section.CellRect;
+    CellRect cellRect = new(section.botLeft.x, section.botLeft.z, 17, 17);
+    cellRect.ClipInsideMap(map);
 
     bool isCutscene = false;
-    CellRect captureBounds = default;
-    if (ModsConfig.OdysseyActive)
+    CellRect captureBounds = CellRect.Empty;
+    if (GravshipCapturer.IsGravshipRenderInProgress)
+    {
+      captureBounds = GravshipCapturer.GravshipCaptureBounds;
+    }
+    else
     {
       isCutscene = WorldComponent_GravshipController.CutsceneInProgress && !GravshipCapturer.IsGravshipRenderInProgress && map == Find.CurrentMap;
       captureBounds = GravshipCapturer.GravshipCaptureBounds;
     }
 
-    // Use MoteOverhead to ensure we are below Skyfallers (30) but above Blueprints (26)
-    float altitude = AltitudeLayer.MoteOverhead.AltitudeFor();
+    // Use MapDataOverlay to ensure we draw above the lighting overlay, 
+    // but leave MetaOverlays available for ghost placement so we don't z-fight.
+    float altitude = AltitudeLayer.MapDataOverlay.AltitudeFor();
 
-    // PASS 1: Draw all roofs and damage scratches
     foreach (IntVec3 c in cellRect)
     {
-      if (fogGrid.IsFogged(c)) continue;
+      if (map.fogGrid.IsFogged(c)) continue;
       if (isCutscene && captureBounds.Contains(c)) continue;
 
-      RoofDef roof = roofGrid.RoofAt(c);
+      RoofDef roof = map.roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsCustomRoof(roof)) continue;
 
       var myGraphicData = RoofStatCache.GetGraphicData(roof);
@@ -97,29 +100,48 @@ public class CustomRoofsRenderer : SectionLayer
 
       if (myGraphicData != null)
       {
-        bool gotUv = myGraphicData.isSeamless
-          ? RoofAtlasManager.TryGetSeamlessUv(myGraphicData.texPath, c.x, c.z, out var uv, out var mat)
-          : RoofAtlasManager.TryGetUv(myGraphicData.texPath, c.GetHashCode(), out uv, out mat);
+        var entry = RoofAtlasManager.GetEntry(myGraphicData.texPath);
+        var (cutout, transparent) = RoofAtlasManager.GetMaterials(myGraphicData.texPath, roofColor);
 
-        if (gotUv)
+        bool isTransparent = RoofStatCache.IsSkylight(roof);
+        Material mat = isTransparent ? transparent : cutout;
+
+        if (entry.IsSeamless && entry.SeamlessGrid != null)
         {
-          if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+          int col = c.x % entry.GridWidth;
+          if (col < 0) col += entry.GridWidth;
+
+          int row = c.z % entry.GridHeight;
+          if (row < 0) row += entry.GridHeight;
+
+          if (entry.SeamlessGrid.TryGetValue((col, row), out var uvs))
           {
-            DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uv!, mat!);
-          }
-          else
-          {
-            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat!, roofColor, Rot4.North, uv!);
+            if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+            {
+              DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
+            }
+            else
+            {
+              DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat, Color.white, 0f, uvs);
+            }
           }
         }
         else
         {
-          DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, FallbackMat, roofColor, Rot4.North);
+          var uvs = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
+          if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+          {
+            DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
+          }
+          else
+          {
+            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat, Color.white, 0f, uvs);
+          }
         }
       }
       else
       {
-        DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, FallbackMat, roofColor, Rot4.North);
+        DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, FallbackMat, roofColor, 0f);
       }
 
       if (integrityGrid != null)
@@ -133,18 +155,12 @@ public class CustomRoofsRenderer : SectionLayer
           DrawDamageScratches(c, roof, myGraphicData, altitude + 0.05f, hp, maxHp, alpha);
         }
       }
-
-      if (RoofBuildings.HasRoofBuildingAt(map, c))
-      {
-        // Warning indicator slightly above scratches (+0.08f)
-        DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.08f, c.z + 0.5f), Vector2.one, RoofBuildings.AttachmentIndicatorMat, Color.white, Rot4.North);
-      }
     }
 
     FinalizeMesh(MeshParts.All);
   }
 
-  private void DrawFramedSkylight(IntVec3 c, RoofDef roof, RoofGraphicData gd, float y, ThingDef? stuff, Vector2[] uv, Material mat)
+  private void DrawFramedSkylight(IntVec3 c, RoofDef roof, RoofGraphicData gd, float y, ThingDef? stuff, Vector2[] uv, string texPath)
   {
     float f = gd.skylightFrameWidth;
     float glassAlpha = 1f - RoofStatCache.GetTransparency(roof);
@@ -155,10 +171,14 @@ public class CustomRoofsRenderer : SectionLayer
     Color glassColor = RoofStatCache.GetGlassTint(roof, Map, c);
     glassColor.a = glassAlpha;
 
-    Vector3 basePos = new Vector3(c.x, y, c.z);
+    // Fetch materials specific to their colors
+    Material frameMat = RoofAtlasManager.GetMaterials(texPath, frameColor).cutout;
+    Material glassMat = RoofAtlasManager.GetMaterials(texPath, glassColor).transparent;
+
+    Vector3 basePos = new(c.x, y, c.z);
 
     // 9-slice positions (0.0 to 1.0)
-    float[] p = { 0f, f, 1f - f, 1f };
+    System.ReadOnlySpan<float> p = stackalloc float[] { 0f, f, 1f - f, 1f };
 
     // UVs (interpolate between corner UVs)
     Vector2 bl = uv[0], tl = uv[1], tr = uv[2], br = uv[3];
@@ -168,13 +188,13 @@ public class CustomRoofsRenderer : SectionLayer
       for (int z = 0; z < 3; z++)
       {
         bool isCenter = (x == 1 && z == 1);
-        Color quadColor = isCenter ? glassColor : frameColor;
+        Material quadMat = isCenter ? glassMat : frameMat;
 
         Vector3 qCenter = basePos + new Vector3((p[x] + p[x + 1]) / 2f, 0, (p[z] + p[z + 1]) / 2f);
-        Vector2 qSize = new Vector2(p[x + 1] - p[x], p[z + 1] - p[z]);
+        Vector2 qSize = new(p[x + 1] - p[x], p[z + 1] - p[z]);
 
         // Compute UVs for this slice
-        Vector2[] qUv = new Vector2[4];
+        System.Span<Vector2> qUv = stackalloc Vector2[4];
 
         Vector2 GetUv(float px, float pz)
         {
@@ -188,24 +208,25 @@ public class CustomRoofsRenderer : SectionLayer
         qUv[2] = GetUv(p[x + 1], p[z + 1]); // TR
         qUv[3] = GetUv(p[x + 1], p[z]);   // BR
 
-        DrawQuadCustom(qCenter, qSize, mat, quadColor, Rot4.North, qUv);
+        // Vertex color is white because color is baked into the material
+        DrawQuadCustom(qCenter, qSize, quadMat, Color.white, 0f, qUv);
       }
     }
   }
 
-  private void DrawQuadCustom(Vector3 center, Vector2 size, Material mat, Color color, Rot4 rot, Vector2[]? uvArray = null, Color[]? vertexColors = null)
+  private void DrawQuadCustom(Vector3 center, Vector2 size, Material mat, Color color, float angle = 0f, System.ReadOnlySpan<Vector2> uvArray = default, Color[]? vertexColors = null)
   {
     LayerSubMesh subMesh = GetSubMesh(mat);
     int vCount = subMesh.verts.Count;
 
-    Vector3 v1 = new Vector3(-size.x / 2f, 0, -size.y / 2f);
-    Vector3 v2 = new Vector3(-size.x / 2f, 0, size.y / 2f);
-    Vector3 v3 = new Vector3(size.x / 2f, 0, size.y / 2f);
-    Vector3 v4 = new Vector3(size.x / 2f, 0, -size.y / 2f);
+    Vector3 v1 = new(-size.x / 2f, 0, -size.y / 2f);
+    Vector3 v2 = new(-size.x / 2f, 0, size.y / 2f);
+    Vector3 v3 = new(size.x / 2f, 0, size.y / 2f);
+    Vector3 v4 = new(size.x / 2f, 0, -size.y / 2f);
 
-    if (rot != Rot4.North)
+    if (angle != 0f)
     {
-      Quaternion q = Quaternion.AngleAxis(rot.AsAngle, Vector3.up);
+      Quaternion q = Quaternion.AngleAxis(angle, Vector3.up);
       v1 = q * v1;
       v2 = q * v2;
       v3 = q * v3;
@@ -227,19 +248,19 @@ public class CustomRoofsRenderer : SectionLayer
       for (int i = 0; i < 4; i++) subMesh.colors.Add(color32);
     }
 
-    if (uvArray != null && uvArray.Length >= 4)
+    if (uvArray.Length >= 4)
     {
-      subMesh.uvs.Add(new Vector3(uvArray[0].x, uvArray[0].y, 0f));
-      subMesh.uvs.Add(new Vector3(uvArray[1].x, uvArray[1].y, 0f));
-      subMesh.uvs.Add(new Vector3(uvArray[2].x, uvArray[2].y, 0f));
-      subMesh.uvs.Add(new Vector3(uvArray[3].x, uvArray[3].y, 0f));
+      subMesh.uvs.Add(new(uvArray[0].x, uvArray[0].y, 0f));
+      subMesh.uvs.Add(new(uvArray[1].x, uvArray[1].y, 0f));
+      subMesh.uvs.Add(new(uvArray[2].x, uvArray[2].y, 0f));
+      subMesh.uvs.Add(new(uvArray[3].x, uvArray[3].y, 0f));
     }
     else
     {
-      subMesh.uvs.Add(new Vector3(0f, 0f, 0f));
-      subMesh.uvs.Add(new Vector3(0f, 1f, 0f));
-      subMesh.uvs.Add(new Vector3(1f, 1f, 0f));
-      subMesh.uvs.Add(new Vector3(1f, 0f, 0f));
+      subMesh.uvs.Add(new(0f, 0f, 0f));
+      subMesh.uvs.Add(new(0f, 1f, 0f));
+      subMesh.uvs.Add(new(1f, 1f, 0f));
+      subMesh.uvs.Add(new(1f, 0f, 0f));
     }
 
     for (int i = 0; i < 4; i++) subMesh.normals.Add(Vector3.up);
@@ -277,13 +298,13 @@ public class CustomRoofsRenderer : SectionLayer
       float rot = Rand.Range(0f, 360f);
       float scale = Rand.Range(0.7f, 0.9f);
 
-      Vector3 center = new Vector3(c.x + 0.5f, y, c.z + 0.5f);
+      Vector3 center = new(c.x + 0.5f, y, c.z + 0.5f);
 
-      Vector2 size = new Vector2(scale, scale);
-      Vector3 v1 = new Vector3(-size.x / 2f, 0, -size.y / 2f);
-      Vector3 v2 = new Vector3(-size.x / 2f, 0, size.y / 2f);
-      Vector3 v3 = new Vector3(size.x / 2f, 0, size.y / 2f);
-      Vector3 v4 = new Vector3(size.x / 2f, 0, -size.y / 2f);
+      Vector2 size = new(scale, scale);
+      Vector3 v1 = new(-size.x / 2f, 0, -size.y / 2f);
+      Vector3 v2 = new(-size.x / 2f, 0, size.y / 2f);
+      Vector3 v3 = new(size.x / 2f, 0, size.y / 2f);
+      Vector3 v4 = new(size.x / 2f, 0, -size.y / 2f);
 
       Quaternion rotQ = Quaternion.AngleAxis(rot, Vector3.up);
       v1 = rotQ * v1 + center;
@@ -297,13 +318,13 @@ public class CustomRoofsRenderer : SectionLayer
       scratchSubMesh.verts.Add(v3);
       scratchSubMesh.verts.Add(v4);
 
-      Color32 scratchColor = new Color32(255, 255, 255, (byte)(alpha * 255));
+      Color32 scratchColor = new(255, 255, 255, (byte)(alpha * 255));
       for (int j = 0; j < 4; j++) scratchSubMesh.colors.Add(scratchColor);
 
-      scratchSubMesh.uvs.Add(new Vector3(0f, 0f, 0f));
-      scratchSubMesh.uvs.Add(new Vector3(0f, 1f, 0f));
-      scratchSubMesh.uvs.Add(new Vector3(1f, 1f, 0f));
-      scratchSubMesh.uvs.Add(new Vector3(1f, 0f, 0f));
+      scratchSubMesh.uvs.Add(new(0f, 0f, 0f));
+      scratchSubMesh.uvs.Add(new(0f, 1f, 0f));
+      scratchSubMesh.uvs.Add(new(1f, 1f, 0f));
+      scratchSubMesh.uvs.Add(new(1f, 0f, 0f));
 
       for (int j = 0; j < 4; j++) scratchSubMesh.normals.Add(Vector3.up);
 

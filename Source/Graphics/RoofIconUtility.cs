@@ -13,15 +13,14 @@ public static class RoofIconUtility
     var gd = RoofStatCache.GetGraphicData(roofDef);
     var bDef = ext.buildableDef;
 
-    if ((icon == null || icon == BaseContent.BadTex || bDef?.uiIcon == icon) && gd != null && RoofAtlasManager.TryGetUv(gd.texPath, out var uvs, out var mat))
+    if ((icon == null || icon == BaseContent.BadTex || bDef?.uiIcon == icon) && gd != null)
     {
-      if (mat == null)
-      {
-        mat = MaterialPool.MatFrom(gd.texPath, ShaderDatabase.Cutout, gd.color);
-      }
+      var uvs = RoofAtlasManager.GetIconUvs(gd.texPath);
 
       if (uvs != null && uvs.Length >= 4)
       {
+        Material mat = RoofAtlasManager.GetMaterials(gd.texPath, gd.color).cutout;
+
         float minU = uvs[0].x;
         float minV = uvs[0].y;
         float maxU = uvs[2].x;
@@ -47,7 +46,7 @@ public static class RoofIconUtility
       }
       else
       {
-        icon = mat.mainTexture;
+        icon = RoofAtlasManager.GetMaterials(gd.texPath, gd.color).cutout.mainTexture;
       }
     }
   }

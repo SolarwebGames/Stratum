@@ -1,12 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
 
-  <ThingDef ParentName="SunLamp">
-    <defName>SunLamp_Hanging</defName>
+  <ThingDef ParentName="LampBase">
+    <defName>SolarWeb-Stratum-SunLamp_Hanging</defName>
     <label>hanging sun lamp</label>
     <description>An industrial lamp which lights an area brightly enough to grow crops, but consumes a huge amount of power. Designed to hang from the underside of a roof ceiling.</description>
+    <thingClass>Building_SunLamp</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Production/LampSun</texPath>
+    </graphicData>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <blockWind>true</blockWind>
+    <tickerType>Rare</tickerType>
     <passability>Standable</passability>
     <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <WorkToBuild>330</WorkToBuild>
+      <Mass>4.5</Mass>
+    </statBases>
+    <costList>
+      <Steel>40</Steel>
+    </costList>
+    <uiOrder>2995</uiOrder>
+    <comps>
+      <li Class="CompProperties_Glower">
+        <overlightRadius>7.0</overlightRadius>
+        <glowRadius>14</glowRadius>
+        <glowColor>(370,370,370,0)</glowColor>
+      </li>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <shortCircuitInRain>true</shortCircuitInRain>
+        <basePowerConsumption>2900</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Schedule">
+        <startTime>0.25</startTime>
+        <endTime>0.8</endTime>
+        <offMessage>Off for plant resting period</offMessage>
+      </li>
+      <li Class="CompProperties_HeatPusher">
+        <compClass>CompHeatPusherPowered</compClass>
+        <heatPerSecond>3</heatPerSecond>
+      </li>
+    </comps>
+    <specialDisplayRadius>5.8</specialDisplayRadius>
     <placeWorkers Inherit="false">
       <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
       <li>PlaceWorker_GlowRadius</li>
@@ -18,26 +58,34 @@
         <destroyOnRoofLoss>false</destroyOnRoofLoss>
       </li>
     </modExtensions>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
   </ThingDef>
 
   <ThingDef ParentName="BuildingBase">
-    <defName>FireSprinkler_Hanging</defName>
+    <defName>SolarWeb-Stratum-FireSprinkler</defName>
     <label>hanging fire sprinkler</label>
-    <description>An automated, powered fire sprinkler system that hangs from the ceiling. Scans the local area for fires every half-second and discharges water to extinguish them.</description>
+    <description>An automated, powered fire sprinkler system that hangs from the ceiling. Scans the local area for fires every half-second and discharges firefoam to extinguish them.</description>
     <thingClass>SolarWeb.Stratum.Things.FireSprinkler</thingClass>
     <graphicData>
       <texPath>Things/Building/Misc/FirefoamPopper</texPath>
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(1,1)</drawSize>
     </graphicData>
+    <defaultPlacingRot>South</defaultPlacingRot>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
     <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
     <statBases>
       <MaxHitPoints>80</MaxHitPoints>
       <WorkToBuild>800</WorkToBuild>
       <Flammability>0</Flammability>
+      <Mass>2.5</Mass>
     </statBases>
     <costList>
       <Steel>30</Steel>
@@ -67,6 +115,193 @@
         <destroyOnRoofLoss>false</destroyOnRoofLoss>
       </li>
     </modExtensions>
+    <researchPrerequisites>
+      <li>Firefoam</li>
+    </researchPrerequisites>
   </ThingDef>
 
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-LEDLight_Hanging</defName>
+    <label>hanging LED lamp</label>
+    <description>A low-profile lighting fixture suspended from the ceiling.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Production/LampSun</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(0.4,0.4)</drawSize>
+    </graphicData>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>30</MaxHitPoints>
+      <WorkToBuild>300</WorkToBuild>
+      <Flammability>0.1</Flammability>
+      <Mass>1.5</Mass>
+    </statBases>
+    <costList>
+      <Steel>15</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>30</basePowerConsumption>
+        <powerUpgrades>
+          <li>
+            <researchProject>ColoredLights</researchProject>
+            <factor>0.5</factor>
+          </li>
+        </powerUpgrades>
+      </li>
+      <li Class="CompProperties_Glower">
+        <glowRadius>11</glowRadius>
+        <glowColor>(214,148,94,0)</glowColor>
+        <colorPickerEnabled>true</colorPickerEnabled>
+        <darklightToggle>true</darklightToggle>
+      </li>
+    </comps>
+    <designationCategory>Furniture</designationCategory>
+    <uiOrder>2852</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Hanging</attachmentType>
+        <minifyOnRoofLoss>true</minifyOnRoofLoss>
+        <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-PASpeaker_Hanging</defName>
+    <label>hanging speaker</label>
+    <description>A small speaker suspended from the ceiling. Receives audio feeds from a powered PA Transmitter console on the same power grid and broadcasts transmissions to nearby colonists.</description>
+    <thingClass>SolarWeb.Stratum.Things.BroadcastSpeaker</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Special/PsychicEmanator</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(0.5,0.5)</drawSize>
+    </graphicData>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <tickerType>Rare</tickerType>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>40</MaxHitPoints>
+      <WorkToBuild>400</WorkToBuild>
+      <Flammability>0.1</Flammability>
+      <Mass>3</Mass>
+    </statBases>
+    <costList>
+      <Steel>20</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>15</basePowerConsumption>
+        <transmitsPower>false</transmitsPower>
+      </li>
+    </comps>
+    <designationCategory>Misc</designationCategory>
+    <uiOrder>2854</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Hanging</attachmentType>
+        <minifyOnRoofLoss>true</minifyOnRoofLoss>
+        <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-PATransmitter</defName>
+    <label>broadcaster</label>
+    <description>A console used to broadcast audio programs to all speakers connected on the same power grid.</description>
+    <thingClass>SolarWeb.Stratum.Things.BroadcastTransmitter</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Misc/VitalsMonitor</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <shadowData>
+        <volume>(0.55, 0.30, 0.40)</volume>
+      </shadowData>
+      <color>(100, 100, 100)</color>
+      <damageData>
+        <rectN>(0.078125,0.46875,0.859375,0.53125)</rectN>
+        <rectS>(0.078125,0.46875,0.859375,0.53125)</rectS>
+        <rectE>(0.125,0.46875,0.625,0.296875)</rectE>
+        <rectW>(0.25,0.46875,0.625,0.296875)</rectW>
+        <cornerTR>Damage/Corner</cornerTR>
+      </damageData>
+    </graphicData>
+    <rotatable>true</rotatable>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>PassThroughOnly</passability>
+    <pathCost>50</pathCost>
+    <tickerType>Rare</tickerType>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>150</MaxHitPoints>
+      <WorkToBuild>1200</WorkToBuild>
+      <Flammability>0.1</Flammability>
+      <Mass>5.5</Mass>
+    </statBases>
+    <costList>
+      <Steel>80</Steel>
+      <Plasteel>10</Plasteel>
+      <ComponentIndustrial>3</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>100</basePowerConsumption>
+        <transmitsPower>true</transmitsPower>
+      </li>
+    </comps>
+    <designationCategory>Misc</designationCategory>
+    <uiOrder>2856</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <researchPrerequisites>
+      <li>Electricity</li>
+    </researchPrerequisites>
+  </ThingDef>
 </Defs>

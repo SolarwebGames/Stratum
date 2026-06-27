@@ -239,17 +239,56 @@ public static class RoofStatCache
     return solarOutputCache.TryGetValue(def.defNameHash, out float val) ? val : 0f;
   }
 
+  private static readonly float?[] transparencyHashCache = new float?[ushort.MaxValue + 1];
+
   public static float GetTransparency(RoofDef def)
   {
     if (def == null) return 0f;
+    
+    ushort hash = def.shortHash;
+    float? cached = transparencyHashCache[hash];
+    if (cached.HasValue) return cached.Value;
+
     float val = transparencyCache.TryGetValue(def.defNameHash, out float t) ? t : 0f;
-    return Mathf.Max(val, MapHookRegistry.GetTransparencyOverride(def));
+    float max = val;
+    var handlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.TransparencyCheckHandler>(MapHookRegistry.HookId.TransparencyCheck);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          max = Mathf.Max(max, handlers[i](def));
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in GlobalTransparencyCheck subscriber: {ex}");
+        }
+      }
+    }
+    transparencyHashCache[hash] = max;
+    return max;
   }
 
   public static bool GetIsAirtight(RoofDef def, ThingDef? stuff = null)
   {
     if (def == null) return false;
-    if (MapHookRegistry.IsAirtightOverride(def)) return true;
+
+    var handlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.AirtightCheckHandler>(MapHookRegistry.HookId.AirtightCheck);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          if (handlers[i](def)) return true;
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in GlobalAirtightCheck subscriber: {ex}");
+        }
+      }
+    }
 
     bool baseAirtight;
     if (airtightCache.TryGetValue(def.defNameHash, out bool val))

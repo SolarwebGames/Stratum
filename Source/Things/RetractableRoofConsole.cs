@@ -434,11 +434,27 @@ public class RetractableRoofConsole : Building
               var gd = RoofStatCache.GetGraphicData(roof);
               if (gd != null)
               {
-                bool gotUv = gd.isSeamless
-                  ? Graphics.RoofAtlasManager.TryGetSeamlessUv(gd.texPath, cell.x, cell.z, out var uvs, out var mat)
-                  : Graphics.RoofAtlasManager.TryGetUv(gd.texPath, cell.GetHashCode(), out uvs, out mat);
+                var entry = Graphics.RoofAtlasManager.GetEntry(gd.texPath);
+                Vector2[]? uvs = null;
 
-                if (gotUv)
+                if (entry.IsSeamless && entry.SeamlessGrid != null)
+                {
+                  int col = cell.x % entry.GridWidth;
+                  if (col < 0) col += entry.GridWidth;
+                  int row = cell.z % entry.GridHeight;
+                  if (row < 0) row += entry.GridHeight;
+
+                  if (entry.SeamlessGrid.TryGetValue((col, row), out var uvEntry))
+                  {
+                    uvs = uvEntry;
+                  }
+                }
+                else if (entry.FlatVariants.Count > 0)
+                {
+                  uvs = entry.FlatVariants[Mathf.Abs(cell.GetHashCode()) % entry.FlatVariants.Count];
+                }
+
+                if (uvs != null)
                 {
                   var animator = Map.GetComponent<RetractableRoofAnimator>();
                   if (animator != null)
@@ -455,7 +471,11 @@ public class RetractableRoofConsole : Building
                     {
                       color.a = 1f - RoofStatCache.GetTransparency(roof);
                     }
-                    animator.AddTransition(start, end, animationDuration, mat!, color, uvs!);
+                    
+                    var mats = Graphics.RoofAtlasManager.GetMaterials(gd.texPath, color);
+                    Material mat = RoofStatCache.IsSkylight(roof) ? mats.transparent : mats.cutout;
+                    
+                    animator.AddTransition(start, end, animationDuration, mat, color, uvs);
                   }
                 }
               }
@@ -474,11 +494,27 @@ public class RetractableRoofConsole : Building
                 var animator = Map.GetComponent<RetractableRoofAnimator>();
                 if (gd != null)
                 {
-                  bool gotUv = gd.isSeamless
-                    ? Graphics.RoofAtlasManager.TryGetSeamlessUv(gd.texPath, cell.x, cell.z, out var uvs, out var mat)
-                    : Graphics.RoofAtlasManager.TryGetUv(gd.texPath, cell.GetHashCode(), out uvs, out mat);
+                  var entry = Graphics.RoofAtlasManager.GetEntry(gd.texPath);
+                  Vector2[]? uvs = null;
 
-                  if (gotUv)
+                  if (entry.IsSeamless && entry.SeamlessGrid != null)
+                  {
+                    int col = cell.x % entry.GridWidth;
+                    if (col < 0) col += entry.GridWidth;
+                    int row = cell.z % entry.GridHeight;
+                    if (row < 0) row += entry.GridHeight;
+
+                    if (entry.SeamlessGrid.TryGetValue((col, row), out var uvEntry))
+                    {
+                      uvs = uvEntry;
+                    }
+                  }
+                  else if (entry.FlatVariants.Count > 0)
+                  {
+                    uvs = entry.FlatVariants[Mathf.Abs(cell.GetHashCode()) % entry.FlatVariants.Count];
+                  }
+
+                  if (uvs != null)
                   {
                     if (animator != null)
                     {
@@ -494,7 +530,11 @@ public class RetractableRoofConsole : Building
                       {
                         color.a = 1f - RoofStatCache.GetTransparency(rDef);
                       }
-                      animator.AddTransition(start, end, animationDuration, mat!, color, uvs!);
+                      
+                      var mats = Graphics.RoofAtlasManager.GetMaterials(gd.texPath, color);
+                      Material mat = RoofStatCache.IsSkylight(rDef) ? mats.transparent : mats.cutout;
+                      
+                      animator.AddTransition(start, end, animationDuration, mat, color, uvs);
                     }
                   }
                 }

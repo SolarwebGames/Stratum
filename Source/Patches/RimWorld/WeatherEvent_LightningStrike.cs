@@ -28,7 +28,7 @@ public static class WeatherEvent_LightningStrike_Patch
           map);
       }
 
-      var rodDef = DefOf.ThingDefOf.LightningRod_Rooftop;
+      var rodDef = DefOf.ThingDefOf.LightningRod;
       if (rodDef != null && map.listerBuildings != null)
       {
         var rods = map.listerBuildings.AllBuildingsColonistOfDef(rodDef);
@@ -140,7 +140,7 @@ public static class WeatherEvent_LightningStrike_Patch
           radius = 1.9f,
           damType = DamageDefOf.Flame,
           instigator = null,
-          damAmount = DamageDefOf.Flame.defaultDamage,
+          damAmount = 250,
           chanceToStartFire = 0.5f
         });
 

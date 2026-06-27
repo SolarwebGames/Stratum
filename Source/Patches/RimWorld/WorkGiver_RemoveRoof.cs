@@ -11,11 +11,11 @@ public static class WorkGiver_RemoveRoof_Patch
 {
   [HarmonyPatch(nameof(WorkGiver_RemoveRoof.HasJobOnCell))]
   [HarmonyPrefix]
-  public static bool HasJobOnCell_Prefix(Map ___map, IntVec3 c, ref bool __result)
+  public static bool HasJobOnCell_Prefix(Pawn pawn, IntVec3 c, ref bool __result)
   {
-    if (___map == null) return true;
+    if (pawn == null || pawn.Map == null) return true;
 
-    if (RoofBuildings.HasNonMinifiableRoofBuildingAt(___map, c))
+    if (RoofBuildings.HasNonMinifiableRoofBuildingAt(pawn.Map, c))
     {
       __result = false;
       return false;

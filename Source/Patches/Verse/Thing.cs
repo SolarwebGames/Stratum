@@ -15,19 +15,40 @@ public static class Thing_Patch
   [HarmonyPostfix]
   public static void DrawPos_Postfix(Thing __instance, ref Vector3 __result)
   {
-    if (__instance == null || __instance.def == null) return;
+    if (!RoofBuildings.IsRoofBuildingOrBlueprintOrFrame(__instance)) return;
     var map = __instance.Map;
     if (map != null)
     {
       var registry = MapHookRegistry.Get(map);
       if (registry != null)
       {
-        var res = registry.GetRoofBuildingDrawPos(__instance, __result);
-        if (res.HasValue)
+        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingDrawPosHandler>(MapHookRegistry.HookId.RoofBuildingDrawPos);
+        if (handlers != null)
         {
-          __result = res.Value;
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              var res = handlers[i](__instance, __result);
+              if (res.HasValue)
+              {
+                __result = res.Value;
+                return;
+              }
+            }
+            catch (Exception ex)
+            {
+              StratumLog.Error($"Error in RoofBuildingDrawPos subscriber: {ex}");
+            }
+          }
         }
       }
+    }
+
+    var fallback = RoofBuildings.GetRoofBuildingDrawPos(__instance, __result);
+    if (fallback.HasValue)
+    {
+      __result = fallback.Value;
     }
   }
 

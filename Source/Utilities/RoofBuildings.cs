@@ -16,12 +16,6 @@ public static class RoofBuildings
   private static Texture2D? showRoofBuildingsIcon;
   public static Texture2D ShowRoofBuildingsIcon => showRoofBuildingsIcon ??= CreateDefaultToggleIcon();
 
-  private static Material? attachmentIndicatorMat;
-  public static Material AttachmentIndicatorMat => attachmentIndicatorMat ??= new Material(ShaderDatabase.MetaOverlay)
-  {
-    mainTexture = CreateRoofAttachmentIndicatorTexture()
-  };
-
   public static bool ShouldRenderRoofBuilding(Thing t)
   {
     if (t == null || t.def == null) return false;
@@ -31,15 +25,29 @@ public static class RoofBuildings
       var registry = MapHookRegistry.Get(map);
       if (registry != null)
       {
-        var res = registry.CheckRoofBuildingRender(t);
-        if (res.HasValue) return res.Value;
+        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingRenderCheckHandler>(MapHookRegistry.HookId.RoofBuildingRenderCheck);
+        if (handlers != null)
+        {
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              var res = handlers[i](t);
+              if (res.HasValue) return res.Value;
+            }
+            catch (System.Exception ex)
+            {
+              StratumLog.Error($"Error in RoofBuildingRenderCheck subscriber: {ex}");
+            }
+          }
+        }
       }
     }
 
     var attachmentType = GetAttachmentType(t);
     if (attachmentType == RoofAttachmentType.Rooftop)
     {
-      return Find.PlaySettings != null && (Find.PlaySettings.showRoofOverlay || IsPlacingOrDesignatingRoofs(t.Map));
+      return Find.PlaySettings != null && (Find.PlaySettings.showRoofOverlay || IsPlacingOrDesignatingRoofs(t.Map) || t is Blueprint || t is Frame);
     }
     else
     {
@@ -73,32 +81,51 @@ public static class RoofBuildings
     return false;
   }
 
+  private static bool?[] isRoofBuildingCache = new bool?[ushort.MaxValue + 1];
+
   public static bool IsRoofBuildingOrBlueprintOrFrame(Thing t)
   {
     if (t == null || t.def == null) return false;
-    if (t.def.HasModExtension<RoofBuilding>()) return true;
-    if (t is Blueprint blueprint && blueprint.def != null && blueprint.def.entityDefToBuild is ThingDef buildDef && buildDef.HasModExtension<RoofBuilding>()) return true;
-    if (t is Frame frame && frame.def != null && frame.def.entityDefToBuild is ThingDef frameDef && frameDef.HasModExtension<RoofBuilding>()) return true;
-    return false;
+
+    ushort hash = t.def.shortHash;
+    bool? cached = isRoofBuildingCache[hash];
+    if (cached.HasValue) return cached.Value;
+
+    bool result = false;
+    if (t.def.HasModExtension<RoofBuilding>()) result = true;
+    else if (t is Blueprint blueprint && blueprint.def != null && blueprint.def.entityDefToBuild is ThingDef buildDef && buildDef.HasModExtension<RoofBuilding>()) result = true;
+    else if (t is Frame frame && frame.def != null && frame.def.entityDefToBuild is ThingDef frameDef && frameDef.HasModExtension<RoofBuilding>()) result = true;
+
+    isRoofBuildingCache[hash] = result;
+    return result;
   }
+
+  private static RoofAttachmentType?[] attachmentTypeCache = new RoofAttachmentType?[ushort.MaxValue + 1];
 
   public static RoofAttachmentType GetAttachmentType(Thing t)
   {
     if (t == null || t.def == null) return RoofAttachmentType.Hanging;
-    var ext = t.def.GetModExtension<RoofBuilding>();
-    if (ext != null) return ext.attachmentType;
+    
+    ushort hash = t.def.shortHash;
+    var cached = attachmentTypeCache[hash];
+    if (cached.HasValue) return cached.Value;
 
-    if (t is Blueprint blueprint && blueprint.def != null && blueprint.def.entityDefToBuild is ThingDef buildDef)
+    RoofAttachmentType type = RoofAttachmentType.Hanging;
+    var ext = t.def.GetModExtension<RoofBuilding>();
+    if (ext != null) type = ext.attachmentType;
+    else if (t is Blueprint blueprint && blueprint.def != null && blueprint.def.entityDefToBuild is ThingDef buildDef)
     {
       var buildExt = buildDef.GetModExtension<RoofBuilding>();
-      if (buildExt != null) return buildExt.attachmentType;
+      if (buildExt != null) type = buildExt.attachmentType;
     }
     else if (t is Frame frame && frame.def != null && frame.def.entityDefToBuild is ThingDef frameDef)
     {
       var frameExt = frameDef.GetModExtension<RoofBuilding>();
-      if (frameExt != null) return frameExt.attachmentType;
+      if (frameExt != null) type = frameExt.attachmentType;
     }
-    return RoofAttachmentType.Hanging;
+
+    attachmentTypeCache[hash] = type;
+    return type;
   }
 
   public static RoofAttachmentType GetAttachmentType(BuildableDef def)
@@ -242,35 +269,6 @@ public static class RoofBuildings
     return tex;
   }
 
-  private static Texture2D CreateRoofAttachmentIndicatorTexture()
-  {
-    Texture2D tex = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-    for (int x = 0; x < 32; x++)
-    {
-      for (int y = 0; y < 32; y++)
-      {
-        tex.SetPixel(x, y, Color.clear);
-      }
-    }
-    for (int x = 0; x < 32; x++)
-    {
-      for (int y = 0; y < 32; y++)
-      {
-        double dist = Math.Sqrt((x - 16) * (x - 16) + (y - 16) * (y - 16));
-        if (dist >= 5.0 && dist <= 7.0)
-        {
-          tex.SetPixel(x, y, new Color(1f, 0.6f, 0f, 0.8f));
-        }
-        else if (dist >= 1.0 && dist <= 2.0)
-        {
-          tex.SetPixel(x, y, new Color(1f, 0.6f, 0f, 0.8f));
-        }
-      }
-    }
-    tex.Apply();
-    return tex;
-  }
-
   public static bool? CheckBlocksConstruction(Thing constructible, Thing existingThing)
   {
     if (constructible == null || existingThing == null || constructible.def == null || existingThing.def == null) return null;
@@ -299,16 +297,61 @@ public static class RoofBuildings
 
     if (isConstructibleRoofBuilding || isExistingRoofBuilding)
     {
+      var roofDef = isConstructibleRoofBuilding ? defConstructible : defExisting;
+      var ext = roofDef?.GetModExtension<RoofBuilding>();
+      var attachmentType = ext != null ? ext.attachmentType : RoofAttachmentType.Hanging;
       var floorDef = isConstructibleRoofBuilding ? defExisting : defConstructible;
+      
       if (floorDef != null)
       {
-        if (floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full))
+        bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
+        if (isImpassable && attachmentType != RoofAttachmentType.Rooftop)
         {
           return true;
         }
       }
 
       return false;
+    }
+
+    return null;
+  }
+
+  public static bool? CheckCanPlaceBlueprintOver(BuildableDef newDef, ThingDef oldDef)
+  {
+    if (newDef == null || oldDef == null) return null;
+
+    bool isNewRoofBuilding = newDef.HasModExtension<RoofBuilding>();
+    bool isOldRoofBuilding = oldDef.HasModExtension<RoofBuilding>();
+
+    if (isNewRoofBuilding && isOldRoofBuilding)
+    {
+      var typeNew = newDef.GetModExtension<RoofBuilding>().attachmentType;
+      var typeOld = oldDef.GetModExtension<RoofBuilding>().attachmentType;
+      if (typeNew != typeOld)
+      {
+        return false;
+      }
+      return true;
+    }
+    else if (isNewRoofBuilding || isOldRoofBuilding)
+    {
+      var roofDef = isNewRoofBuilding ? newDef : oldDef;
+      var attachmentType = roofDef.GetModExtension<RoofBuilding>().attachmentType;
+      var floorDef = isNewRoofBuilding ? oldDef : (newDef as ThingDef);
+      
+      if (floorDef != null)
+      {
+        bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
+        if (!isImpassable || attachmentType == RoofAttachmentType.Rooftop)
+        {
+          return false;
+        }
+        else
+        {
+          return true;
+        }
+      }
     }
 
     return null;
@@ -361,9 +404,16 @@ public static class RoofBuildings
       var attachmentType = GetAttachmentType(thing);
       if (attachmentType == RoofAttachmentType.Rooftop)
       {
-        float roofAltitude = AltitudeLayer.MoteOverhead.AltitudeFor() + 0.1f;
+        float roofAltitude = AltitudeLayer.MapDataOverlay.AltitudeFor() + 0.1f;
         var modified = originalTrueCenter;
         modified.y = roofAltitude;
+        return modified;
+      }
+      else if (attachmentType == RoofAttachmentType.Hanging)
+      {
+        float hangingAltitude = AltitudeLayer.MapDataOverlay.AltitudeFor() - 0.1f;
+        var modified = originalTrueCenter;
+        modified.y = hangingAltitude;
         return modified;
       }
     }
@@ -377,9 +427,16 @@ public static class RoofBuildings
       var attachmentType = GetAttachmentType(thing);
       if (attachmentType == RoofAttachmentType.Rooftop)
       {
-        float roofAltitude = AltitudeLayer.MoteOverhead.AltitudeFor() + 0.1f;
+        float roofAltitude = AltitudeLayer.MapDataOverlay.AltitudeFor() + 0.1f;
         var modified = originalDrawPos;
         modified.y = roofAltitude;
+        return modified;
+      }
+      else if (attachmentType == RoofAttachmentType.Hanging)
+      {
+        float hangingAltitude = AltitudeLayer.MapDataOverlay.AltitudeFor() - 0.1f;
+        var modified = originalDrawPos;
+        modified.y = hangingAltitude;
         return modified;
       }
     }

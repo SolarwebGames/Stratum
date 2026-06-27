@@ -112,7 +112,7 @@
         <defaultTargetTemperature>21</defaultTargetTemperature>
       </li>
     </comps>
-    <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+    <designationCategory>Temperature</designationCategory>
     <uiOrder>2160</uiOrder>
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
     <terrainAffordanceNeeded IsNull="True" />

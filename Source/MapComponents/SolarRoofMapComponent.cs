@@ -34,8 +34,8 @@ public class SolarRoofMapComponent : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged += Notify_StratumRoofChanged;
-      registry.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+      registry.Register<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
     }
   }
 
@@ -57,8 +57,8 @@ public class SolarRoofMapComponent : MapComponent
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
-      registry.OnRoofChanged -= Notify_StratumRoofChanged;
-      registry.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+      registry.Unregister<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
     }
   }
 

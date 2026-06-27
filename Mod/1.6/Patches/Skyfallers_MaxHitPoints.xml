@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[@Name="SkyfallerBase" or @Name="ShipChunkIncomingBase" or defName="CrashedShipPartIncoming" or defName="MeteoriteIncoming" or defName="MeteoriteCraterIncoming" or @Name="ShuttleSkyfallerBase"][not(statBases)]</xpath>
+        <value><statBases/></value>
+      </li>
+    </operations>
+  </Operation>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[@Name="SkyfallerBase"]/statBases[not(MaxHitPoints)]</xpath>
+        <value><MaxHitPoints>300</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[@Name="SkyfallerBase"]/statBases/MaxHitPoints</xpath>
+        <value><MaxHitPoints>300</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[@Name="ShipChunkIncomingBase"]/statBases[not(MaxHitPoints)]</xpath>
+        <value><MaxHitPoints>500</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[@Name="ShipChunkIncomingBase"]/statBases/MaxHitPoints</xpath>
+        <value><MaxHitPoints>500</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="CrashedShipPartIncoming"]/statBases[not(MaxHitPoints)]</xpath>
+        <value><MaxHitPoints>500</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="CrashedShipPartIncoming"]/statBases/MaxHitPoints</xpath>
+        <value><MaxHitPoints>500</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[defName="MeteoriteIncoming" or defName="MeteoriteCraterIncoming"]/statBases[not(MaxHitPoints)]</xpath>
+        <value><MaxHitPoints>1000</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[defName="MeteoriteIncoming" or defName="MeteoriteCraterIncoming"]/statBases/MaxHitPoints</xpath>
+        <value><MaxHitPoints>1000</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[@Name="ShuttleSkyfallerBase"]/statBases[not(MaxHitPoints)]</xpath>
+        <value><MaxHitPoints>800</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+  <Operation Class="PatchOperationSequence">
+    <success>Always</success>
+    <operations>
+      <li Class="PatchOperationReplace">
+        <xpath>Defs/ThingDef[@Name="ShuttleSkyfallerBase"]/statBases/MaxHitPoints</xpath>
+        <value><MaxHitPoints>800</MaxHitPoints></value>
+      </li>
+    </operations>
+  </Operation>
+
+</Patch>

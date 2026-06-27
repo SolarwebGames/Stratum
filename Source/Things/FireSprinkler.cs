@@ -37,6 +37,8 @@ public class FireSprinkler : Building
       foreach (var cell in GenRadial.RadialCellsAround(center, radius, true))
       {
         if (!cell.InBounds(map)) continue;
+        if (!GenSight.LineOfSight(center, cell, map, true)) continue;
+
         var thingList = cell.GetThingList(map);
         if (thingList == null) continue;
         for (int i = thingList.Count - 1; i >= 0; i--)
@@ -56,14 +58,14 @@ public class FireSprinkler : Building
         var sound = SoundDef.Named("Explosion_FirefoamPopper");
         sound?.PlayOneShot(new TargetInfo(Position, map));
 
-        var waterFilthDef = DefOf.ThingDefOf.Filth_Water;
-        if (waterFilthDef != null)
+        var foamDef = ThingDefOf.Filth_FireFoam;
+        if (foamDef != null)
         {
           foreach (var cell in GenRadial.RadialCellsAround(center, radius, true))
           {
-            if (cell.InBounds(map))
+            if (cell.InBounds(map) && GenSight.LineOfSight(center, cell, map, true))
             {
-              FilthMaker.TryMakeFilth(cell, map, waterFilthDef);
+              FilthMaker.TryMakeFilth(cell, map, foamDef);
             }
           }
         }

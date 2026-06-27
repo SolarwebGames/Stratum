@@ -3,9 +3,7 @@ using UnityEngine;
 using Verse;
 using RimWorld;
 
-using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Hooks;
-using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -16,7 +14,7 @@ public static class GenThing_Patch
   [HarmonyPostfix]
   public static void TrueCenter_Postfix(Thing t, ref Vector3 __result)
   {
-    if (t == null || t.def == null) return;
+    if (!Utilities.RoofBuildings.IsRoofBuildingOrBlueprintOrFrame(t)) return;
 
     var map = t.Map;
     if (map != null)
@@ -24,12 +22,33 @@ public static class GenThing_Patch
       var registry = MapHookRegistry.Get(map);
       if (registry != null)
       {
-        var res = registry.GetRoofBuildingTrueCenter(t, __result);
-        if (res.HasValue)
+        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingTrueCenterHandler>(MapHookRegistry.HookId.RoofBuildingTrueCenter);
+        if (handlers != null)
         {
-          __result = res.Value;
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              var res = handlers[i](t, __result);
+              if (res.HasValue)
+              {
+                __result = res.Value;
+                return;
+              }
+            }
+            catch (System.Exception ex)
+            {
+              StratumLog.Error($"Error in RoofBuildingTrueCenter subscriber: {ex}");
+            }
+          }
         }
       }
+    }
+    
+    var fallback = Utilities.RoofBuildings.GetRoofBuildingTrueCenter(t, __result);
+    if (fallback.HasValue)
+    {
+      __result = fallback.Value;
     }
   }
 }

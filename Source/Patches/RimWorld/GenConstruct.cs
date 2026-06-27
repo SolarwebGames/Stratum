@@ -19,14 +19,70 @@ public static class GenConstruct_Patch
       var registry = MapHookRegistry.Get(map);
       if (registry != null)
       {
-        var val = registry.CheckBlocksConstruction(constructible, t);
-        if (val.HasValue)
+        var handlers = registry.GetHandlers<MapHookRegistry.BlocksConstructionHandler>(MapHookRegistry.HookId.BlocksConstruction);
+        if (handlers != null)
         {
-          __result = val.Value;
-          return false;
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              var val = handlers[i](constructible, t);
+              if (val.HasValue)
+              {
+                __result = val.Value;
+                return false;
+              }
+            }
+            catch (System.Exception ex)
+            {
+              StratumLog.Error($"Error in BlocksConstruction subscriber: {ex}");
+            }
+          }
         }
       }
     }
+
+    var fallback = Utilities.RoofBuildings.CheckBlocksConstruction(constructible, t);
+    if (fallback.HasValue)
+    {
+      __result = fallback.Value;
+      return false;
+    }
+
     return true;
+  }
+
+  [HarmonyPatch(nameof(GenConstruct.CanPlaceBlueprintOver))]
+  [HarmonyPostfix]
+  public static void CanPlaceBlueprintOver_Postfix(BuildableDef newDef, ThingDef oldDef, ref bool __result)
+  {
+    if (__result) return;
+
+    var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.CanPlaceBlueprintOverHandler>(MapHookRegistry.HookId.CanPlaceBlueprintOver);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var val = globalHandlers[i](newDef, oldDef);
+          if (val.HasValue)
+          {
+            __result = val.Value;
+            return;
+          }
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in GlobalCanPlaceBlueprintOver subscriber: {ex}");
+        }
+      }
+    }
+
+    var fallback = Utilities.RoofBuildings.CheckCanPlaceBlueprintOver(newDef, oldDef);
+    if (fallback.HasValue)
+    {
+      __result = fallback.Value;
+    }
   }
 }

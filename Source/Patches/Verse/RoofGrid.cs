@@ -53,7 +53,21 @@ public static class RoofGrid_Patch
     {
       bool allow = true;
       RoofDef? newRoof = def;
-      registry.Notify_BeforeSetRoof(c, oldRoof, ref newRoof, ref allow);
+      var handlers = registry.GetHandlers<MapHookRegistry.BeforeSetRoofHandler>(MapHookRegistry.HookId.BeforeSetRoof);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            handlers[i](___map, c, oldRoof, ref newRoof, ref allow);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in BeforeSetRoof subscriber: {ex}");
+          }
+        }
+      }
       def = newRoof!;
       if (!allow)
       {
@@ -74,7 +88,21 @@ public static class RoofGrid_Patch
     var registry = MapHookRegistry.Get(___map);
     if (registry != null)
     {
-      registry.Notify_RoofChanged(c, __state, currentRoof);
+      var handlers = registry.GetHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            handlers[i](___map, c, __state, currentRoof);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in RoofChanged subscriber: {ex}");
+          }
+        }
+      }
     }
   }
 }
