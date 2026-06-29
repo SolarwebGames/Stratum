@@ -1,3 +1,6 @@
+0.8.10:
+  Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
+
 0.8.9:
   Bug Fix: Removed an unsupported property that was causing errors with Save Our Ship 2.
 
