@@ -1,3 +1,9 @@
+0.8.10:
+  Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
+
+0.8.9:
+  Bug Fix: Removed an unsupported property that was causing errors with Save Our Ship 2.
+
 0.8.8:
   Bug Fix: Added a missing patch that provides hitpoints to skyfallers. Skyfallers should now do appropriate damage to roofs and crash through correctly.
 
