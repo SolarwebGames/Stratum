@@ -2,7 +2,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-namespace SolarWeb.Stratum.Things;
+namespace SolarWeb.Stratum.ThingComps;
 
 public class RooftopWindTurbine : CompPowerPlant
 {

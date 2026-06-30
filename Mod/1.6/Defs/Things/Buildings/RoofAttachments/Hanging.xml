@@ -66,7 +66,7 @@
   <ThingDef ParentName="BuildingBase">
     <defName>SolarWeb-Stratum-FireSprinkler</defName>
     <label>hanging fire sprinkler</label>
-    <description>An automated, powered fire sprinkler system that hangs from the ceiling. Scans the local area for fires every half-second and discharges firefoam to extinguish them.</description>
+    <description>An automated, powered fire sprinkler system that hangs from the ceiling. When fire is detected, it discharges firefoam to extinguish them.</description>
     <thingClass>SolarWeb.Stratum.Things.FireSprinkler</thingClass>
     <graphicData>
       <texPath>Things/Building/Misc/FirefoamPopper</texPath>
@@ -126,10 +126,14 @@
     <description>A low-profile lighting fixture suspended from the ceiling.</description>
     <thingClass>Building</thingClass>
     <graphicData>
-      <texPath>Things/Building/Production/LampSun</texPath>
+      <texPath>Things/Building/Furniture/WallLamp/WallLamp</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>(0.4,0.4)</drawSize>
+      <graphicClass>Graphic_Multi</graphicClass>
+      <damageData>
+        <enabled>false</enabled>
+      </damageData>
     </graphicData>
+    <uiIconPath>Things/Building/Furniture/WallLamp/WallLamp_MenuIcon</uiIconPath>
     <defaultPlacingRot>South</defaultPlacingRot>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
@@ -139,10 +143,9 @@
       <isEdifice>false</isEdifice>
     </building>
     <statBases>
-      <MaxHitPoints>30</MaxHitPoints>
-      <WorkToBuild>300</WorkToBuild>
-      <Flammability>0.1</Flammability>
-      <Mass>1.5</Mass>
+      <WorkToBuild>330</WorkToBuild>
+      <MaxHitPoints>35</MaxHitPoints>
+      <Mass>2</Mass>
     </statBases>
     <costList>
       <Steel>15</Steel>
@@ -183,9 +186,6 @@
         <destroyOnRoofLoss>false</destroyOnRoofLoss>
       </li>
     </modExtensions>
-    <researchPrerequisites>
-      <li>Electricity</li>
-    </researchPrerequisites>
   </ThingDef>
 
   <ThingDef ParentName="BuildingBase">
