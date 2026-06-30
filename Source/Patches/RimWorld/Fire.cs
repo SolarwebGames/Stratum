@@ -26,6 +26,52 @@ public static class Fire_Patch
     }
   }
 
+  [HarmonyPatch("TrySpread")]
+  [HarmonyPostfix]
+  public static void TrySpread_Postfix(Fire __instance)
+  {
+    if (!Stratum.Settings.enableRoofFires || !__instance.Spawned) return;
+
+    Map map = __instance.Map;
+    if (map == null) return;
+
+    IntVec3 target;
+    if (Rand.Chance(0.8f))
+    {
+      target = __instance.Position + GenRadial.ManualRadialPattern[Rand.RangeInclusive(1, 8)];
+    }
+    else
+    {
+      target = __instance.Position + GenRadial.ManualRadialPattern[Rand.RangeInclusive(10, 20)];
+    }
+
+    if (!target.InBounds(map)) return;
+
+    RoofDef targetRoof = map.roofGrid.RoofAt(target);
+    if (targetRoof != null && RoofStatCache.IsCustomRoof(targetRoof))
+    {
+      var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
+      float flammability = RoofStatCache.GetFlammability(targetRoof, integrityGrid?.GetStuff(target));
+      flammability *= fireSizeRef(__instance);
+
+      if (flammability > 0f && !target.ContainsRoofFire(map))
+      {
+        bool canSpread = true;
+        if (target.DistanceToSquared(__instance.Position) > 2)
+        {
+          CellRect startRect = CellRect.SingleCell(__instance.Position);
+          CellRect endRect = CellRect.SingleCell(target);
+          canSpread = GenSight.LineOfSight(__instance.Position, target, map, startRect, endRect);
+        }
+
+        if (canSpread && Rand.Chance(flammability * 0.25f))
+        {
+          RoofFireUtility.SpawnRoofFire(target, map, 0.1f, instigatorRef(__instance));
+        }
+      }
+    }
+  }
+
   private static void TryIgniteRoof(Fire groundFire)
   {
     Map map = groundFire.Map;

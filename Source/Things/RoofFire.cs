@@ -14,9 +14,11 @@ public class RoofFire : Fire
 {
   private static readonly AccessTools.FieldRef<Fire, float> fireSizeRef = AccessTools.FieldRefAccess<Fire, float>("fireSize");
   private static readonly AccessTools.FieldRef<Fire, float> flammabilityMaxRef = AccessTools.FieldRefAccess<Fire, float>("flammabilityMax");
-  private static readonly AccessTools.FieldRef<Fire, Thing> instigatorRef = AccessTools.FieldRefAccess<Fire, Thing>("instigator");
   private static readonly AccessTools.FieldRef<Fire, int> ticksSinceSpawnRef = AccessTools.FieldRefAccess<Fire, int>("ticksSinceSpawn");
   private static readonly AccessTools.FieldRef<Fire, Sustainer> sustainerRef = AccessTools.FieldRefAccess<Fire, Sustainer>("sustainer");
+  private static readonly AccessTools.FieldRef<Fire, int> ticksSinceSpreadRef = AccessTools.FieldRefAccess<Fire, int>("ticksSinceSpread");
+
+
 
   public override Vector3 DrawPos
   {
@@ -25,6 +27,14 @@ public class RoofFire : Fire
       Vector3 pos = base.DrawPos;
       pos.y = AltitudeLayer.MoteOverhead.AltitudeFor() + 0.1f;
       return pos;
+    }
+  }
+
+  protected override void DrawAt(Vector3 drawLoc, bool flip = false)
+  {
+    if (Find.PlaySettings.showRoofOverlay)
+    {
+      base.DrawAt(drawLoc, flip);
     }
   }
 
@@ -40,22 +50,34 @@ public class RoofFire : Fire
       ticksSinceSpawnRef(this) = 0;
     }
 
-    if (ticksSinceSpawn % 150 == 100 && Stratum.Settings.enableRoofFires)
+    if (Stratum.Settings.enableRoofFires && fireSizeRef(this) > 1f)
     {
-      TrySpreadRoofFire();
+      int ticksSinceSpread = ticksSinceSpreadRef(this);
+      ticksSinceSpread += delta;
+      
+      float spreadInterval = Mathf.Max(75f, 150f - (fireSizeRef(this) - 1f) * 40f);
+      if (ticksSinceSpread >= spreadInterval)
+      {
+        base.TrySpread();
+        ticksSinceSpread = 0;
+      }
+      ticksSinceSpreadRef(this) = ticksSinceSpread;
     }
 
     if (Spawned)
     {
       sustainerRef(this)?.Maintain();
 
-      if (Rand.Chance(0.02f * delta * fireSizeRef(this)))
+      if (Find.PlaySettings.showRoofOverlay)
       {
-        FleckMaker.ThrowSmoke(DrawPos, Map, fireSizeRef(this));
-      }
-      if (fireSizeRef(this) > 0.7f && Rand.Chance(0.01f * delta * fireSizeRef(this)))
-      {
-        FleckMaker.ThrowMicroSparks(DrawPos, Map);
+        if (Rand.Chance(0.02f * delta * fireSizeRef(this)))
+        {
+          RoofFleckMaker.ThrowSmoke(DrawPos, Map, fireSizeRef(this), DefOf.FleckDefOf.RoofSmoke);
+        }
+        if (fireSizeRef(this) > 0.7f && Rand.Chance(0.01f * delta * fireSizeRef(this)))
+        {
+          RoofFleckMaker.ThrowMicroSparks(DrawPos, Map, DefOf.FleckDefOf.RoofSparks);
+        }
       }
     }
   }
@@ -107,31 +129,6 @@ public class RoofFire : Fire
     if (effectiveVacuum > 0f)
     {
       TakeDamage(new DamageInfo(DamageDefOf.Extinguish, 20f * effectiveVacuum));
-    }
-  }
-
-  private void TrySpreadRoofFire()
-  {
-    IntVec3 pos = Position;
-    Map map = Map;
-
-    IntVec3 target = pos + GenAdj.AdjacentCells[Rand.RangeInclusive(0, 7)];
-    if (!target.InBounds(map)) return;
-
-    RoofDef targetRoof = map.roofGrid.RoofAt(target);
-    if (targetRoof != null && RoofStatCache.IsCustomRoof(targetRoof))
-    {
-      var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
-      float flammability = RoofStatCache.GetFlammability(targetRoof, integrityGrid?.GetStuff(target));
-      flammability *= fireSizeRef(this);
-
-      if (flammability > 0f && !target.ContainsRoofFire(map))
-      {
-        if (Rand.Value < flammability * 0.5f)
-        {
-          RoofFireUtility.SpawnRoofFire(target, map, 0.1f, instigatorRef(this));
-        }
-      }
     }
   }
 }
