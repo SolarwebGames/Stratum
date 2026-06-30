@@ -140,7 +140,7 @@ public static class WeatherEvent_LightningStrike_Patch
           radius = 1.9f,
           damType = DamageDefOf.Flame,
           instigator = null,
-          damAmount = 250,
+          damAmount = 50,
           chanceToStartFire = 0.5f
         });
 
