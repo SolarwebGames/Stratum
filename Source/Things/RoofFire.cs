@@ -28,10 +28,10 @@ public class RoofFire : Fire
     }
   }
 
-  protected override void Tick()
+  protected override void TickInterval(int delta)
   {
     int ticksSinceSpawn = ticksSinceSpawnRef(this);
-    ticksSinceSpawn++;
+    ticksSinceSpawn += delta;
     ticksSinceSpawnRef(this) = ticksSinceSpawn;
 
     if (ticksSinceSpawn >= 150)
@@ -48,6 +48,15 @@ public class RoofFire : Fire
     if (Spawned)
     {
       sustainerRef(this)?.Maintain();
+
+      if (Rand.Chance(0.02f * delta * fireSizeRef(this)))
+      {
+        FleckMaker.ThrowSmoke(DrawPos, Map, fireSizeRef(this));
+      }
+      if (fireSizeRef(this) > 0.7f && Rand.Chance(0.01f * delta * fireSizeRef(this)))
+      {
+        FleckMaker.ThrowMicroSparks(DrawPos, Map);
+      }
     }
   }
 
