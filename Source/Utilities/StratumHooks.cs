@@ -27,6 +27,14 @@ public static class StratumHooks
   /// </summary>
   public static Func<RoofDef, float>? GlobalTransparencyCheck;
 
+  public delegate bool RoofDamageCalculationHandler(RoofDef roof, ThingDef? stuff, float amount, float penetration, DamageInfo? dinfo, ref float effectiveDamage);
+
+  /// <summary>
+  /// Allows other mods to override damage calculations for a roof.
+  /// Returns true if handled, false to fallback to default calculation.
+  /// </summary>
+  public static RoofDamageCalculationHandler? OnCalculateDamage;
+
   public delegate void PowerNetEnergyGainHandler(RimWorld.PowerNet net, ref float energyGainRate);
 
   /// <summary>

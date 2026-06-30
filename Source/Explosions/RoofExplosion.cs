@@ -34,7 +34,11 @@ public class RoofExplosion : Explosion
 
     if (resolvedArmorPenetration < 0f)
     {
-      resolvedArmorPenetration = (float)resolvedDamAmount * 0.015f;
+      resolvedArmorPenetration = (config.damType != null) ? config.damType.defaultArmorPenetration : -1f;
+      if (resolvedArmorPenetration < 0f)
+      {
+        resolvedArmorPenetration = (float)resolvedDamAmount * 0.015f;
+      }
     }
 
     damAmount = resolvedDamAmount;
