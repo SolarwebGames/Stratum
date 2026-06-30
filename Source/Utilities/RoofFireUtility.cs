@@ -34,7 +34,7 @@ public static class RoofFireUtility
     return false;
   }
 
-  public static void TryIgniteRoofAt(IntVec3 c, Map map, Thing instigator)
+  public static void TryIgniteRoofAt(IntVec3 c, Map map, Thing instigator, DamageDef? damageDef = null)
   {
     RoofDef roof = c.GetRoof(map);
     if (roof != null && RoofStatCache.IsCustomRoof(roof))
@@ -44,7 +44,13 @@ public static class RoofFireUtility
 
       if (flammability > 0f)
       {
-        if (Rand.Value < flammability)
+        float ignitionChance = flammability;
+        if (damageDef != null)
+        {
+          ignitionChance *= damageDef.igniteCellChance;
+        }
+
+        if (Rand.Value < ignitionChance)
         {
           SpawnRoofFire(c, map, 0.1f, instigator);
         }
