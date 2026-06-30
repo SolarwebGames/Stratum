@@ -7,6 +7,7 @@ using Verse.Sound;
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Utilities;
+using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.Patches.CE;
 
@@ -16,6 +17,28 @@ public static class CECompatibility
   static CECompatibility()
   {
     BlockerRegistry.RegisterImpactSomethingCallback(ImpactSomethingCallback);
+    StratumHooks.OnCalculateDamage += CalculateCEDamage;
+  }
+
+  public static bool CalculateCEDamage(RoofDef roof, ThingDef? stuff, float amount, float penetration, DamageInfo? dinfo, ref float effectiveDamage)
+  {
+    float ar = RoofStatCache.GetArmorRating(roof, stuff);
+    if (penetration > 0f && ar > 0f)
+    {
+      // We interpret AR as mm RHA equivalent if it's high, or scale it if it's low.
+      float effectiveArmor = ar > 2f ? ar : ar * 10f;
+
+      if (penetration > effectiveArmor)
+      {
+        effectiveDamage = amount * (1f - (effectiveArmor / (penetration * 2f)));
+      }
+      else
+      {
+        effectiveDamage = amount * 0.05f;
+      }
+      return true;
+    }
+    return false;
   }
 
   public static bool ImpactSomethingCallback(ProjectileCE projectile, Thing launcher)

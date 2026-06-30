@@ -1,26 +1,36 @@
 using HarmonyLib;
-using RimWorld;
 using UnityEngine;
 using Verse;
 using Verse.Sound;
+using RimWorld;
 
-using SolarWeb.Stratum.Utilities;
 using SolarWeb.Stratum.Explosions;
+using SolarWeb.Stratum.Utilities;
 
-namespace SolarWeb.Stratum.Patches.RimWorld;
+namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch(typeof(WeatherEvent_LightningStrike))]
-public static class WeatherEvent_LightningStrike_DoStrike_Patch
+public static class WeatherEvent_LightningStrike_Patch
 {
   [HarmonyPatch(nameof(WeatherEvent_LightningStrike.DoStrike))]
   [HarmonyPrefix]
   public static bool DoStrike_Prefix(ref IntVec3 strikeLoc, Map map, ref Mesh boltMesh)
   {
-    if (!strikeLoc.IsValid)
+    if (map == null) return true;
+
+    try
     {
-      strikeLoc = CellFinderLoose.RandomCellWith((IntVec3 sq) =>
-        sq.Standable(map) && (!map.roofGrid.Roofed(sq) || !map.roofGrid.RoofAt(sq).isThickRoof),
-        map);
+      if (!strikeLoc.IsValid)
+      {
+        strikeLoc = CellFinderLoose.RandomCellWith((IntVec3 sq) =>
+          sq.Standable(map) && (map.roofGrid == null || !map.roofGrid.Roofed(sq) || map.roofGrid.RoofAt(sq) == null || !map.roofGrid.RoofAt(sq).isThickRoof),
+          map);
+      }
+
+    }
+    catch (System.Exception ex)
+    {
+      StratumLog.Error($"Error in LightningStrike DoStrike_Prefix: {ex}");
     }
 
     RoofDef roof = strikeLoc.GetRoof(map);
@@ -38,7 +48,7 @@ public static class WeatherEvent_LightningStrike_DoStrike_Patch
           radius = 1.9f,
           damType = DamageDefOf.Flame,
           instigator = null,
-          damAmount = DamageDefOf.Flame.defaultDamage,
+          damAmount = 50,
           chanceToStartFire = 0.5f
         });
 

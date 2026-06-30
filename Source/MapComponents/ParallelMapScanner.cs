@@ -76,7 +76,9 @@ public static class ParallelMapScanner
     {
       if (integrity.HitPointsArray[i] == 0)
       {
-        integrity.HitPointsArray[i] = (short)RoofStatCache.GetMaxHitPoints(roof);
+        var cell = local.map.cellIndices.IndexToCell(i);
+        var stuff = integrity.GetStuff(cell);
+        integrity.HitPointsArray[i] = (short)RoofStatCache.GetMaxHitPoints(roof, stuff);
       }
     }
 
