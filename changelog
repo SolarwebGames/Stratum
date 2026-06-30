@@ -1,5 +1,10 @@
-0.8.11:
+0.8.16:
   Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
+  Bug Fix: Stuffable roofs could initialize with an incorrect maximum health after loading a game.
+  Bug Fix: Fires on roofs would die out if nothing burnable was under the roof.
+  Bug Fix: Roof fires were not spreading.
+  Balance: Adjusted Lightning Strikes to deal more damage to roofs.
+  Compatibility: Adjusted Combat Extended damage calculations
 
 0.8.10:
   Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
