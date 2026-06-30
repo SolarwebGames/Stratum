@@ -1,3 +1,6 @@
+0.8.11:
+  Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
+
 0.8.10:
   Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
 
