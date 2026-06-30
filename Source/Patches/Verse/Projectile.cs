@@ -68,7 +68,7 @@ public static class Projectile_Patch
             integrityGrid.TakeDamage(pos, damage, __instance.ArmorPenetration, new DamageInfo(damageDef, damage));
             if (damageDef != null && (damageDef.igniteCellChance > 0f || damageDef == DamageDefOf.Flame || damageDef == DamageDefOf.Burn))
             {
-              RoofFireUtility.TryIgniteRoofAt(pos, map, __instance);
+              RoofFireUtility.TryIgniteRoofAt(pos, map, __instance, damageDef);
             }
           }
 
