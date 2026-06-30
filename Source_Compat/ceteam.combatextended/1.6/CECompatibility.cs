@@ -80,7 +80,7 @@ public static class CECompatibility
     grid.TakeDamage(cell, damage, penetration, new DamageInfo(damageDef, damage));
     if (damageDef != null && (damageDef.igniteCellChance > 0f || damageDef == DamageDefOf.Flame || damageDef == DamageDefOf.Burn))
     {
-      RoofFireUtility.TryIgniteRoofAt(cell, map, instigator);
+      RoofFireUtility.TryIgniteRoofAt(cell, map, instigator, damageDef);
     }
   }
 }
