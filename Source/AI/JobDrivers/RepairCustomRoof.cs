@@ -33,28 +33,30 @@ public class RepairCustomRoof : JobDriver
     repair.initAction = delegate
         {
           ticksToNextRepair = 80f;
-          cachedGrid = pawn.Map.GetComponent<RoofIntegrityGrid>();
+          cachedGrid = pawn.Map?.GetComponent<RoofIntegrityGrid>();
         };
     repair.tickAction = delegate
         {
-          pawn.skills?.Learn(SkillDefOf.Construction, 0.05f);
-          pawn.rotationTracker.FaceCell(Cell);
+          Pawn actor = repair.actor;
+          actor.skills?.Learn(SkillDefOf.Construction, 0.05f);
+          actor.rotationTracker.FaceCell(Cell);
 
-          float num = pawn.GetStatValue(StatDefOf.ConstructionSpeed) * 1.7f;
+          float num = (StatDefOf.ConstructionSpeed.Worker.IsDisabledFor(actor) ? 0.1f : actor.GetStatValue(StatDefOf.ConstructionSpeed)) * 1.7f;
           ticksToNextRepair -= num;
 
           if (ticksToNextRepair <= 0f)
           {
             ticksToNextRepair += TicksBetweenRepairs;
 
-            if (cachedGrid != null)
+            var grid = cachedGrid ?? actor.Map?.GetComponent<RoofIntegrityGrid>();
+            if (grid != null)
             {
-              cachedGrid.Repair(Cell, 1);
+              grid.Repair(Cell, 1);
 
-              if (cachedGrid.GetHitPoints(Cell) >= cachedGrid.GetMaxHitPoints(Cell))
+              if (grid.GetHitPoints(Cell) >= grid.GetMaxHitPoints(Cell))
               {
-                pawn.records.Increment(RecordDefOf.ThingsRepaired);
-                pawn.jobs.EndCurrentJob(JobCondition.Succeeded);
+                actor.records.Increment(RecordDefOf.ThingsRepaired);
+                actor.jobs.EndCurrentJob(JobCondition.Succeeded);
               }
             }
           }
