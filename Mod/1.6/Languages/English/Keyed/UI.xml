@@ -15,5 +15,6 @@
   <ShowRoofBuildingsToggleButton>Toggle visibility of roof-attached buildings.</ShowRoofBuildingsToggleButton>
   <MustPlaceOnRoof>Must be placed on a roof tile.</MustPlaceOnRoof>
   <RoofAttachmentNotSupported>Roof does not support this attachment type.</RoofAttachmentNotSupported>
+  <Stratum_Alert_RoofOnFire>Roof on fire</Stratum_Alert_RoofOnFire>
+  <Stratum_Alert_RoofOnFireDesc>A roof is on fire!</Stratum_Alert_RoofOnFireDesc>
 </LanguageData>
-

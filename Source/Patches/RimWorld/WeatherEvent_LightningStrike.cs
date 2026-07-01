@@ -5,8 +5,8 @@ using Verse;
 using Verse.Sound;
 using RimWorld;
 
-using SolarWeb.Stratum.Utilities;
 using SolarWeb.Stratum.Explosions;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches;
 

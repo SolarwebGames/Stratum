@@ -1,5 +1,16 @@
-0.8.11:
+0.8.20:
+  Compatibility: Added support for ReBuild: Doors and Corners. Glass roofs will now have glass material requirements instead of some of the existing requirements when this mod is installed.
+  Minor: Telescopes now work underneath skylights.
+  Minor: Improvements to Retractable Roofing animations.
+  Bug Fix: Added protections to the Selector Harmony patches to hopefully help address crashes.
+
+0.8.16:
   Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
+  Bug Fix: Stuffable roofs could initialize with an incorrect maximum health after loading a game.
+  Bug Fix: Fires on roofs would die out if nothing burnable was under the roof.
+  Bug Fix: Roof fires were not spreading.
+  Balance: Adjusted Lightning Strikes to deal more damage to roofs.
+  Compatibility: Adjusted Combat Extended damage calculations
 
 0.8.10:
   Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.

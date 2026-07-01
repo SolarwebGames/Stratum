@@ -88,15 +88,9 @@ public static class ParallelMapScanner
       
       if (integrity.HitPointsArray[i] == 0)
       {
-        integrity.HitPointsArray[i] = maxHP;
-      }
-      else if (integrity.HitPointsArray[i] > maxHP)
-      {
-        integrity.HitPointsArray[i] = maxHP;
-      }
-      else if (integrity.HitPointsArray[i] < maxHP)
-      {
-        local.damagedRoofs.Add(i);
+        var cell = local.map.cellIndices.IndexToCell(i);
+        var stuff = integrity.GetStuff(cell);
+        integrity.HitPointsArray[i] = (short)RoofStatCache.GetMaxHitPoints(roof, stuff);
       }
     }
 

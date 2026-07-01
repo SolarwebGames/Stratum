@@ -19,6 +19,10 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public bool hasScanned;
   private object scanLockInt = new();
 
+  private Dictionary<int, short>? loadedDamagedCells;
+  private Dictionary<int, ThingDef>? loadedSavedStuff;
+  private Dictionary<int, UnityEngine.Color>? loadedSavedTints;
+
   public HashSet<int> RoofsNeedingRepair => roofsNeedingRepair;
   internal short[] HitPointsArray => hitPoints;
   internal ThingDef?[] StuffDefsArray => stuffDefs;
@@ -32,64 +36,61 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       hasScanned = false;
     }
 
-    // We only save cells that have missing hitpoints or custom data to save space.
-    Dictionary<int, short>? damagedCells = null;
-    Dictionary<int, ThingDef>? savedStuff = null;
-    Dictionary<int, UnityEngine.Color>? savedTints = null;
-
     if (Scribe.mode == LoadSaveMode.Saving)
     {
-      damagedCells = [];
-      savedStuff = [];
-      savedTints = [];
+      loadedDamagedCells = [];
+      loadedSavedStuff = [];
+      loadedSavedTints = [];
       for (int i = 0; i < hitPoints.Length; i++)
       {
         if (roofsNeedingRepair.Contains(i))
-          damagedCells[i] = hitPoints[i];
+          loadedDamagedCells[i] = hitPoints[i];
 
         if (stuffDefs[i] != null)
-          savedStuff[i] = stuffDefs[i]!;
+          loadedSavedStuff[i] = stuffDefs[i]!;
 
         if (glassTints[i] != null)
-          savedTints[i] = glassTints[i]!.Value;
+          loadedSavedTints[i] = glassTints[i]!.Value;
       }
     }
 
-    Scribe_Collections.Look(ref damagedCells, "damagedCells", LookMode.Value, LookMode.Value);
-    Scribe_Collections.Look(ref savedStuff, "savedStuff", LookMode.Value, LookMode.Def);
-    Scribe_Collections.Look(ref savedTints, "savedTints", LookMode.Value, LookMode.Value);
+    Scribe_Collections.Look(ref loadedDamagedCells, "damagedCells", LookMode.Value, LookMode.Value);
+    Scribe_Collections.Look(ref loadedSavedStuff, "savedStuff", LookMode.Value, LookMode.Def);
+    Scribe_Collections.Look(ref loadedSavedTints, "savedTints", LookMode.Value, LookMode.Value);
 
-    if (Scribe.mode == LoadSaveMode.LoadingVars)
+    if (Scribe.mode == LoadSaveMode.PostLoadInit)
     {
-      if (damagedCells != null)
+      scanLockInt = new object();
+
+      if (loadedDamagedCells != null)
       {
-        foreach (var kvp in damagedCells)
+        foreach (var kvp in loadedDamagedCells)
         {
           hitPoints[kvp.Key] = kvp.Value;
           roofsNeedingRepair.Add(kvp.Key);
         }
       }
 
-      if (savedStuff != null)
+      if (loadedSavedStuff != null)
       {
-        foreach (var kvp in savedStuff)
+        foreach (var kvp in loadedSavedStuff)
         {
           stuffDefs[kvp.Key] = kvp.Value;
         }
       }
 
-      if (savedTints != null)
+      if (loadedSavedTints != null)
       {
-        foreach (var kvp in savedTints)
+        foreach (var kvp in loadedSavedTints)
         {
           glassTints[kvp.Key] = kvp.Value;
         }
       }
-    }
 
-    if (Scribe.mode == LoadSaveMode.PostLoadInit)
-    {
-      scanLockInt = new object();
+      // Clear memory after load completes
+      loadedDamagedCells = null;
+      loadedSavedStuff = null;
+      loadedSavedTints = null;
     }
   }
 
@@ -322,26 +323,26 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
     float effectiveDamage = amount;
 
-    if (penetration > 0f && ar > 0f)
+    bool handled = false;
+    if (Utilities.StratumHooks.OnCalculateDamage != null)
     {
-      // We interpret AR as mm RHA equivalent if it's high, or scale it if it's low.
-      float effectiveArmor = ar > 2f ? ar : ar * 10f;
-
-      if (penetration > effectiveArmor)
+      foreach (Utilities.StratumHooks.RoofDamageCalculationHandler handler in Utilities.StratumHooks.OnCalculateDamage.GetInvocationList())
       {
-        effectiveDamage = amount * (1f - (effectiveArmor / (penetration * 2f)));
-      }
-      else
-      {
-        effectiveDamage = amount * 0.05f;
+        if (handler(roof, stuff, amount, penetration, dinfo, ref effectiveDamage))
+        {
+          handled = true;
+          break;
+        }
       }
     }
-    else
+
+    if (!handled)
     {
       effectiveDamage -= dt;
       if (effectiveDamage <= 0) return;
 
-      effectiveDamage *= (1f - ar);
+      float effectiveArmor = System.Math.Max(0f, ar - penetration);
+      effectiveDamage *= (1f - effectiveArmor);
     }
 
     if (effectiveDamage <= 0) return;
