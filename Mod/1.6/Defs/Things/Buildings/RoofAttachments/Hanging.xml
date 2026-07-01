@@ -434,4 +434,71 @@
       <li>HospitalBed</li>
     </researchPrerequisites>
   </ThingDef>
+
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-AeroponicsMister_Hanging</defName>
+    <label>aeroponics mister</label>
+    <description>A powered, ceiling-mounted automated mister designed for agricultural use. Periodically releases a fine mist of nutrient-enriched water, slightly boosting the growth rate (+15%) of plants directly under its spray radius.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Furniture/WallLamp/WallLamp</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(1,1)</drawSize>
+    </graphicData>
+    <defaultPlacingRot>South</defaultPlacingRot>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <tickerType>Rare</tickerType>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>60</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Flammability>0.5</Flammability>
+      <Mass>3.0</Mass>
+    </statBases>
+    <costList>
+      <Steel>30</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>30</basePowerConsumption>
+        <transmitsPower>false</transmitsPower>
+      </li>
+      <li Class="CompProperties_Flickable"/>
+      <li>
+        <compClass>SolarWeb.Stratum.ThingComps.GrowthBooster</compClass>
+      </li>
+    </comps>
+    <designationCategory>Production</designationCategory>
+    <uiOrder>2864</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsFurniture</li>
+    </thingCategories>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Hanging</attachmentType>
+        <minifyOnRoofLoss>true</minifyOnRoofLoss>
+        <destroyOnRoofLoss>false</destroyOnRoofLoss>
+      </li>
+      <li Class="SolarWeb.Stratum.DefModExtensions.GrowthBooster">
+        <growthRateFactor>1.15</growthRateFactor>
+        <radius>5.9</radius>
+        <emitMist>true</emitMist>
+      </li>
+    </modExtensions>
+    <researchPrerequisites>
+      <li>Hydroponics</li>
+    </researchPrerequisites>
+  </ThingDef>
 </Defs>

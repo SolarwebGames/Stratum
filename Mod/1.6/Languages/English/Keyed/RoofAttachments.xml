@@ -16,4 +16,5 @@
   <SolarWeb_Stratum_ConnectedSpeakersCount>Connected speakers: {0}</SolarWeb_Stratum_ConnectedSpeakersCount>
   <SolarWeb_Stratum_SpeakerConnected>Transmitter Connection: Connected</SolarWeb_Stratum_SpeakerConnected>
   <SolarWeb_Stratum_SpeakerDisconnected>Transmitter Connection: Disconnected</SolarWeb_Stratum_SpeakerDisconnected>
+  <SolarWeb_Stratum_AeroponicsMisterBoost>Aeroponics Mister</SolarWeb_Stratum_AeroponicsMisterBoost>
 </LanguageData>
