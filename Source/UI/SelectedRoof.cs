@@ -96,7 +96,6 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
   {
     StringBuilder sb = new();
 
-    var integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
     var solarComp = map.GetComponent<MapComponents.SolarRoofMapComponent>();
     if (solarComp != null && solarComp.TryGetSolarNetworkPower(cell, out var cellPower, out var netPower))
     {
@@ -104,19 +103,8 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
       sb.AppendLine("Stratum_SolarPower_Grid".Translate(netPower.currentPower.ToString("F0"), netPower.maxPower.ToString("F0")));
     }
 
-    float beauty = RoofStatCache.GetBeauty(def, integrity?.GetStuff(cell));
-    if (beauty != 0) sb.AppendLine("Beauty_Label".Translate() + ": " + beauty.ToString("F2"));
-
-    float transparency = RoofStatCache.GetTransparency(def);
-    if (transparency > 0) sb.AppendLine("Stratum_Transparency".Translate() + ": " + transparency.ToStringPercent());
-
     float solarOut = RoofStatCache.GetSolarOutput(def);
     if (solarOut > 0) sb.AppendLine(DefOf.StatDefOf.SolarOutput.LabelCap + ": " + solarOut.ToString("F1") + " W");
-
-    float conductivity = RoofStatCache.GetThermalConductivity(def, integrity?.GetStuff(cell));
-    float insulation = 1f - conductivity;
-    string insulationStr = insulation.ToString("P1");
-    sb.AppendLine(DefOf.StatDefOf.Insulation.LabelCap + ": " + insulationStr);
 
     return sb.ToString().TrimEndNewlines();
   }

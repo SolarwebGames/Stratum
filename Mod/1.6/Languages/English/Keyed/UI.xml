@@ -12,4 +12,6 @@
   <Stratum_CancelTransitionDesc>Halt the canopy transition.</Stratum_CancelTransitionDesc>
   <Stratum_ReconnectRoofNet>Reconnect Roof Net</Stratum_ReconnectRoofNet>
   <Stratum_ReconnectRoofNetDesc>Cycle through available power networks for the connected radiator roofs.</Stratum_ReconnectRoofNetDesc>
+  <Stratum_Alert_RoofOnFire>Roof on fire</Stratum_Alert_RoofOnFire>
+  <Stratum_Alert_RoofOnFireDesc>A roof is on fire!</Stratum_Alert_RoofOnFireDesc>
 </LanguageData>

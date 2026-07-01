@@ -23,16 +23,30 @@ public class RetractableRoofConsole : Building
   private HashSet<IntVec3> canopyCells = [];
   private Vector3 roomCentroid;
   private CompPowerTrader? powerComp;
+  private RetractableRoofTracker? cachedTracker;
+  private RoofIntegrityGrid? cachedIntegrityGrid;
+  private RetractableRoofAnimator? cachedAnimator;
 
   public override void SpawnSetup(Map map, bool respawningAfterLoad)
   {
     base.SpawnSetup(map, respawningAfterLoad);
     powerComp = GetComp<CompPowerTrader>();
+    cachedTracker = map.GetComponent<RetractableRoofTracker>();
+    cachedIntegrityGrid = map.GetComponent<RoofIntegrityGrid>();
+    cachedAnimator = map.GetComponent<RetractableRoofAnimator>();
 
     if (respawningAfterLoad && isTransitioning)
     {
       RecalculateRings();
     }
+  }
+
+  public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
+  {
+    base.DeSpawn(mode);
+    cachedTracker = null;
+    cachedIntegrityGrid = null;
+    cachedAnimator = null;
   }
 
   public override void ExposeData()
@@ -137,7 +151,7 @@ public class RetractableRoofConsole : Building
     RecalculateRings();
     isTransitioning = true;
     jobPending = false;
-    transitionProgress = 0f;
+    transitionProgress = 9999f; // Trigger first ring immediately on next tick
 
     if (isOpeningRequested)
     {
@@ -182,7 +196,7 @@ public class RetractableRoofConsole : Building
 
   private void RecalculateRings()
   {
-    var tracker = Map.GetComponent<RetractableRoofTracker>();
+    var tracker = cachedTracker;
     HashSet<IntVec3> validCells;
 
     var room = this.GetRoom();
@@ -342,7 +356,7 @@ public class RetractableRoofConsole : Building
     }
 
     int animationDuration = 1; // Default minimum to prevent div by 0
-    var tracker = Map.GetComponent<RetractableRoofTracker>();
+    var tracker = cachedTracker;
     var currentRing = transitionRings[currentRingIndex];
     foreach (var cell in currentRing)
     {
@@ -373,7 +387,8 @@ public class RetractableRoofConsole : Building
       }
     }
 
-    int ticksToNextRing = Mathf.Max(1, animationDuration / 6);
+    int delayTicks = Mathf.Max(1, animationDuration / 3);
+    int ticksToNextRing = animationDuration + delayTicks;
 
     float speedMultiplier = 1f;
     transitionProgress += speedMultiplier;
@@ -383,7 +398,7 @@ public class RetractableRoofConsole : Building
       transitionProgress = 0f;
 
       var ring = transitionRings[currentRingIndex];
-      var integrityGrid = Map.GetComponent<RoofIntegrityGrid>();
+      var integrityGrid = cachedIntegrityGrid;
 
       foreach (var cell in ring)
       {
@@ -432,7 +447,7 @@ public class RetractableRoofConsole : Building
 
               if (gotUv)
               {
-                var animator = Map.GetComponent<RetractableRoofAnimator>();
+                var animator = cachedAnimator;
                 if (animator != null)
                 {
                   Vector3 start = cell.ToVector3Shifted();
@@ -463,7 +478,7 @@ public class RetractableRoofConsole : Building
             if (Map.roofGrid.RoofAt(cell) == null)
             {
               var gd = RoofStatCache.GetGraphicData(rDef);
-              var animator = Map.GetComponent<RetractableRoofAnimator>();
+              var animator = cachedAnimator;
               if (gd != null)
               {
                 bool gotUv = gd.isSeamless
