@@ -21,6 +21,9 @@ public static class HediffDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}PA_SleepAid_Hediff")]
   public static HediffDef PA_SleepAid_Hediff = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}CeilingFanBreeze")]
+  public static HediffDef CeilingFanBreeze = default!;
+
   static HediffDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(HediffDefOf));
