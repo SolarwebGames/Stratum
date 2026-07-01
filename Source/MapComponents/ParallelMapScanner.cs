@@ -83,9 +83,6 @@ public static class ParallelMapScanner
 
     if (RoofStatCache.IsCustomRoof(roof))
     {
-      var stuff = integrity.StuffDefsArray[i];
-      var maxHP = (short)RoofStatCache.GetMaxHitPoints(roof, stuff);
-      
       if (integrity.HitPointsArray[i] == 0)
       {
         var cell = local.map.cellIndices.IndexToCell(i);

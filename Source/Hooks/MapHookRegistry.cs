@@ -22,7 +22,9 @@ public class MapHookRegistry : MapComponent
     RoofBuildingTrueCenter,
     BlocksConstruction,
     PlaySettingsDoMapControls,
-    CanPlaceBlueprintOver
+    CanPlaceBlueprintOver,
+    CalculateCEDamage,
+    RoofDamageCalculation
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -135,4 +137,5 @@ public class MapHookRegistry : MapComponent
   public delegate bool? BlocksConstructionHandler(Thing constructible, Thing existingThing);
   public delegate void PlaySettingsDoMapControlsHandler(WidgetRow row);
   public delegate bool? CanPlaceBlueprintOverHandler(BuildableDef newDef, ThingDef oldDef);
+  public delegate bool RoofDamageCalculationHandler(RoofDef roofDef, ThingDef? stuffDef, float baseDamage, float penetration, DamageInfo? damageDef, ref float effectiveDamage);
 }

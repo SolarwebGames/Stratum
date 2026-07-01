@@ -324,9 +324,9 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     float effectiveDamage = amount;
 
     bool handled = false;
-    if (Utilities.StratumHooks.OnCalculateDamage != null)
+    if (MapHookRegistry.Get(map)?.GetHandlers<MapHookRegistry.RoofDamageCalculationHandler>(MapHookRegistry.HookId.RoofDamageCalculation) is List<MapHookRegistry.RoofDamageCalculationHandler> handlers)
     {
-      foreach (Utilities.StratumHooks.RoofDamageCalculationHandler handler in Utilities.StratumHooks.OnCalculateDamage.GetInvocationList())
+      foreach (var handler in handlers)
       {
         if (handler(roof, stuff, amount, penetration, dinfo, ref effectiveDamage))
         {
@@ -380,25 +380,6 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
           var debris = ThingMaker.MakeThing(roof.collapseLeavingThingDef);
           GenPlace.TryPlaceThing(debris, cell, map, ThingPlaceMode.Near);
-        }
-        var registry = MapHookRegistry.Get(map);
-        if (registry != null)
-        {
-          var handlers = registry.GetHandlers<MapHookRegistry.RoofDebrisDroppedHandler>(MapHookRegistry.HookId.RoofDebrisDropped);
-          if (handlers != null)
-          {
-            for (int i = 0; i < handlers.Count; i++)
-            {
-              try
-              {
-                handlers[i](map, cell, roof, stuff);
-              }
-              catch (Exception ex)
-              {
-                StratumLog.Error($"Error in RoofDebrisDropped subscriber: {ex}");
-              }
-            }
-          }
         }
       }
     }
