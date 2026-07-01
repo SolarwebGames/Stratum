@@ -1,3 +1,9 @@
+0.8.20:
+  Compatibility: Added support for ReBuild: Doors and Corners. Glass roofs will now have glass material requirements instead of some of the existing requirements when this mod is installed.
+  Minor: Telescopes now work underneath skylights.
+  Minor: Improvements to Retractable Roofing animations.
+  Bug Fix: Added protections to the Selector Harmony patches to hopefully help address crashes.
+
 0.8.16:
   Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
   Bug Fix: Stuffable roofs could initialize with an incorrect maximum health after loading a game.
