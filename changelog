@@ -1,3 +1,9 @@
+0.8.22:
+  Bug Fix: Added custom WorkGiver for fighting roof fires.
+
+0.8.21:
+  Bug Fix: Fixed a bug where constructoids would never make progress repairing roofs due to a skill check.
+
 0.8.20:
   Compatibility: Added support for ReBuild: Doors and Corners. Glass roofs will now have glass material requirements instead of some of the existing requirements when this mod is installed.
   Minor: Telescopes now work underneath skylights.

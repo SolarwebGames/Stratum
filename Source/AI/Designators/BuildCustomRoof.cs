@@ -138,7 +138,7 @@ public class BuildCustomRoof : Designator_Build
     }
   }
 
-  public override IEnumerable<FloatMenuOption> RightClickFloatMenuOptions => null!;
+  public override IEnumerable<FloatMenuOption> RightClickFloatMenuOptions => [];
 
   public override void DoExtraGuiControls(float leftX, float bottomY)
   {
@@ -156,6 +156,11 @@ public class BuildCustomRoof : Designator_Build
           UpdateIcon();
         }));
       }
+      base.DoExtraGuiControls(leftX, bottomY - 35f);
+    }
+    else
+    {
+      base.DoExtraGuiControls(leftX, bottomY);
     }
   }
 
