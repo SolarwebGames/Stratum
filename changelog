@@ -1,3 +1,6 @@
+0.8.22:
+  Bug Fix: Added custom WorkGiver for fighting roof fires.
+
 0.8.21:
   Bug Fix: Fixed a bug where constructoids would never make progress repairing roofs due to a skill check.
 
