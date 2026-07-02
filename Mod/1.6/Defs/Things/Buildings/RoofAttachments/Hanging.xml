@@ -66,8 +66,8 @@
   <ThingDef ParentName="BuildingBase">
     <defName>SolarWeb-Stratum-FireSprinkler</defName>
     <label>hanging fire sprinkler</label>
-    <description>An automated, powered fire sprinkler system that hangs from the ceiling. When fire is detected, it discharges firefoam to extinguish them.</description>
-    <thingClass>SolarWeb.Stratum.Things.FireSprinkler</thingClass>
+    <description>An automated fire sprinkler system that hangs from the ceiling. When fire is detected, it discharges firefoam to extinguish them. Uses chemfuel to spray the foam and must be recharged after going off.</description>
+    <thingClass>Building</thingClass>
     <graphicData>
       <texPath>Things/Building/Misc/FirefoamPopper</texPath>
       <graphicClass>Graphic_Single</graphicClass>
@@ -92,12 +92,44 @@
       <ComponentIndustrial>1</ComponentIndustrial>
     </costList>
     <comps>
-      <li Class="CompProperties_Power">
-        <compClass>CompPowerTrader</compClass>
-        <basePowerConsumption>30</basePowerConsumption>
-        <transmitsPower>false</transmitsPower>
+      <li Class="CompProperties_Refuelable">
+        <fuelCapacity>30.0</fuelCapacity>
+        <fuelFilter>
+          <thingDefs>
+            <li>Chemfuel</li>
+          </thingDefs>
+        </fuelFilter>
+        <fuelLabel>Chemfuel</fuelLabel>
+        <fuelGizmoLabel>Chemfuel</fuelGizmoLabel>
+        <consumeFuelOnlyWhenUsed>true</consumeFuelOnlyWhenUsed>
+        <autoRefuelPercent>1</autoRefuelPercent>
+        <showFuelGizmo>true</showFuelGizmo>
+        <drawOutOfFuelOverlay>false</drawOutOfFuelOverlay>
+        <showAllowAutoRefuelToggle>true</showAllowAutoRefuelToggle>
+        <canEjectFuel>false</canEjectFuel>
+        <drawFuelGaugeInMap>false</drawFuelGaugeInMap>
+      </li>
+      <li Class="CompProperties_Explosive">
+        <explosiveRadius>0</explosiveRadius>
+        <explosiveExpandPerFuel>0.8333</explosiveExpandPerFuel>
+        <explosiveDamageType>Extinguish</explosiveDamageType>
+        <startWickHitPointsPercent>-1</startWickHitPointsPercent>
+        <chanceNeverExplodeFromDamage>1</chanceNeverExplodeFromDamage>
+        <postExplosionSpawnThingDef>Filth_FireFoam</postExplosionSpawnThingDef>
+        <postExplosionSpawnChance>1</postExplosionSpawnChance>
+        <postExplosionSpawnThingCount>1</postExplosionSpawnThingCount>
+        <applyDamageToExplosionCellsNeighbors>true</applyDamageToExplosionCellsNeighbors>
+        <explosionEffect>ExtinguisherExplosion</explosionEffect>
+        <explosionSound>Explosion_FirefoamPopper</explosionSound>
+        <wickTicks>0</wickTicks>
+        <destroyThingOnExplosionSize>9999</destroyThingOnExplosionSize>
+      </li>
+      <li Class="CompProperties_ProximityFuse">
+        <target>Fire</target>
+        <radius>5</radius>
       </li>
     </comps>
+    <tickerType>Normal</tickerType>
     <designationCategory>Misc</designationCategory>
     <uiOrder>2850</uiOrder>
     <constructEffect>ConstructMetal</constructEffect>
@@ -442,7 +474,7 @@
     <thingClass>Building</thingClass>
     <graphicData>
       <texPath>Things/Building/Furniture/WallLamp/WallLamp</texPath>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <drawSize>(1,1)</drawSize>
     </graphicData>
     <defaultPlacingRot>South</defaultPlacingRot>
@@ -470,7 +502,7 @@
         <basePowerConsumption>30</basePowerConsumption>
         <transmitsPower>false</transmitsPower>
       </li>
-      <li Class="CompProperties_Flickable"/>
+      <li Class="CompProperties_Flickable" />
       <li>
         <compClass>SolarWeb.Stratum.ThingComps.GrowthBooster</compClass>
       </li>

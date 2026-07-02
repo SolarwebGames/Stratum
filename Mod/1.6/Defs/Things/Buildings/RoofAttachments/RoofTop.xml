@@ -160,4 +160,50 @@
     </researchPrerequisites>
   </ThingDef>
 
+  <ThingDef ParentName="BuildingBase">
+    <defName>SolarWeb-Stratum-RotaryTurbineVent</defName>
+    <label>rooftop rotary turbine vent</label>
+    <description>A vent with a built-in rotary turbine designed to pull hot air out of the room below it without using any power. Wind drives the turbine, so in periods of low wind this provides little benefit.</description>
+    <thingClass>Building</thingClass>
+    <graphicData>
+      <texPath>Things/Building/Misc/TempControl/Vent</texPath>
+      <graphicClass>Graphic_Multi</graphicClass>
+    </graphicData>
+    <rotatable>false</rotatable>
+    <altitudeLayer>Building</altitudeLayer>
+    <passability>Standable</passability>
+    <pathCost>0</pathCost>
+    <building>
+      <isEdifice>false</isEdifice>
+    </building>
+    <statBases>
+      <MaxHitPoints>100</MaxHitPoints>
+      <WorkToBuild>600</WorkToBuild>
+      <Flammability>1.0</Flammability>
+    </statBases>
+    <costList>
+      <Steel>40</Steel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <comps>
+      <li Class="SolarWeb.Stratum.CompProperties.RotaryTurbineVent">
+        <baseCoolingCapacity>12</baseCoolingCapacity>
+        <compClass>SolarWeb.Stratum.ThingComps.RotaryTurbineVent</compClass>
+      </li>
+    </comps>
+    <designationCategory>Temperature</designationCategory>
+    <uiOrder>2130</uiOrder>
+    <constructEffect>ConstructMetal</constructEffect>
+    <placeWorkers>
+      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
+    </placeWorkers>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
+        <attachmentType>Rooftop</attachmentType>
+        <minifyOnRoofLoss>false</minifyOnRoofLoss>
+        <destroyOnRoofLoss>true</destroyOnRoofLoss>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
 </Defs>
