@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-using SolarWeb.Stratum.Stats;
 using System.IO;
+
+using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.Graphics;
 
@@ -60,16 +61,41 @@ public static class RoofAtlasManager
         StratumLog.Warning($"Could not find any sprites matching '{fileName}' for {def.defName}.");
       }
     }
+
+    foreach (var atlasDef in DefDatabase<Defs.StratumTextureAtlasDef>.AllDefs)
+    {
+      if (atlasDef.texPath.NullOrEmpty()) continue;
+
+      string fileName = Path.GetFileNameWithoutExtension(atlasDef.texPath);
+
+      var matchingSprites = allSprites.Where(s =>
+      {
+        string name = s.name;
+        if (name.EndsWith("(Clone)")) name = name[..^7].Trim();
+        return name == fileName || name.StartsWith(fileName + "_");
+      }).ToList();
+
+      if (matchingSprites.Count > 0)
+      {
+        CacheUv(atlasDef.texPath, atlasDef.isSeamless, atlasDef.isTransparent, matchingSprites);
+      }
+      else
+      {
+        StratumLog.Warning($"Could not find any sprites matching '{fileName}' for texture atlas {atlasDef.defName}.");
+      }
+    }
   }
 
   private static (Material cutout, Material transparent) GetMaterials(Texture2D tex)
   {
     if (!materialCache.TryGetValue(tex, out var mats))
     {
-      mats = (
-        new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Cutout" },
-        new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Transparent" }
-      );
+      var cutout = new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Cutout" };
+      cutout.renderQueue = 4500;
+
+      var trans = MaterialPool.MatFrom(tex, ShaderDatabase.Transparent, Color.white);
+
+      mats = (cutout, trans);
       materialCache[tex] = mats;
     }
     return mats;

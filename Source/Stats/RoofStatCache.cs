@@ -11,6 +11,8 @@ namespace SolarWeb.Stratum.Stats;
 [StaticConstructorOnStartup]
 public static class RoofStatCache
 {
+  private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Map, MapComponents.RoofIntegrityGrid> integrityGridCache = new();
+
   private static readonly Dictionary<int, float> baseBeautyCache = [];
   private static readonly Dictionary<int, float> baseWealthCache = [];
   private static readonly Dictionary<int, float> cleanlinessCache = [];
@@ -27,6 +29,11 @@ public static class RoofStatCache
   private static readonly Dictionary<int, Color> glassTintCache = [];
   private static readonly HashSet<int> buildableCache = [];
   private static readonly HashSet<int> skylightCache = [];
+
+  public static float[] transparencyByIndex = [];
+  public static bool[] isSkylightByIndex = [];
+  public static bool[] isCustomRoofByIndex = [];
+  public static Color[] glassTintByIndex = [];
 
   private static readonly object CacheLock = new();
 
@@ -108,11 +115,29 @@ public static class RoofStatCache
         }
       }
     }
+    transparencyByIndex = new float[65536];
+    isSkylightByIndex = new bool[65536];
+    isCustomRoofByIndex = new bool[65536];
+    glassTintByIndex = new Color[65536];
+    foreach (var def in DefDatabase<RoofDef>.AllDefs)
+    {
+      int idx = def.index;
+      isCustomRoofByIndex[idx] = buildableCache.Contains(def.defNameHash);
+      
+      float trans = transparencyCache.TryGetValue(def.defNameHash, out float t) ? t : 0f;
+      trans = Mathf.Max(trans, Utilities.StratumHooks.GetTransparencyOverride(def));
+      transparencyByIndex[idx] = trans;
+      
+      isSkylightByIndex[idx] = skylightCache.Contains(def.defNameHash);
+      glassTintByIndex[idx] = glassTintCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
+    }
+
     RoofAtlasManager.Initialize();
   }
 
-  public static bool IsCustomRoof(RoofDef def) => def != null && buildableCache.Contains(def.defNameHash);
-  public static bool IsSkylight(RoofDef def) => def != null && skylightCache.Contains(def.defNameHash);
+  public static bool IsCustomRoof(RoofDef def) => def != null && isCustomRoofByIndex[def.index];
+  public static bool IsSkylight(RoofDef def) => def != null && isSkylightByIndex[def.index];
+  public static bool IsVisibleRoof(RoofDef def) => def != null && !def.isNatural;
 
   private static readonly Dictionary<int, float> roofStuffBeautyCache = [];
   private static readonly Dictionary<int, float> roofStuffWealthCache = [];
@@ -234,9 +259,7 @@ public static class RoofStatCache
 
   public static float GetTransparency(RoofDef def)
   {
-    if (def == null) return 0f;
-    float val = transparencyCache.TryGetValue(def.defNameHash, out float t) ? t : 0f;
-    return Mathf.Max(val, Utilities.StratumHooks.GetTransparencyOverride(def));
+    return def != null ? transparencyByIndex[def.index] : 0f;
   }
 
   public static bool GetIsAirtight(RoofDef def, ThingDef? stuff = null)
@@ -359,10 +382,35 @@ public static class RoofStatCache
   {
     if (map != null && cell.IsValid)
     {
-      var tint = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetGlassTint(cell);
+      if (!integrityGridCache.TryGetValue(map, out var integrity))
+      {
+        integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
+        integrityGridCache.Add(map, integrity);
+      }
+      var tint = integrity?.GetGlassTint(cell);
       if (tint.HasValue) return tint.Value;
     }
-    return glassTintCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
+    return glassTintByIndex[def.index];
+  }
+
+  public static Color GetGlassTint(RoofDef def, MapComponents.RoofIntegrityGrid? integrity, IntVec3 cell)
+  {
+    if (integrity != null && cell.IsValid)
+    {
+      var tint = integrity.GetGlassTint(cell);
+      if (tint.HasValue) return tint.Value;
+    }
+    return glassTintByIndex[def.index];
+  }
+
+  public static Color GetGlassTint(RoofDef def, MapComponents.RoofIntegrityGrid? integrity, int index)
+  {
+    if (integrity != null)
+    {
+      var tint = integrity.GetGlassTint(index);
+      if (tint.HasValue) return tint.Value;
+    }
+    return glassTintByIndex[def.index];
   }
 
   public static RoofEdgeGraphicData? GetEdgeGraphicData(RoofDef def)
