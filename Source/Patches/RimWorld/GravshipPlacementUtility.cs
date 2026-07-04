@@ -1,14 +1,15 @@
 using HarmonyLib;
 using RimWorld;
 using RimWorld.Planet;
-using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.WorldComponents;
 using System.Collections.Generic;
 using Verse;
 
+using SolarWeb.Stratum.MapComponents;
+using SolarWeb.Stratum.WorldComponents;
+
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(GravshipPlacementUtility))]
 public static class GravshipPlacementUtility_SpawnRoofs_Patch
 {
   public static Gravship? CurrentLandingGravship;
@@ -16,7 +17,7 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
   public static Dictionary<IntVec3, GravshipRoofTracker.RoofCellData>? CurrentRoofData;
   public static Dictionary<IntVec3, RoofConstructionTracker.ConstructionRecord>? CurrentConstructionData;
 
-  [HarmonyPatch(typeof(GravshipPlacementUtility), "SpawnRoofs")]
+  [HarmonyPatch("SpawnRoofs")]
   [HarmonyPrefix]
   public static void Prefix(Gravship gravship, IntVec3 root)
   {
@@ -38,7 +39,7 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
     }
   }
 
-  [HarmonyPatch(typeof(GravshipPlacementUtility), "SpawnRoofs")]
+  [HarmonyPatch("SpawnRoofs")]
   [HarmonyPostfix]
   public static void Postfix(Gravship gravship, IntVec3 root, Map map)
   {
@@ -58,21 +59,21 @@ public static class GravshipPlacementUtility_SpawnRoofs_Patch
     if (CurrentRoofData != null)
     {
       var integrityGrid = map.GetComponent<RoofIntegrityGrid>();
+      var skylightCoating = map.GetComponent<SkylightCoating>();
       foreach (var kvp in CurrentRoofData)
       {
-         if (kvp.Value.roofDef != null)
-         {
-            var targetCell = root + PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation);
-            if (map.roofGrid.RoofAt(targetCell) == null)
-            {
-               map.roofGrid.SetRoof(targetCell, kvp.Value.roofDef);
-               
-               if (integrityGrid != null)
-               {
-                  integrityGrid.InitializeRoof(targetCell, kvp.Value.roofDef, kvp.Value.stuff, kvp.Value.glassTint ?? UnityEngine.Color.white, kvp.Value.hitPoints);
-               }
-            }
-         }
+        if (kvp.Value.roofDef != null)
+        {
+          var targetCell = root + PrefabUtility.GetAdjustedLocalPosition(kvp.Key, gravship.Rotation);
+          if (map.roofGrid.RoofAt(targetCell) == null)
+          {
+            map.roofGrid.SetRoof(targetCell, kvp.Value.roofDef);
+
+            integrityGrid?.InitializeRoof(targetCell, kvp.Value.roofDef, kvp.Value.stuff, kvp.Value.glassTint ?? UnityEngine.Color.white, kvp.Value.hitPoints);
+
+            skylightCoating?.SetSnowLevel(targetCell, 0f);
+          }
+        }
       }
     }
 

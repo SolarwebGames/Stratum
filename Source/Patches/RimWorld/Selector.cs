@@ -10,7 +10,7 @@ using SolarWeb.Stratum.WorldComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(Selector))]
 public static class Selector_Patch
 {
   private static IEnumerable<object> YieldRoofAndOriginal(object roofObj, IEnumerable<object> original)
@@ -22,12 +22,21 @@ public static class Selector_Patch
     }
   }
 
-  [HarmonyPatch(typeof(Selector), "SelectableObjectsUnderMouse")]
+  [HarmonyPatch("SelectableObjectsUnderMouse")]
   [HarmonyPostfix]
   public static void SelectableObjectsUnderMouse_Postfix(ref IEnumerable<object> __result)
   {
     if (__result == null) return;
     if (!Find.PlaySettings.showRoofOverlay) return;
+
+    if (Find.ColonistBar != null)
+    {
+      UnityEngine.Vector2 mousePos = Verse.UI.MousePositionOnUIInverted;
+      if (Find.ColonistBar.ColonistOrCorpseAt(mousePos) != null || Find.ColonistBar.CaravanMemberCaravanAt(mousePos) != null)
+      {
+        return;
+      }
+    }
 
     Map map = Find.CurrentMap;
     if (map == null || map.roofGrid == null) return;
@@ -45,7 +54,7 @@ public static class Selector_Patch
     __result = YieldRoofAndOriginal(roofObj, __result);
   }
 
-  [HarmonyPatch(typeof(Selector), "SelectableObjectsAt")]
+  [HarmonyPatch("SelectableObjectsAt")]
   [HarmonyPostfix]
   public static void SelectableObjectsAt_Postfix(ref IEnumerable<object> __result, IntVec3 c, Map map)
   {
@@ -104,7 +113,7 @@ public static class Selector_Patch
     return true;
   }
 
-  [HarmonyPatch(typeof(Selector), "DeselectInternal")]
+  [HarmonyPatch("DeselectInternal")]
   [HarmonyPostfix]
   public static void DeselectInternal_Postfix(object obj)
   {
@@ -114,7 +123,7 @@ public static class Selector_Patch
     }
   }
 
-  [HarmonyPatch(typeof(Selector), "ClearSelection")]
+  [HarmonyPatch("ClearSelection")]
   [HarmonyPrefix]
   public static void ClearSelection_Prefix(Selector __instance)
   {

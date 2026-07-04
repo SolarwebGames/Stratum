@@ -11,7 +11,7 @@ public class UseTelescope : JoyGiver_InteractBuildingInteractionCell
     if (def.unroofedOnly && t.Spawned)
     {
       var roof = t.Map.roofGrid.RoofAt(t.Position);
-      if (roof != null && RoofStatCache.IsSkylight(roof))
+      if (roof != null && RoofStatCache.IsSkylight(roof) && RoofStatCache.GetTransparency(roof) > 0.5f)
       {
         bool originalUnroofedOnly = def.unroofedOnly;
         def.unroofedOnly = false;
@@ -25,6 +25,7 @@ public class UseTelescope : JoyGiver_InteractBuildingInteractionCell
         }
       }
     }
+
     return base.CanInteractWith(pawn, t, inBed);
   }
 }

@@ -1,3 +1,9 @@
+0.9.0:
+  Feature: Skylights are now affected by weather and can build up layers of dirt, pollen, and snow. Colonists will automatically clean skylights when they're dirty. Snow also accumulates on other roofs, but doesn't need cleaning.
+  Minor Feature: Rooms with lots of plants and skylights will gain the Greenhouse role.
+  Bug Fix: Trying to click colonist portraits would instead select a roof tile underneath the portrait.
+  Bug Fix: Weather effects were rendering underneath the roof if the roof allowed any light through.
+
 0.8.22:
   Bug Fix: Added custom WorkGiver for fighting roof fires.
 
