@@ -31,6 +31,7 @@ public class CustomRoofsRenderer : SectionLayer
 
   private static Material? fallbackMat;
   private static Material FallbackMat => fallbackMat ??= MaterialPool.MatFrom(RimWorldTextures.Terrain.Surfaces.Concrete, ShaderDatabase.Cutout, new Color(0.5f, 0.5f, 0.5f));
+
   public CustomRoofsRenderer(Section section) : base(section)
   {
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.Buildings | (ulong)MapMeshFlagDefOf.FogOfWar;
@@ -87,35 +88,53 @@ public class CustomRoofsRenderer : SectionLayer
       RoofDef roof = map.roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsCustomRoof(roof)) continue;
 
-      var myGraphicData = RoofStatCache.GetGraphicData(roof);
-      ThingDef? stuff = integrityGrid?.GetStuff(c);
-      Color roofColor = RoofStatCache.GetColor(roof, stuff);
+      ThingDef? stuff = null;
+      RoofGraphicData? myGraphicData = null;
       float alpha = 1f;
 
-      if (RoofStatCache.IsSkylight(roof))
+      if (RoofStatCache.IsCustomRoof(roof))
       {
-        alpha = 1f - RoofStatCache.GetTransparency(roof);
-      }
-      roofColor.a *= alpha;
+        myGraphicData = RoofStatCache.GetGraphicData(roof);
+        stuff = integrityGrid?.GetStuff(c);
+        Color roofColor = RoofStatCache.GetColor(roof, stuff);
 
-      if (myGraphicData != null)
-      {
-        var entry = RoofAtlasManager.GetEntry(myGraphicData.texPath);
-        var (cutout, transparent) = RoofAtlasManager.GetMaterials(myGraphicData.texPath, roofColor);
-
-        bool isTransparent = RoofStatCache.IsSkylight(roof);
-        Material mat = isTransparent ? transparent : cutout;
-
-        if (entry.IsSeamless && entry.SeamlessGrid != null)
+        if (RoofStatCache.IsSkylight(roof))
         {
-          int col = c.x % entry.GridWidth;
-          if (col < 0) col += entry.GridWidth;
+          alpha = 1f - RoofStatCache.GetTransparency(roof);
+        }
+        roofColor.a *= alpha;
 
-          int row = c.z % entry.GridHeight;
-          if (row < 0) row += entry.GridHeight;
+        if (myGraphicData != null)
+        {
+          var entry = RoofAtlasManager.GetEntry(myGraphicData.texPath);
+          var (cutout, transparent) = RoofAtlasManager.GetMaterials(myGraphicData.texPath, roofColor);
 
-          if (entry.SeamlessGrid.TryGetValue((col, row), out var uvs))
+          bool isTransparent = RoofStatCache.IsSkylight(roof);
+          Material mat = isTransparent ? transparent : cutout;
+
+          if (entry.IsSeamless && entry.SeamlessGrid != null)
           {
+            int col = c.x % entry.GridWidth;
+            if (col < 0) col += entry.GridWidth;
+
+            int row = c.z % entry.GridHeight;
+            if (row < 0) row += entry.GridHeight;
+
+            if (entry.SeamlessGrid.TryGetValue((col, row), out var uvs))
+            {
+              if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+              {
+                DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
+              }
+              else
+              {
+                DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat, Color.white, 0f, uvs);
+              }
+            }
+          }
+          else
+          {
+            var uvs = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
             if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
             {
               DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
@@ -128,20 +147,8 @@ public class CustomRoofsRenderer : SectionLayer
         }
         else
         {
-          var uvs = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
-          if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
-          {
-            DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
-          }
-          else
-          {
-            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat, Color.white, 0f, uvs);
-          }
+          DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, FallbackMat, roofColor, 0f);
         }
-      }
-      else
-      {
-        DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, FallbackMat, roofColor, 0f);
       }
 
       if (integrityGrid != null)
@@ -156,6 +163,7 @@ public class CustomRoofsRenderer : SectionLayer
         }
       }
     }
+
 
     FinalizeMesh(MeshParts.All);
   }

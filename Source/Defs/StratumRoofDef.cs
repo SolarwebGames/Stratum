@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
@@ -51,6 +52,33 @@ public class StratumRoofDef : RoofDef
       {
         float pct = (float)hp / maxHp;
         label += $" ({hp} / {maxHp} {pct.ToStringPercent("F0")})";
+      }
+
+      var coating = map.GetComponent<MapComponents.SkylightCoating>();
+      if (coating != null)
+      {
+        float dirt = coating.GetDirtLevel(cell);
+        float snow = coating.GetSnowLevel(cell);
+        List<string> details = [];
+
+        if (dirt > 0.01f)
+        {
+          RimWorld.Season season = RimWorld.GenLocalDate.Season(map);
+          string dirtType = (season == RimWorld.Season.Spring || season == RimWorld.Season.Summer)
+            ? "SolarWeb_Stratum_Pollen".Translate()
+            : "SolarWeb_Stratum_Dust".Translate();
+          details.Add($"{dirtType}: {dirt.ToStringPercent("F0")}");
+        }
+
+        if (snow > 0.01f)
+        {
+          details.Add($"{"SolarWeb_Stratum_Snow".Translate()}: {snow.ToStringPercent("F0")}");
+        }
+
+        if (details.Count > 0)
+        {
+          label += $" ({string.Join(", ", details)})";
+        }
       }
 
       return label;

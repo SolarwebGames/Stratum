@@ -17,4 +17,7 @@
   <RoofAttachmentNotSupported>Roof does not support this attachment type.</RoofAttachmentNotSupported>
   <Stratum_Alert_RoofOnFire>Roof on fire</Stratum_Alert_RoofOnFire>
   <Stratum_Alert_RoofOnFireDesc>A roof is on fire!</Stratum_Alert_RoofOnFireDesc>
+  <SolarWeb_Stratum_Pollen>Pollen</SolarWeb_Stratum_Pollen>
+  <SolarWeb_Stratum_Dust>Dust</SolarWeb_Stratum_Dust>
+  <SolarWeb_Stratum_Snow>Snow</SolarWeb_Stratum_Snow>
 </LanguageData>

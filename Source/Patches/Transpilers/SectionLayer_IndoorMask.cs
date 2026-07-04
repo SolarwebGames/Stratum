@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
-using SolarWeb.Stratum.Stats;
 using Verse;
 
 namespace SolarWeb.Stratum.Patches.Transpilers;
@@ -30,13 +29,22 @@ public static class SectionLayer_IndoorMask_Patch
     return codes.AsEnumerable();
   }
 
+  // Treat transparent roofs as roofed under normal gameplay to prevent weather rendering inside
   public static bool IsRoofedForMask(IntVec3 c, Map map)
   {
-    var roof = map.roofGrid.RoofAt(c);
-    if (roof != null && RoofStatCache.IsCustomRoof(roof) && RoofStatCache.GetTransparency(roof) > 0f)
+    return map.roofGrid.Roofed(c);
+  }
+
+  // If the roof overlay is enabled, disable the indoor mask so weather renders over the roofs
+  [HarmonyPatch(nameof(SectionLayer_IndoorMask.Visible), MethodType.Getter)]
+  [HarmonyPrefix]
+  public static bool Visible_Prefix(ref bool __result)
+  {
+    if (Find.PlaySettings.showRoofOverlay)
     {
+      __result = false;
       return false;
     }
-    return map.roofGrid.Roofed(c);
+    return true;
   }
 }

@@ -87,7 +87,6 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         }
       }
 
-      // Clear memory after load completes
       loadedDamagedCells = null;
       loadedSavedStuff = null;
       loadedSavedTints = null;
@@ -304,6 +303,12 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   {
     if (!cell.InBounds(map)) return null;
     return glassTints[map.cellIndices.CellToIndex(cell)];
+  }
+
+  public UnityEngine.Color? GetGlassTint(int index)
+  {
+    if (index < 0 || index >= glassTints.Length) return null;
+    return glassTints[index];
   }
 
   public void TakeDamage(IntVec3 cell, float amount, float penetration = 0f, DamageInfo? dinfo = null)
