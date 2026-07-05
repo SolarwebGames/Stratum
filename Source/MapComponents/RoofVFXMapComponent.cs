@@ -23,21 +23,30 @@ public class RoofVFXMapComponent : MapComponent
   private const int MaxFlecksPerTick = 20;
   private const float MinSunlight = 0.3f;
 
-  public RoofVFXMapComponent(Map map) : base(map) { }
+  public RoofVFXMapComponent(Map map) : base(map)
+  {
+    int numGridCells = map.cellIndices.NumGridCells;
+    cellToIndex = new int[numGridCells];
+    for (int i = 0; i < numGridCells; i++) cellToIndex[i] = -1;
+  }
 
   public override void FinalizeInit()
   {
     base.FinalizeInit();
 
-    int numGridCells = map.cellIndices.NumGridCells;
-    cellToIndex = new int[numGridCells];
-    for (int i = 0; i < numGridCells; i++) cellToIndex[i] = -1;
+    var integrity = map.GetComponent<RoofIntegrityGrid>();
+    if (integrity != null)
+    {
+      if (!integrity.hasScanned)
+      {
+        sectionTransparentCounts.Clear();
+        activeSections.Clear();
+        transparentCells.Clear();
+        for (int i = 0; i < cellToIndex.Length; i++) cellToIndex[i] = -1;
 
-    sectionTransparentCounts.Clear();
-    activeSections.Clear();
-    transparentCells.Clear();
-
-    map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
+        integrity.ExecuteScan();
+      }
+    }
 
     Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
   }
