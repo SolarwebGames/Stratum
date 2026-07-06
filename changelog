@@ -1,3 +1,6 @@
+0.9.2:
+  Bug Fix: Removed an unnecessary MayRequire for Odyssey.
+
 0.9.1:
   Bug Fix: Corrected a potential crash when initializing the VFX component.
 
