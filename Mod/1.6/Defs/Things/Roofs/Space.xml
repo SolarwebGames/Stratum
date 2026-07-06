@@ -186,7 +186,7 @@
     </researchPrerequisites>
   </ThingDef>
 
-  <SolarWeb.Stratum.Defs.StratumRoofDef MayRequire="Ludeon.RimWorld.Odyssey">
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
     <defName>SolarWeb-Stratum-ReinforcedGlassPanel</defName>
     <label>reinforced glass panel</label>
     <description>Thick, lead-lined glass panels held in a steel frame. Allows viewing the stars while maintaining an airtight seal, though it is less insulating and strong than solid hull plates.</description>
@@ -217,7 +217,7 @@
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
-  
+
   <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
     <defName>SolarWeb-Stratum-RetractableRoof_Buildable</defName>
     <label>heavy retractable canopy</label>
