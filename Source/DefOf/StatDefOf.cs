@@ -32,6 +32,9 @@ public static class StatDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}TransitionSpeed")]
   public static RimWorld.StatDef TransitionSpeed = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}StuffBeautyMultiplier")]
+  public static RimWorld.StatDef StuffBeautyMultiplier = default!;
+
   static StatDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(StatDefOf));

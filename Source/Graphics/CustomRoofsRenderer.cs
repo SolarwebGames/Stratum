@@ -113,7 +113,20 @@ public class CustomRoofsRenderer : SectionLayer
             }
             else
             {
-              DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat!, roofColor, Rot4.North, uv!);
+              if (roof.isNatural)
+              {
+                Color c_BL = AverageColor(roofColor, GetColorOrSelf(c.x - 1, c.z, roofColor, map, integrityGrid), GetColorOrSelf(c.x, c.z - 1, roofColor, map, integrityGrid), GetColorOrSelf(c.x - 1, c.z - 1, roofColor, map, integrityGrid));
+                Color c_TL = AverageColor(roofColor, GetColorOrSelf(c.x - 1, c.z, roofColor, map, integrityGrid), GetColorOrSelf(c.x, c.z + 1, roofColor, map, integrityGrid), GetColorOrSelf(c.x - 1, c.z + 1, roofColor, map, integrityGrid));
+                Color c_TR = AverageColor(roofColor, GetColorOrSelf(c.x + 1, c.z, roofColor, map, integrityGrid), GetColorOrSelf(c.x, c.z + 1, roofColor, map, integrityGrid), GetColorOrSelf(c.x + 1, c.z + 1, roofColor, map, integrityGrid));
+                Color c_BR = AverageColor(roofColor, GetColorOrSelf(c.x + 1, c.z, roofColor, map, integrityGrid), GetColorOrSelf(c.x, c.z - 1, roofColor, map, integrityGrid), GetColorOrSelf(c.x + 1, c.z - 1, roofColor, map, integrityGrid));
+                
+                Color[] vertexColors = [c_BL, c_TL, c_TR, c_BR];
+                DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat!, roofColor, Rot4.North, uv!, vertexColors);
+              }
+              else
+              {
+                DrawQuadCustom(new Vector3(c.x + 0.5f, altitude, c.z + 0.5f), Vector2.one, mat!, roofColor, Rot4.North, uv!);
+              }
             }
           }
           else
@@ -315,5 +328,30 @@ public class CustomRoofsRenderer : SectionLayer
       scratchSubMesh.tris.Add(sVCount + 3);
     }
     Rand.PopState();
+  }
+
+  private static Color GetColorOrSelf(int nx, int nz, Color selfColor, Map map, RoofIntegrityGrid? integrityGrid)
+  {
+    IntVec3 cell = new IntVec3(nx, 0, nz);
+    if (cell.InBounds(map) && !map.fogGrid.IsFogged(cell))
+    {
+      var r = map.roofGrid.RoofAt(cell);
+      if (r != null && r.isNatural && RoofStatCache.IsCustomRoof(r))
+      {
+        var s = integrityGrid?.GetStuff(cell);
+        return RoofStatCache.GetColor(r, s);
+      }
+    }
+    return selfColor;
+  }
+
+  private static Color AverageColor(Color c1, Color c2, Color c3, Color c4)
+  {
+    return new Color(
+      (c1.r + c2.r + c3.r + c4.r) * 0.25f,
+      (c1.g + c2.g + c3.g + c4.g) * 0.25f,
+      (c1.b + c2.b + c3.b + c4.b) * 0.25f,
+      (c1.a + c2.a + c3.a + c4.a) * 0.25f
+    );
   }
 }

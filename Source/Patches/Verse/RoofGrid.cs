@@ -81,7 +81,7 @@ public static class RoofGrid_Patch
     var integrity = ___map.GetComponent<RoofIntegrityGrid>();
     if (def != null && RoofStatCache.IsCustomRoof(def))
     {
-      ThingDef? stuff = null;
+      ThingDef? stuff = integrity?.GetStuff(c);
       UnityEngine.Color? tint = null;
       if (DebugSettings.godMode)
       {
@@ -91,6 +91,11 @@ public static class RoofGrid_Patch
           stuff = designator.StuffDef;
           tint = designator.SelectedTint;
         }
+      }
+
+      if (stuff == null && def.isNatural)
+      {
+        stuff = RoofIntegrityGrid.GetStonyStuffForCell(def, c, ___map);
       }
 
       if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
