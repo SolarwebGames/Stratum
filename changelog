@@ -1,132 +1,135 @@
+0.10.1:
+Minor: Blend rock roof edges for more natural transitions.
+
 0.10.0:
-  Feature: Rock roofs are now smoothable, increasing their beauty.
-  Minor: Improved rendering of rock roofs.
+Feature: Rock roofs are now smoothable, increasing their beauty.
+Minor: Improved rendering of rock roofs.
 
 0.9.2:
-  Bug Fix: Removed an unnecessary MayRequire for Odyssey.
+Bug Fix: Removed an unnecessary MayRequire for Odyssey.
 
 0.9.1:
-  Bug Fix: Corrected a potential crash when initializing the VFX component.
+Bug Fix: Corrected a potential crash when initializing the VFX component.
 
 0.9.0:
-  Feature: Skylights are now affected by weather and can build up layers of dirt, pollen, and snow. Colonists will automatically clean skylights when they're dirty. Snow also accumulates on other roofs, but doesn't need cleaning.
-  Minor Feature: Rooms with lots of plants and skylights will gain the Greenhouse role.
-  Bug Fix: Trying to click colonist portraits would instead select a roof tile underneath the portrait.
-  Bug Fix: Weather effects were rendering underneath the roof if the roof allowed any light through.
+Feature: Skylights are now affected by weather and can build up layers of dirt, pollen, and snow. Colonists will automatically clean skylights when they're dirty. Snow also accumulates on other roofs, but doesn't need cleaning.
+Minor Feature: Rooms with lots of plants and skylights will gain the Greenhouse role.
+Bug Fix: Trying to click colonist portraits would instead select a roof tile underneath the portrait.
+Bug Fix: Weather effects were rendering underneath the roof if the roof allowed any light through.
 
 0.8.22:
-  Bug Fix: Added custom WorkGiver for fighting roof fires.
+Bug Fix: Added custom WorkGiver for fighting roof fires.
 
 0.8.21:
-  Bug Fix: Fixed a bug where constructoids would never make progress repairing roofs due to a skill check.
+Bug Fix: Fixed a bug where constructoids would never make progress repairing roofs due to a skill check.
 
 0.8.20:
-  Compatibility: Added support for ReBuild: Doors and Corners. Glass roofs will now have glass material requirements instead of some of the existing requirements when this mod is installed.
-  Minor: Telescopes now work underneath skylights.
-  Minor: Improvements to Retractable Roofing animations.
-  Bug Fix: Added protections to the Selector Harmony patches to hopefully help address crashes.
+Compatibility: Added support for ReBuild: Doors and Corners. Glass roofs will now have glass material requirements instead of some of the existing requirements when this mod is installed.
+Minor: Telescopes now work underneath skylights.
+Minor: Improvements to Retractable Roofing animations.
+Bug Fix: Added protections to the Selector Harmony patches to hopefully help address crashes.
 
 0.8.16:
-  Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
-  Bug Fix: Stuffable roofs could initialize with an incorrect maximum health after loading a game.
-  Bug Fix: Fires on roofs would die out if nothing burnable was under the roof.
-  Bug Fix: Roof fires were not spreading.
-  Balance: Adjusted Lightning Strikes to deal more damage to roofs.
-  Compatibility: Adjusted Combat Extended damage calculations
+Bug Fix: TryIgniteRoofAt now accepts a DamageDef used to influence ignition chance.
+Bug Fix: Stuffable roofs could initialize with an incorrect maximum health after loading a game.
+Bug Fix: Fires on roofs would die out if nothing burnable was under the roof.
+Bug Fix: Roof fires were not spreading.
+Balance: Adjusted Lightning Strikes to deal more damage to roofs.
+Compatibility: Adjusted Combat Extended damage calculations
 
 0.8.10:
-  Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
+Bug Fix: Corrected various bugs with Save Our Ship 2 roof compatibility.
 
 0.8.9:
-  Bug Fix: Removed an unsupported property that was causing errors with Save Our Ship 2.
+Bug Fix: Removed an unsupported property that was causing errors with Save Our Ship 2.
 
 0.8.8:
-  Bug Fix: Added a missing patch that provides hitpoints to skyfallers. Skyfallers should now do appropriate damage to roofs and crash through correctly.
+Bug Fix: Added a missing patch that provides hitpoints to skyfallers. Skyfallers should now do appropriate damage to roofs and crash through correctly.
 
 0.8.7:
-  Bug Fix: Corrected an issue with loading into pocket maps.
+Bug Fix: Corrected an issue with loading into pocket maps.
 
 0.8.6:
-  Bug Fix: Fixed an issue with forbidden roof frames when other roof frames are nearby and receiving resources.
+Bug Fix: Fixed an issue with forbidden roof frames when other roof frames are nearby and receiving resources.
 
 0.8.5:
-  Minor: Added defensive null checks in many methods.
-  Minor: Made roof frames forbiddable.
+Minor: Added defensive null checks in many methods.
+Minor: Made roof frames forbiddable.
 
 0.8.3:
-  Feature: Retractable roofs. Build a set of retractable roofs and a Retractable Roof Console to allow a room to open up to the skies at will.
-  Feature: Thermal Radiator roofs. These roofs actively cool a room, and can be controlled by a Thermostat placed in the room.
-  Bug Fix: Improved various Harmony patches.
-  Bug Fix: Explosions that impact roofs will now respect damage types.
-  Bug Fix: Many stats were migrated to traditional RimWorld stats. You can now see more information by inspecting roofs.
+Feature: Retractable roofs. Build a set of retractable roofs and a Retractable Roof Console to allow a room to open up to the skies at will.
+Feature: Thermal Radiator roofs. These roofs actively cool a room, and can be controlled by a Thermostat placed in the room.
+Bug Fix: Improved various Harmony patches.
+Bug Fix: Explosions that impact roofs will now respect damage types.
+Bug Fix: Many stats were migrated to traditional RimWorld stats. You can now see more information by inspecting roofs.
 
-0.6.8: 
-  Bug Fix: Updated Selector patch types to make them less fragile - this should hopefully address some crash possibilities.
-  Bug Fix: Adjusted roof draw style category to floors (it makes sense, trust me). This will hopefully fix issues with drawing roof construction areas.
+0.6.8:
+Bug Fix: Updated Selector patch types to make them less fragile - this should hopefully address some crash possibilities.
+Bug Fix: Adjusted roof draw style category to floors (it makes sense, trust me). This will hopefully fix issues with drawing roof construction areas.
 
 0.6.6:
-  Feature: Added compatibility for Combat Extended.
-  Balance: Added Fabrication as a research requirement for luxury glass roofs.
-  Balance: Reduced the material costs of many roofs.
-  Bug Fix: Deconstructed roofs could stay selected.
-  Bug Fix: Made the Cancel designator work for canceling roof deconstruction.
-  Bug Fix: Fixed an error that could arise when removing or destroying roofs.
-  Bug Fix: Vanilla "No Roof" areas were sometimes remaining after roof deconstruction.
+Feature: Added compatibility for Combat Extended.
+Balance: Added Fabrication as a research requirement for luxury glass roofs.
+Balance: Reduced the material costs of many roofs.
+Bug Fix: Deconstructed roofs could stay selected.
+Bug Fix: Made the Cancel designator work for canceling roof deconstruction.
+Bug Fix: Fixed an error that could arise when removing or destroying roofs.
+Bug Fix: Vanilla "No Roof" areas were sometimes remaining after roof deconstruction.
 
 0.5.0:
-  Feature: Added compatibility support for Save Our Ship 2.
+Feature: Added compatibility support for Save Our Ship 2.
 
 0.4.3:
-  Bug Fix: Removed custom stuff handling to improve compatibility with other mods.
-  Minor Feature: Added roof explosions and enabled lightning strikes on roofs. Lightning may now start your thatch roof on fire.
-  Balancing: Adjusted the beauty on luxury glass panels.
-  Graphics: Added special graphics for luxury glass panels.
+Bug Fix: Removed custom stuff handling to improve compatibility with other mods.
+Minor Feature: Added roof explosions and enabled lightning strikes on roofs. Lightning may now start your thatch roof on fire.
+Balancing: Adjusted the beauty on luxury glass panels.
+Graphics: Added special graphics for luxury glass panels.
 
 0.4.0:
-  Feature: Roof selection now affects how well roofs retain heat. The insulation stat on roofs indicates how well that roof protects from the outside.
-  Feature: New buildable roof - Composite Insulated Panels. These panels are stuffable with cloth or leather to provide different levels of insulation and flammability.
+Feature: Roof selection now affects how well roofs retain heat. The insulation stat on roofs indicates how well that roof protects from the outside.
+Feature: New buildable roof - Composite Insulated Panels. These panels are stuffable with cloth or leather to provide different levels of insulation and flammability.
 
 0.3.3:
-  Feature: Some roofs (like thatch) are now flammable! This feature can be enabled or disabled via the mod options.
-  Graphics: Changed the frame on basic skylights to be grey, to reflect its steel construction material.
-  Bug Fix: Roofs can be built from diagonally adjacent cells.
-  Bug Fix: Roof damage should now render correctly.
+Feature: Some roofs (like thatch) are now flammable! This feature can be enabled or disabled via the mod options.
+Graphics: Changed the frame on basic skylights to be grey, to reflect its steel construction material.
+Bug Fix: Roofs can be built from diagonally adjacent cells.
+Bug Fix: Roof damage should now render correctly.
 
 0.2.6:
-  Bug Fix: The way some UI mods were handling caching was breaking building display. A compatibility fix has been implemented to fix this.
-  Bug Fix: Fixed a minor issue where the "Deconstruct" button for roofs was not disabled under some circumstances.
+Bug Fix: The way some UI mods were handling caching was breaking building display. A compatibility fix has been implemented to fix this.
+Bug Fix: Fixed a minor issue where the "Deconstruct" button for roofs was not disabled under some circumstances.
 
 0.2.4:
-  Feature: Roofs are selectable! When the roof layer is enabled, select a roof tile to view its stats.
-  Bug Fix: Fixed a bug where mechs (particularly constructoids) couldn't perform roof jobs.
-  Bug Fix: Changed roofs to be displayed as buildable items rather than designators. This should help with compatibility with UI mods.
-  Bug Fix: Slightly improved handling of roofs during gravship cutscenes when the roof layer is enabled.
-  Bug Fix: Added support for migrating existing saved games.
+Feature: Roofs are selectable! When the roof layer is enabled, select a roof tile to view its stats.
+Bug Fix: Fixed a bug where mechs (particularly constructoids) couldn't perform roof jobs.
+Bug Fix: Changed roofs to be displayed as buildable items rather than designators. This should help with compatibility with UI mods.
+Bug Fix: Slightly improved handling of roofs during gravship cutscenes when the roof layer is enabled.
+Bug Fix: Added support for migrating existing saved games.
 
 0.1.2:
-  Bug Fix: Create icons for roofs on the fly. This should greatly increase compatibility with mods that use custom menus.
+Bug Fix: Create icons for roofs on the fly. This should greatly increase compatibility with mods that use custom menus.
 
 0.1.1:
-  Bug Fix: Removed unnecessary requirements for Odyssey on hull plating.
+Bug Fix: Removed unnecessary requirements for Odyssey on hull plating.
 
 0.1.0:
-  Feature: Many people have pointed out that thatch can actually be a very effective roofing material. A superior thatch roof is now available at the cost of hay, with primitive thatch remaining a free, basic construction option.
-  Feature: Skylights are now tintable! After selecting a skylight to build, look for the "Set Glass Tint" button above the build panel.
+Feature: Many people have pointed out that thatch can actually be a very effective roofing material. A superior thatch roof is now available at the cost of hay, with primitive thatch remaining a free, basic construction option.
+Feature: Skylights are now tintable! After selecting a skylight to build, look for the "Set Glass Tint" button above the build panel.
 
 0.0.16:
-  Bug Fix: Fixed a bug where destroyed roofs could continue to be tracked behind the scenes.
-  Bug Fix: Added full support for gravships, fixing a bug where gravship roofs would lose their stuff and hitpoints.
-  Bug Fix: Changed the cost of reinforced glass to include a plasteel cost, fixing a problem where reinforced glass had the same cost as regular glass.
-  Bug Fix: Lowered the stuff cost of luxury glass panels from 100 to 25, substantially reducing the cost.
-  Bug Fix: Show skylight percentage without rounding.
-  Bug Fix: Room stats weren't being marked as dirty after a room was built, resulting in stats lagging behind construction.
-  Bug Fix: Updated Skyfaller roof impact logic to damage roofs in a radius, matching base game behavior.
-  Bug Fix: Fixed a potential crash in SolarRoofMapComponent by ensuring PowerNet lookups occur on the main thread.
-  Bug Fix: Added missing grid bounds checks in RoofIntegrityGrid to prevent IndexOutOfRangeException.
-  Bug Fix: Fixed a bug where removing a roof would return base materials instead of the stuff it was built with.
+Bug Fix: Fixed a bug where destroyed roofs could continue to be tracked behind the scenes.
+Bug Fix: Added full support for gravships, fixing a bug where gravship roofs would lose their stuff and hitpoints.
+Bug Fix: Changed the cost of reinforced glass to include a plasteel cost, fixing a problem where reinforced glass had the same cost as regular glass.
+Bug Fix: Lowered the stuff cost of luxury glass panels from 100 to 25, substantially reducing the cost.
+Bug Fix: Show skylight percentage without rounding.
+Bug Fix: Room stats weren't being marked as dirty after a room was built, resulting in stats lagging behind construction.
+Bug Fix: Updated Skyfaller roof impact logic to damage roofs in a radius, matching base game behavior.
+Bug Fix: Fixed a potential crash in SolarRoofMapComponent by ensuring PowerNet lookups occur on the main thread.
+Bug Fix: Added missing grid bounds checks in RoofIntegrityGrid to prevent IndexOutOfRangeException.
+Bug Fix: Fixed a bug where removing a roof would return base materials instead of the stuff it was built with.
 
 0.0.6:
-  Feature: Show roof hitpoints along with health percentage when damaged.
-  Feature: Drop pod raids will attempt to find a nearby safe spot to land, so that drop pod raids remain relevant even with high-tier reinforced roofing. You should still expect drop pods to impact your roofs.
-  Bug fix: Switched placeholder sound effect for thatch roof impacts.
-  Bug fix: Corrected skyfaller impacts to properly impact against roofs.
+Feature: Show roof hitpoints along with health percentage when damaged.
+Feature: Drop pod raids will attempt to find a nearby safe spot to land, so that drop pod raids remain relevant even with high-tier reinforced roofing. You should still expect drop pods to impact your roofs.
+Bug fix: Switched placeholder sound effect for thatch roof impacts.
+Bug fix: Corrected skyfaller impacts to properly impact against roofs.
