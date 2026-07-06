@@ -1,3 +1,7 @@
+0.10.0:
+  Feature: Rock roofs are now smoothable, increasing their beauty.
+  Minor: Improved rendering of rock roofs.
+
 0.9.2:
   Bug Fix: Removed an unnecessary MayRequire for Odyssey.
 
