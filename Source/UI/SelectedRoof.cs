@@ -90,6 +90,38 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
         }
       };
     }
+
+    if (def == RimWorld.RoofDefOf.RoofRockThin || def == RimWorld.RoofDefOf.RoofRockThick)
+    {
+      var designation = map.designationManager.DesignationAt(cell, DefOf.DesignationDefOf.SmoothRoof);
+      if (designation != null)
+      {
+        yield return new Command_Action
+        {
+          defaultLabel = "SolarWeb_Stratum_CancelSmoothRoof".Translate(),
+          defaultDesc = "SolarWeb_Stratum_CancelSmoothRoofDesc".Translate(),
+          icon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel"),
+          action = delegate
+          {
+            map.designationManager.TryRemoveDesignation(cell, DefOf.DesignationDefOf.SmoothRoof);
+          },
+          hotKey = KeyBindingDefOf.Designator_Cancel
+        };
+      }
+      else
+      {
+        yield return new Command_Action
+        {
+          defaultLabel = "SolarWeb_Stratum_DesignatorSmoothRoof".Translate(),
+          defaultDesc = "SolarWeb_Stratum_DesignatorSmoothRoofDesc".Translate(),
+          icon = ContentFinder<Texture2D>.Get("UI/Designators/SmoothSurface"),
+          action = delegate
+          {
+            map.designationManager.AddDesignation(new Designation(cell, DefOf.DesignationDefOf.SmoothRoof));
+          }
+        };
+      }
+    }
   }
 
   public string GetInspectString()

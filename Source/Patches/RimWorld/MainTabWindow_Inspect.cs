@@ -5,6 +5,7 @@ using UnityEngine;
 
 using SolarWeb.Stratum.UI;
 using SolarWeb.Stratum.DefModExtensions;
+using SolarWeb.Stratum.MapComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -23,7 +24,8 @@ public static class MainTabWindow_Inspect_Patch
         float x = rect.width - 48f;
         if (__instance.ShouldShowSelectNextInCellButton) x -= 24f;
 
-        Widgets.InfoCardButton(x, 0f, ext.buildableDef);
+        var stuff = sr.map.GetComponent<RoofIntegrityGrid>()?.GetStuff(sr.cell);
+        Widgets.InfoCardButton(x, 0f, ext.buildableDef, stuff);
         lineEndWidth += 24f;
       }
     }

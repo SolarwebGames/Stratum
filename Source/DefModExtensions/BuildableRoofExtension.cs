@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 using SolarWeb.Stratum.Graphics;
@@ -18,4 +19,6 @@ public class BuildableRoofExtension : DefModExtension
   public bool isAirtight = true;
 
   public bool isRetractable = false;
+
+  public readonly Dictionary<TerrainDef, ThingDef> terrainToStuff = [];
 }
