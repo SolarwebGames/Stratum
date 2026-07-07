@@ -3,6 +3,7 @@ using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.UI;
 
 namespace SolarWeb.Stratum.Defs;
 
@@ -28,13 +29,38 @@ public class StratumRoofDef : RoofDef
   {
     get
     {
-      var map = Find.CurrentMap;
-      if (map == null)
-        return base.LabelCap;
+      SelectedRoof? selectedRoof = null;
+      var selectedObjects = Find.Selector.SelectedObjects;
+      if (selectedObjects != null)
+      {
+        for (int i = 0; i < selectedObjects.Count; i++)
+        {
+          if (selectedObjects[i] is SelectedRoof sr && sr.def == this)
+          {
+            selectedRoof = sr;
+            break;
+          }
+        }
+      }
 
-      var cell = Verse.UI.MouseCell();
-      if (!cell.InBounds(map) || map.roofGrid.RoofAt(cell) != this)
-        return base.LabelCap;
+      Map map;
+      IntVec3 cell;
+
+      if (selectedRoof != null)
+      {
+        map = selectedRoof.map;
+        cell = selectedRoof.cell;
+      }
+      else
+      {
+        map = Find.CurrentMap;
+        if (map == null)
+          return base.LabelCap;
+
+        cell = Verse.UI.MouseCell();
+        if (!cell.InBounds(map) || map.roofGrid.RoofAt(cell) != this)
+          return base.LabelCap;
+      }
 
       var integrityGrid = map.GetComponent<MapComponents.RoofIntegrityGrid>();
       if (integrityGrid == null)

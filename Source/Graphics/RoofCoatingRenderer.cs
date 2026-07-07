@@ -36,7 +36,7 @@ public class RoofCoatingRenderer : SectionLayer
         Material[] mats = new Material[array.Length];
         for (int i = 0; i < array.Length; i++)
         {
-          mats[i] = MaterialPool.MatFrom(array[i].path, ShaderDatabase.Transparent, Color.white);
+          mats[i] = MaterialPool.MatFrom(array[i].path, ShaderDatabase.MetaOverlay, Color.white);
         }
         return mats;
       }
@@ -131,7 +131,7 @@ public class RoofCoatingRenderer : SectionLayer
 
           if (RoofAtlasManager.uvMap.TryGetValue("Snow", out var entry))
           {
-            var (_, transparent) = RoofAtlasManager.GetMaterials("Snow", Color.white);
+            var transparent = RoofAtlasManager.GetMetaOverlay("Snow");
             transparent.renderQueue = 4550;
 
             Vector2[]? uv = null;

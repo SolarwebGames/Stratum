@@ -57,6 +57,10 @@ public class SkylightCoating(Map map) : MapComponent(map)
     if (m != map) return;
     int idx = map.cellIndices.CellToIndex(c);
 
+    dirtLevels[idx] = 0f;
+    dirtColors[idx] = Color.white;
+    snowLevels[idx] = 0f;
+
     bool isNewSkylight = newRoof != null && Stats.RoofStatCache.IsSkylight(newRoof);
     if (isNewSkylight)
     {
@@ -65,7 +69,6 @@ public class SkylightCoating(Map map) : MapComponent(map)
     else
     {
       activeSkylightCells.Remove(idx);
-      dirtLevels[idx] = 0f;
     }
 
     bool isVisible = newRoof != null && Stats.RoofStatCache.IsVisibleRoof(newRoof);
@@ -76,7 +79,6 @@ public class SkylightCoating(Map map) : MapComponent(map)
     else
     {
       activeVisibleRoofedCells.Remove(idx);
-      snowLevels[idx] = 0f;
     }
   }
 

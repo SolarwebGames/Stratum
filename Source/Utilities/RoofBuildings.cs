@@ -8,6 +8,7 @@ using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.Utilities;
 
+[StaticConstructorOnStartup]
 public static class RoofBuildings
 {
   public static bool showRoofBuildings = false;
@@ -105,7 +106,7 @@ public static class RoofBuildings
   public static RoofAttachmentType GetAttachmentType(Thing t)
   {
     if (t == null || t.def == null) return RoofAttachmentType.Hanging;
-    
+
     ushort hash = t.def.shortHash;
     var cached = attachmentTypeCache[hash];
     if (cached.HasValue) return cached.Value;
@@ -301,7 +302,7 @@ public static class RoofBuildings
       var ext = roofDef?.GetModExtension<RoofBuilding>();
       var attachmentType = ext != null ? ext.attachmentType : RoofAttachmentType.Hanging;
       var floorDef = isConstructibleRoofBuilding ? defExisting : defConstructible;
-      
+
       if (floorDef != null)
       {
         bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
@@ -339,7 +340,7 @@ public static class RoofBuildings
       var roofDef = isNewRoofBuilding ? newDef : oldDef;
       var attachmentType = roofDef.GetModExtension<RoofBuilding>().attachmentType;
       var floorDef = isNewRoofBuilding ? oldDef : (newDef as ThingDef);
-      
+
       if (floorDef != null)
       {
         bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
