@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -22,4 +23,5 @@ public class BuildableRoofExtension : DefModExtension
 
   public bool allowHangingAttachments = true;
   public bool allowRooftopAttachments = true;
+  public readonly Dictionary<TerrainDef, ThingDef> terrainToStuff = [];
 }

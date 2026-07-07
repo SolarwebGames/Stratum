@@ -30,15 +30,13 @@ public class RoofVFXMapComponent : MapComponent
   {
     base.FinalizeInit();
 
-    int numGridCells = map.cellIndices.NumGridCells;
-    cellToIndex = new int[numGridCells];
-    for (int i = 0; i < numGridCells; i++) cellToIndex[i] = -1;
+    EnsureInitialized();
 
-    sectionTransparentCounts.Clear();
-    activeSections.Clear();
-    transparentCells.Clear();
-
-    map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
+    var integrity = map.GetComponent<RoofIntegrityGrid>();
+    if (integrity != null && !integrity.hasScanned)
+    {
+      integrity.ExecuteScan();
+    }
 
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
@@ -66,6 +64,7 @@ public class RoofVFXMapComponent : MapComponent
   internal void AddTransparentCellInternal(int cellIdx)
   {
     if (cellToIndex == null || cellIdx < 0 || cellIdx >= cellToIndex.Length) return;
+    EnsureInitialized();
     if (cellToIndex[cellIdx] != -1) return;
 
     cellToIndex[cellIdx] = transparentCells.Count;
@@ -80,6 +79,19 @@ public class RoofVFXMapComponent : MapComponent
       activeSections.Add(sectionPos);
     }
     sectionTransparentCounts[sectionPos] = count + 1;
+  }
+
+  private void EnsureInitialized()
+  {
+    if (cellToIndex != null) return;
+
+    int numGridCells = map.cellIndices.NumGridCells;
+    cellToIndex = new int[numGridCells];
+    for (int i = 0; i < numGridCells; i++) cellToIndex[i] = -1;
+
+    sectionTransparentCounts.Clear();
+    activeSections.Clear();
+    transparentCells.Clear();
   }
 
   private void RemoveCellInternal(int cellIdx, int listIdx)

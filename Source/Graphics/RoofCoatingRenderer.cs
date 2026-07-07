@@ -6,6 +6,7 @@ using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.Graphics;
 
+[StaticConstructorOnStartup]
 public class RoofCoatingRenderer : SectionLayer
 {
   private static Material[]? dirtMats;

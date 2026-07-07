@@ -30,6 +30,12 @@ public static class RoofDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofSolarShingles")]
   public static StratumRoofDef RoofSolarShingles = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofThinRockSmoothed")]
+  public static StratumRoofDef RoofThinRockSmoothed = default!;
+
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}RoofOverheadMountainSmoothed")]
+  public static StratumRoofDef RoofOverheadMountainSmoothed = default!;
+
   static RoofDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(RoofDefOf));

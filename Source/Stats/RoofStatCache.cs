@@ -45,6 +45,7 @@ public static class RoofStatCache
       var ext = def.GetModExtension<BuildableRoofExtension>();
       if (ext != null)
       {
+        PopulateTerrainToStuff(ext);
         int hash = def.defNameHash;
         buildableCache.Add(hash);
 
@@ -159,7 +160,13 @@ public static class RoofStatCache
       var ext = def.GetModExtension<BuildableRoofExtension>();
       if (ext?.buildableDef != null)
       {
-        beauty = ext.buildableDef.GetStatValueAbstract(StatDefOf.Beauty, stuff);
+        float baseBeauty = ext.buildableDef.GetStatValueAbstract(StatDefOf.Beauty);
+        float stuffBeauty = ext.buildableDef.GetStatValueAbstract(StatDefOf.Beauty, stuff);
+        float stuffBeautyMult = ext.buildableDef.GetStatValueAbstract(DefOf.StatDefOf.StuffBeautyMultiplier);
+
+        float delta = stuffBeauty - baseBeauty;
+        beauty = baseBeauty + (delta * stuffBeautyMult);
+
         roofStuffBeautyCache[hashKey] = beauty;
         return beauty;
       }
@@ -427,7 +434,19 @@ public static class RoofStatCache
 
   public static Color GetColor(RoofDef def, ThingDef? stuff = null)
   {
-    if (stuff != null && stuff.stuffProps != null) return stuff.stuffProps.color;
+    if (stuff != null && stuff.stuffProps != null)
+    {
+      Color baseColor = stuff.stuffProps.color;
+      if (def != null)
+      {
+        var ext = def.GetModExtension<BuildableRoofExtension>();
+        if (ext?.graphicData != null)
+        {
+          baseColor *= ext.graphicData.color;
+        }
+      }
+      return baseColor;
+    }
     if (def == null) return Color.white;
     return colorCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
   }
@@ -480,5 +499,63 @@ public static class RoofStatCache
   {
     if (def == null) return null;
     return GetGraphicData(def)?.skylightEdgeData;
+  }
+
+  private static void PopulateTerrainToStuff(BuildableRoofExtension ext)
+  {
+    foreach (var rockDef in DefDatabase<ThingDef>.AllDefs)
+    {
+      if (rockDef.building == null || !rockDef.building.isNaturalRock) continue;
+
+      ThingDef? blocksDef = GetStonyStuffForRock(rockDef);
+      if (blocksDef == null) continue;
+
+      if (rockDef.building.naturalTerrain != null)
+      {
+        ext.terrainToStuff[rockDef.building.naturalTerrain] = blocksDef;
+        if (rockDef.building.naturalTerrain.smoothedTerrain != null)
+        {
+          ext.terrainToStuff[rockDef.building.naturalTerrain.smoothedTerrain] = blocksDef;
+        }
+      }
+
+      if (rockDef.building.leaveTerrain != null)
+      {
+        ext.terrainToStuff[rockDef.building.leaveTerrain] = blocksDef;
+        if (rockDef.building.leaveTerrain.smoothedTerrain != null)
+        {
+          ext.terrainToStuff[rockDef.building.leaveTerrain.smoothedTerrain] = blocksDef;
+        }
+      }
+    }
+  }
+
+  private static ThingDef? GetStonyStuffForRock(ThingDef rockDef)
+  {
+    ThingDef? blocks = GetStonyStuffFromButcherProducts(rockDef);
+    if (blocks != null) return blocks;
+
+    if (rockDef.building?.mineableThing != null)
+    {
+      blocks = GetStonyStuffFromButcherProducts(rockDef.building.mineableThing);
+      if (blocks != null) return blocks;
+    }
+
+    return null;
+  }
+
+  private static ThingDef? GetStonyStuffFromButcherProducts(ThingDef def)
+  {
+    if (def.butcherProducts != null)
+    {
+      foreach (var product in def.butcherProducts)
+      {
+        if (product.thingDef?.stuffProps?.categories?.Contains(StuffCategoryDefOf.Stony) == true)
+        {
+          return product.thingDef;
+        }
+      }
+    }
+    return null;
   }
 }

@@ -8,7 +8,7 @@ namespace SolarWeb.Stratum.WorldComponents;
 
 public class SaveMigrationManager(World world) : WorldComponent(world)
 {
-  private const int CurrentDataVersion = 1;
+  private const int CurrentDataVersion = 2;
   private int lastMigratedDataVersion = 0;
   private string lastPlayedModVersion = "0.0.0";
 
@@ -50,6 +50,9 @@ public class SaveMigrationManager(World world) : WorldComponent(world)
       case 1:
         PerformMigration_v1();
         break;
+      case 2:
+        PerformMigration_v2();
+        break;
     }
   }
 
@@ -60,6 +63,56 @@ public class SaveMigrationManager(World world) : WorldComponent(world)
       ClearVanillaRoofAreas(map);
       map.GetComponent<RoofIntegrityGrid>()?.ExecuteScan(force: true);
       map.mapDrawer?.WholeMapChanged((ulong)MapMeshFlagDefOf.Roofs);
+    }
+  }
+
+  private void PerformMigration_v2()
+  {
+    foreach (var map in Find.Maps)
+    {
+      var integrity = map.GetComponent<RoofIntegrityGrid>();
+      if (integrity == null) continue;
+
+      integrity.InitializeNaturalRoofsStuff();
+
+      var numCells = map.cellIndices.NumGridCells;
+      var roofGrid = map.roofGrid;
+      var hitPoints = integrity.HitPointsArray;
+
+      for (int i = 0; i < numCells; i++)
+      {
+        var roof = roofGrid.RoofAt(i);
+        if (roof != null && Stats.RoofStatCache.IsCustomRoof(roof) && roof.isNatural)
+        {
+          var cell = map.cellIndices.IndexToCell(i);
+          short loadedHP = hitPoints[i];
+
+          if (loadedHP > 0)
+          {
+            int oldMaxHP = Stats.RoofStatCache.GetMaxHitPoints(roof, null);
+            if (oldMaxHP > 0)
+            {
+              var stuff = integrity.GetStuff(cell);
+              int newMaxHP = Stats.RoofStatCache.GetMaxHitPoints(roof, stuff);
+              if (newMaxHP != oldMaxHP)
+              {
+                float ratio = (float)loadedHP / oldMaxHP;
+                short newHP = (short)UnityEngine.Mathf.Clamp(UnityEngine.Mathf.RoundToInt(ratio * newMaxHP), 1, newMaxHP);
+                hitPoints[i] = newHP;
+
+                if (newHP < newMaxHP)
+                {
+                  integrity.RoofsNeedingRepair.Add(i);
+                }
+                else
+                {
+                  integrity.RoofsNeedingRepair.Remove(i);
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 

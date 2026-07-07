@@ -122,7 +122,11 @@ public class CustomRoofsRenderer : SectionLayer
 
             if (entry.SeamlessGrid.TryGetValue((col, row), out var uvs))
             {
-              if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+              if (roof.isNatural)
+              {
+                DrawNaturalRoof(c, roof, mat, roofColor, altitude, map, integrityGrid, uvs);
+              }
+              else if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
               {
                 DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
               }
@@ -135,7 +139,11 @@ public class CustomRoofsRenderer : SectionLayer
           else
           {
             var uvs = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
-            if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
+            if (roof.isNatural)
+            {
+              DrawNaturalRoof(c, roof, mat, roofColor, altitude, map, integrityGrid, uvs);
+            }
+            else if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
             {
               DrawFramedSkylight(c, roof, myGraphicData, altitude, stuff, uvs, myGraphicData.texPath);
             }
@@ -220,6 +228,145 @@ public class CustomRoofsRenderer : SectionLayer
         DrawQuadCustom(qCenter, qSize, quadMat, Color.white, 0f, qUv);
       }
     }
+  }
+
+  private void DrawNaturalRoof(IntVec3 c, RoofDef roof, Material mat, Color roofColor, float altitude, Map map, RoofIntegrityGrid? integrityGrid, Vector2[] uv)
+  {
+    bool hasW = HasRoofAt(map, c.x - 1, c.z);
+    bool hasE = HasRoofAt(map, c.x + 1, c.z);
+    bool hasS = HasRoofAt(map, c.x, c.z - 1);
+    bool hasN = HasRoofAt(map, c.x, c.z + 1);
+    bool hasSW = HasRoofAt(map, c.x - 1, c.z - 1);
+    bool hasNW = HasRoofAt(map, c.x - 1, c.z + 1);
+    bool hasSE = HasRoofAt(map, c.x + 1, c.z - 1);
+    bool hasNE = HasRoofAt(map, c.x + 1, c.z + 1);
+
+    Color[,] colors = new Color[4, 4];
+    for (int i = 0; i < 4; i++)
+    {
+      for (int j = 0; j < 4; j++)
+      {
+        colors[i, j] = roofColor;
+      }
+    }
+
+    colors[0, 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), !hasW);
+    colors[0, 2] = colors[0, 1];
+
+    colors[3, 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), !hasE);
+    colors[3, 2] = colors[3, 1];
+
+    colors[1, 0] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z - 1), !hasS);
+    colors[2, 0] = colors[1, 0];
+
+    colors[1, 3] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z + 1), !hasN);
+    colors[2, 3] = colors[1, 3];
+
+    colors[0, 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x - 1, 0, c.z - 1), !(hasW && hasS && hasSW));
+    colors[0, 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x - 1, 0, c.z + 1), !(hasW && hasN && hasNW));
+    colors[3, 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x + 1, 0, c.z - 1), !(hasE && hasS && hasSE));
+    colors[3, 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x + 1, 0, c.z + 1), !(hasE && hasN && hasNE));
+
+    float f = 0.25f;
+    float[] p = [0f, f, 1f - f, 1f];
+
+    Vector3 basePos = new(c.x, altitude, c.z);
+    Vector2 bl = uv[0], tl = uv[1], tr = uv[2], br = uv[3];
+
+    Vector2 GetUv(float px, float pz)
+    {
+      Vector2 bottom = Vector2.Lerp(bl, br, px);
+      Vector2 top = Vector2.Lerp(tl, tr, px);
+      return Vector2.Lerp(bottom, top, pz);
+    }
+
+    for (int x = 0; x < 3; x++)
+    {
+      for (int z = 0; z < 3; z++)
+      {
+        Vector3 qCenter = basePos + new Vector3((p[x] + p[x + 1]) / 2f, 0, (p[z] + p[z + 1]) / 2f);
+        Vector2 qSize = new(p[x + 1] - p[x], p[z + 1] - p[z]);
+
+        Vector2[] qUv = [GetUv(p[x], p[z]), GetUv(p[x], p[z + 1]), GetUv(p[x + 1], p[z + 1]), GetUv(p[x + 1], p[z])];
+        Color[] qColors = [colors[x, z], colors[x, z + 1], colors[x + 1, z + 1], colors[x + 1, z]];
+        DrawQuadCustom(qCenter, qSize, mat, roofColor, 0f, qUv, qColors);
+      }
+    }
+  }
+
+  private static bool HasRoofAt(Map map, int x, int z)
+  {
+    IntVec3 cell = new(x, 0, z);
+    return cell.InBounds(map) && map.roofGrid.RoofAt(cell) != null;
+  }
+
+  private static Color GetEdgeColor(Map map, RoofIntegrityGrid? integrityGrid, Color selfColor, IntVec3 neighbor, bool fades)
+  {
+    float r = selfColor.r;
+    float g = selfColor.g;
+    float b = selfColor.b;
+    float a = selfColor.a;
+    int count = 1;
+
+    if (neighbor.InBounds(map))
+    {
+      var rf = map.roofGrid.RoofAt(neighbor);
+      if (rf != null && rf.isNatural && RoofStatCache.IsCustomRoof(rf))
+      {
+        var stuff = integrityGrid?.GetStuff(neighbor);
+        Color c = RoofStatCache.GetColor(rf, stuff);
+        r += c.r;
+        g += c.g;
+        b += c.b;
+        a += c.a;
+        count++;
+      }
+    }
+
+    Color avgColor = new(r / count, g / count, b / count, a / count);
+    if (fades)
+    {
+      avgColor.a = 0f;
+    }
+    return avgColor;
+  }
+
+  private static Color GetCornerColor(Map map, RoofIntegrityGrid? integrityGrid, Color selfColor, IntVec3 n1, IntVec3 n2, IntVec3 n3, bool fades)
+  {
+    float r = selfColor.r;
+    float g = selfColor.g;
+    float b = selfColor.b;
+    float a = selfColor.a;
+    int count = 1;
+
+    void AddIfNatural(IntVec3 cell)
+    {
+      if (cell.InBounds(map))
+      {
+        var rf = map.roofGrid.RoofAt(cell);
+        if (rf != null && rf.isNatural && RoofStatCache.IsCustomRoof(rf))
+        {
+          var stuff = integrityGrid?.GetStuff(cell);
+          Color c = RoofStatCache.GetColor(rf, stuff);
+          r += c.r;
+          g += c.g;
+          b += c.b;
+          a += c.a;
+          count++;
+        }
+      }
+    }
+
+    AddIfNatural(n1);
+    AddIfNatural(n2);
+    AddIfNatural(n3);
+
+    Color avgColor = new(r / count, g / count, b / count, a / count);
+    if (fades)
+    {
+      avgColor.a = 0f;
+    }
+    return avgColor;
   }
 
   private void DrawQuadCustom(Vector3 center, Vector2 size, Material mat, Color color, float angle = 0f, System.ReadOnlySpan<Vector2> uvArray = default, Color[]? vertexColors = null)
@@ -344,5 +491,32 @@ public class CustomRoofsRenderer : SectionLayer
       scratchSubMesh.tris.Add(sVCount + 3);
     }
     Rand.PopState();
+  }
+
+  private static Color GetColorOrSelf(int nx, int nz, Color selfColor, Map map, RoofIntegrityGrid? integrityGrid)
+  {
+    IntVec3 cell = new(nx, 0, nz);
+    if (cell.InBounds(map) && !map.fogGrid.IsFogged(cell))
+    {
+      var r = map.roofGrid.RoofAt(cell);
+      if (r != null && r.isNatural && RoofStatCache.IsCustomRoof(r))
+      {
+        var s = integrityGrid?.GetStuff(cell);
+        return RoofStatCache.GetColor(r, s);
+      }
+    }
+    Color transparent = selfColor;
+    transparent.a = 0f;
+    return transparent;
+  }
+
+  private static Color AverageColor(Color c1, Color c2, Color c3, Color c4)
+  {
+    return new Color(
+      (c1.r + c2.r + c3.r + c4.r) * 0.25f,
+      (c1.g + c2.g + c3.g + c4.g) * 0.25f,
+      (c1.b + c2.b + c3.b + c4.b) * 0.25f,
+      (c1.a + c2.a + c3.a + c4.a) * 0.25f
+    );
   }
 }

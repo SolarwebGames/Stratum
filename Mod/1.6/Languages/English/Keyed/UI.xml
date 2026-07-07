@@ -20,4 +20,10 @@
   <SolarWeb_Stratum_Pollen>Pollen</SolarWeb_Stratum_Pollen>
   <SolarWeb_Stratum_Dust>Dust</SolarWeb_Stratum_Dust>
   <SolarWeb_Stratum_Snow>Snow</SolarWeb_Stratum_Snow>
+  <SolarWeb_Stratum_DesignatorSmoothRoof>Smooth stone roof</SolarWeb_Stratum_DesignatorSmoothRoof>
+  <SolarWeb_Stratum_DesignatorSmoothRoofDesc>Smooth a rough natural rock roof to improve its beauty.</SolarWeb_Stratum_DesignatorSmoothRoofDesc>
+  <SolarWeb_Stratum_MessageMustDesignateNaturalRoof>Must designate a rough natural rock roof.</SolarWeb_Stratum_MessageMustDesignateNaturalRoof>
+  <SolarWeb_Stratum_RoofAlreadySmoothed>Already smoothed.</SolarWeb_Stratum_RoofAlreadySmoothed>
+  <SolarWeb_Stratum_CancelSmoothRoof>Cancel smoothing roof</SolarWeb_Stratum_CancelSmoothRoof>
+  <SolarWeb_Stratum_CancelSmoothRoofDesc>Cancel the smoothing of this natural stone roof.</SolarWeb_Stratum_CancelSmoothRoofDesc>
 </LanguageData>

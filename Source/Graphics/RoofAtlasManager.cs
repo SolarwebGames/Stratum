@@ -85,22 +85,49 @@ public static class RoofAtlasManager
     }
   }
 
+  public static AtlasEntry GetOrCreateEntry(string path)
+  {
+    if (path.NullOrEmpty())
+    {
+      path = "fallback_empty";
+    }
+
+    if (!uvMap.TryGetValue(path, out var entry))
+    {
+      StratumLog.Warning($"No UV entry found for '{path}', creating fallback entry.");
+      var fallbackTex = ContentFinder<Texture2D>.Get(path, false) ?? BaseContent.BadTex ?? Texture2D.whiteTexture;
+      entry = new AtlasEntry
+      {
+        BaseTexture = fallbackTex
+      };
+      entry.FlatVariants.Add([
+        new Vector2(0f, 0f),
+        new Vector2(0f, 1f),
+        new Vector2(1f, 1f),
+        new Vector2(1f, 0f)
+      ]);
+      uvMap[path] = entry;
+    }
+    return entry;
+  }
+
   public static AtlasEntry GetEntry(string path)
   {
-    return uvMap[path];
+    return GetOrCreateEntry(path);
   }
 
   public static (Material cutout, Material transparent) GetMaterials(string path, Color color)
   {
-    if (!uvMap.TryGetValue(path, out var entry))
-    {
-      return (null!, null!);
-    }
+    var entry = GetOrCreateEntry(path);
     return GetMaterials(entry.BaseTexture, color);
   }
 
   private static (Material cutout, Material transparent) GetMaterials(Texture2D tex, Color color)
   {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
     if (!materialColorCache.TryGetValue((tex, color), out var mats))
     {
       mats = (
@@ -159,28 +186,26 @@ public static class RoofAtlasManager
 
   public static Vector2[]? GetIconUvs(string path)
   {
-    if (uvMap.TryGetValue(path, out var entry))
+    if (path.NullOrEmpty()) return null;
+    var entry = GetOrCreateEntry(path);
+    if (entry.FlatVariants.Count > 0)
     {
-      if (entry.FlatVariants.Count > 0)
-      {
-        return entry.FlatVariants[0];
-      }
-      if (entry.SeamlessGrid != null && entry.SeamlessGrid.Count > 0)
-      {
-        return entry.SeamlessGrid.Values.First();
-      }
+      return entry.FlatVariants[0];
+    }
+    if (entry.SeamlessGrid != null && entry.SeamlessGrid.Count > 0)
+    {
+      return entry.SeamlessGrid.Values.First();
     }
     return null;
   }
 
   public static Vector2[]? GetUvs(string path, int variantIndex)
   {
-    if (uvMap.TryGetValue(path, out var entry))
+    if (path.NullOrEmpty()) return null;
+    var entry = GetOrCreateEntry(path);
+    if (entry.FlatVariants.Count > 0)
     {
-      if (entry.FlatVariants.Count > 0)
-      {
-        return entry.FlatVariants[Mathf.Abs(variantIndex) % entry.FlatVariants.Count];
-      }
+      return entry.FlatVariants[Mathf.Abs(variantIndex) % entry.FlatVariants.Count];
     }
     return null;
   }

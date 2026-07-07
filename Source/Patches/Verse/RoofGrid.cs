@@ -3,6 +3,7 @@ using Verse;
 
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Hooks;
+using SolarWeb.Stratum.MapComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -100,6 +101,85 @@ public static class RoofGrid_Patch
           catch (System.Exception ex)
           {
             StratumLog.Error($"Error in RoofChanged subscriber: {ex}");
+          }
+        }
+      }
+    }
+
+    if (___map.areaManager.NoRoof != null)
+    {
+      ___map.areaManager.NoRoof[c] = false;
+    }
+    if (___map.areaManager.BuildRoof != null)
+    {
+      ___map.areaManager.BuildRoof[c] = false;
+    }
+
+    if (___map.regionAndRoomUpdater != null && ___map.regionAndRoomUpdater.Enabled)
+    {
+      var room = c.GetRoom(___map);
+      if (room != null)
+      {
+        foreach (var district in room.Districts)
+        {
+          district.Notify_RoofChanged();
+        }
+      }
+    }
+
+    var integrity = ___map.GetComponent<RoofIntegrityGrid>();
+    if (currentRoof != null && RoofStatCache.IsCustomRoof(currentRoof))
+    {
+      ThingDef? stuff = integrity?.GetStuff(c);
+      UnityEngine.Color? tint = null;
+      if (DebugSettings.godMode)
+      {
+        var designator = Find.DesignatorManager.SelectedDesignator as AI.Designators.BuildCustomRoof;
+        if (designator != null)
+        {
+          stuff = designator.StuffDef;
+          tint = designator.SelectedTint;
+        }
+      }
+
+      if (stuff == null && currentRoof.isNatural)
+      {
+        stuff = RoofIntegrityGrid.GetStonyStuffForCell(currentRoof, c, ___map);
+      }
+
+      if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
+      {
+        var local = c - GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingRoot;
+        if (GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData != null &&
+            GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
+        {
+          stuff = cellData.stuff;
+          integrity?.InitializeRoof(c, currentRoof, stuff, cellData.glassTint, cellData.hitPoints);
+        }
+        else
+        {
+          integrity?.InitializeRoof(c, currentRoof, stuff, tint);
+        }
+      }
+      else
+      {
+        integrity?.InitializeRoof(c, currentRoof, stuff, tint);
+      }
+    }
+    else
+    {
+      integrity?.RemoveRoof(c);
+    }
+
+    if (Find.Selector.SelectedObjects.Count > 0)
+    {
+      for (int i = Find.Selector.SelectedObjects.Count - 1; i >= 0; i--)
+      {
+        if (Find.Selector.SelectedObjects[i] is UI.SelectedRoof sr && sr.map == ___map && sr.cell == c)
+        {
+          if (currentRoof == null || sr.def != currentRoof)
+          {
+            Find.Selector.Deselect(sr);
           }
         }
       }

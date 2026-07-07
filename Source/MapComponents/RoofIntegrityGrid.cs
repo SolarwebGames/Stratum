@@ -30,11 +30,6 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void ExposeData()
   {
     base.ExposeData();
-    Scribe_Values.Look(ref hasScanned, "hasScanned", false);
-    if (Scribe.mode == LoadSaveMode.LoadingVars)
-    {
-      hasScanned = false;
-    }
 
     if (Scribe.mode == LoadSaveMode.Saving)
     {
@@ -96,6 +91,8 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void FinalizeInit()
   {
     base.FinalizeInit();
+    InitializeNaturalRoofsStuff();
+
     if (!hasScanned)
     {
       ExecuteScan();
@@ -111,6 +108,26 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       map.areaManager.NoRoof?.Clear();
     }
   }
+
+  internal void InitializeNaturalRoofsStuff()
+  {
+    var numCells = map.cellIndices.NumGridCells;
+    var roofGrid = map.roofGrid;
+    for (int i = 0; i < numCells; i++)
+    {
+      var roof = roofGrid.RoofAt(i);
+      if (roof != null && roof.isNatural)
+      {
+        var cell = map.cellIndices.IndexToCell(i);
+        if (stuffDefs[i] == null)
+        {
+          stuffDefs[i] = GetStonyStuffForCell(roof, cell, map);
+        }
+      }
+    }
+  }
+
+
 
   public override void MapRemoved()
   {
@@ -234,6 +251,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     lock (scanLockInt)
     {
       if (hasScanned && !force) return;
+      InitializeNaturalRoofsStuff();
       hasScanned = true;
       ParallelMapScanner.ExecuteScan(this, force);
     }
@@ -411,5 +429,82 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       }
       map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
     }
+  }
+
+  public static ThingDef GetStonyStuffForTerrain(RoofDef roof, TerrainDef floor)
+  {
+    if (floor == null || roof == null)
+    {
+      return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+    }
+
+    var ext = roof.GetModExtension<BuildableRoofExtension>();
+    if (ext != null && ext.terrainToStuff.TryGetValue(floor, out var stuff))
+    {
+      return stuff;
+    }
+
+    // Secondary fallback: check if any custom roof extension has this mapping
+    foreach (var rDef in DefDatabase<RoofDef>.AllDefs)
+    {
+      var rExt = rDef.GetModExtension<BuildableRoofExtension>();
+      if (rExt != null && rExt.terrainToStuff.TryGetValue(floor, out stuff))
+      {
+        return stuff;
+      }
+    }
+
+    return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+  }
+
+  public static ThingDef GetStonyStuffForCell(RoofDef roof, IntVec3 cell, Map map)
+  {
+    if (cell.InBounds(map))
+    {
+      var edifice = cell.GetEdifice(map);
+      if (edifice != null && edifice.def.building != null && edifice.def.building.isNaturalRock)
+      {
+        var blocksDef = GetStonyStuffForRock(edifice.def);
+        if (blocksDef != null) return blocksDef;
+      }
+
+      var floor = cell.GetTerrain(map);
+      if (floor != null)
+      {
+        var stuff = GetStonyStuffForTerrain(roof, floor);
+        if (stuff != null) return stuff;
+      }
+    }
+
+    return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+  }
+
+  private static ThingDef? GetStonyStuffForRock(ThingDef rockDef)
+  {
+    ThingDef? blocks = GetStonyStuffFromButcherProducts(rockDef);
+    if (blocks != null) return blocks;
+
+    if (rockDef.building?.mineableThing != null)
+    {
+      blocks = GetStonyStuffFromButcherProducts(rockDef.building.mineableThing);
+      if (blocks != null) return blocks;
+    }
+
+    return null;
+  }
+
+  private static ThingDef? GetStonyStuffFromButcherProducts(ThingDef def)
+  {
+    if (def.butcherProducts != null)
+    {
+      foreach (var product in def.butcherProducts)
+      {
+        if (product.thingDef?.stuffProps?.categories?.Contains(StuffCategoryDefOf.Stony) == true)
+        {
+          return product.thingDef;
+        }
+      }
+    }
+    return null;
   }
 }
