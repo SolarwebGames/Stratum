@@ -62,6 +62,7 @@ public static class Selector_Patch
     if (!Find.PlaySettings.showRoofOverlay) return;
     if (map == null || map.roofGrid == null) return;
     if (!c.InBounds(map)) return;
+    if (!c.Fogged(map)) return;
 
     RoofDef roof = map.roofGrid.RoofAt(c);
     if (!RoofStatCache.IsCustomRoof(roof)) return;
