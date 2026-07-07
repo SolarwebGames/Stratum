@@ -124,7 +124,8 @@ public class CustomRoofsRenderer : SectionLayer
             {
               if (roof.isNatural)
               {
-                DrawNaturalRoof(c, roof, mat, roofColor, altitude, map, integrityGrid, uvs);
+                var naturalMat = RoofAtlasManager.GetMetaOverlay(myGraphicData.texPath);
+                DrawNaturalRoof(c, roof, naturalMat, roofColor, altitude, map, integrityGrid, uvs);
               }
               else if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
               {
@@ -141,7 +142,8 @@ public class CustomRoofsRenderer : SectionLayer
             var uvs = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
             if (roof.isNatural)
             {
-              DrawNaturalRoof(c, roof, mat, roofColor, altitude, map, integrityGrid, uvs);
+              var naturalMat = RoofAtlasManager.GetMetaOverlay(myGraphicData.texPath);
+              DrawNaturalRoof(c, roof, naturalMat, roofColor, altitude, map, integrityGrid, uvs);
             }
             else if (RoofStatCache.IsSkylight(roof) && myGraphicData.skylightFrameWidth > 0f)
             {
@@ -293,6 +295,8 @@ public class CustomRoofsRenderer : SectionLayer
       }
     }
   }
+
+
 
   private static bool HasRoofAt(Map map, int x, int z)
   {

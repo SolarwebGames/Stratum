@@ -23,6 +23,7 @@ public static class RoofAtlasManager
 
   public static readonly Dictionary<string, AtlasEntry> uvMap = [];
   private static readonly Dictionary<(Texture2D, Color), (Material cutout, Material transparent)> materialColorCache = [];
+  private static readonly Dictionary<Texture2D, Material> metaOverlayCache = [];
 
   public static void Initialize()
   {
@@ -137,6 +138,27 @@ public static class RoofAtlasManager
       materialColorCache[(tex, color)] = mats;
     }
     return mats;
+  }
+
+  public static Material GetMetaOverlay(string path)
+  {
+    var entry = GetOrCreateEntry(path);
+    return GetMetaOverlay(entry.BaseTexture);
+  }
+
+  public static Material GetMetaOverlay(Texture2D tex)
+  {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
+    if (!metaOverlayCache.TryGetValue(tex, out var mat))
+    {
+      mat = new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_MetaOverlay" };
+      mat.renderQueue = 4500;
+      metaOverlayCache[tex] = mat;
+    }
+    return mat;
   }
 
   private static void CacheUv(string path, bool isSeamless, List<Sprite> spriteList)
