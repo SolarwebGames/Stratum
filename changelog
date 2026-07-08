@@ -1,3 +1,7 @@
+0.10.3:
+Compatibility: Added native compatibility for Dubs Skylights. Dubs Skylights frames now provide a bonus to hitpoints and insulation when built under Stratum skylights.
+Bug Fix: Stratum was crashing under some circumstances due to a conflict with Adaptive Storage Framework.
+
 0.10.1:
 Minor: Blend rock roof edges for more natural transitions.
 
