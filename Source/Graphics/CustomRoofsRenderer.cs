@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Graphics;
 
@@ -164,7 +163,7 @@ public class CustomRoofsRenderer : SectionLayer
       if (integrityGrid != null)
       {
         short hp = integrityGrid.GetHitPoints(c);
-        short maxHp = (short)RoofStatCache.GetMaxHitPoints(roof, stuff);
+        short maxHp = integrityGrid.GetMaxHitPoints(c);
 
         if (hp > 0 && hp < maxHp)
         {

@@ -24,7 +24,11 @@ public class MapHookRegistry : MapComponent
     PlaySettingsDoMapControls,
     CanPlaceBlueprintOver,
     CalculateCEDamage,
-    RoofDamageCalculation
+    RoofDamageCalculation,
+    ThermalConductivity,
+    RoofMaxHitPoints,
+    RoofDamageThreshold,
+    RoofArmorRating
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -123,6 +127,166 @@ public class MapHookRegistry : MapComponent
     return null;
   }
 
+  public static float GetCellThermalConductivity(Map map, IntVec3 cell, float baseConductivity)
+  {
+    float current = baseConductivity;
+    var globalHandlers = GetGlobalHandlers<ThermalConductivityHandler>(HookId.ThermalConductivity);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global ThermalConductivity handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<ThermalConductivityHandler>(HookId.ThermalConductivity);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in ThermalConductivity handler: {ex}");
+          }
+        }
+      }
+    }
+    return current;
+  }
+
+  public static int GetCellRoofMaxHitPoints(Map map, IntVec3 cell, int baseMaxHp)
+  {
+    int current = baseMaxHp;
+    var globalHandlers = GetGlobalHandlers<RoofMaxHitPointsHandler>(HookId.RoofMaxHitPoints);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofMaxHitPoints handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<RoofMaxHitPointsHandler>(HookId.RoofMaxHitPoints);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in RoofMaxHitPoints handler: {ex}");
+          }
+        }
+      }
+    }
+    return current;
+  }
+
+  public static float GetCellRoofDamageThreshold(Map map, IntVec3 cell, float baseDt)
+  {
+    float current = baseDt;
+    var globalHandlers = GetGlobalHandlers<RoofDamageThresholdHandler>(HookId.RoofDamageThreshold);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofDamageThreshold handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<RoofDamageThresholdHandler>(HookId.RoofDamageThreshold);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in RoofDamageThreshold handler: {ex}");
+          }
+        }
+      }
+    }
+    return current;
+  }
+
+  public static float GetCellRoofArmorRating(Map map, IntVec3 cell, float baseArmor)
+  {
+    float current = baseArmor;
+    var globalHandlers = GetGlobalHandlers<RoofArmorRatingHandler>(HookId.RoofArmorRating);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofArmorRating handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<RoofArmorRatingHandler>(HookId.RoofArmorRating);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in RoofArmorRating handler: {ex}");
+          }
+        }
+      }
+    }
+    return current;
+  }
+
   public delegate void RoofChangedHandler(Map map, IntVec3 cell, RoofDef? oldRoof, RoofDef? newRoof);
   public delegate void BeforeSetRoofHandler(Map map, IntVec3 cell, RoofDef? oldRoof, ref RoofDef? newRoof, ref bool allow);
   public delegate bool AirtightCheckHandler(RoofDef def);
@@ -138,4 +302,8 @@ public class MapHookRegistry : MapComponent
   public delegate void PlaySettingsDoMapControlsHandler(WidgetRow row);
   public delegate bool? CanPlaceBlueprintOverHandler(BuildableDef newDef, ThingDef oldDef);
   public delegate bool RoofDamageCalculationHandler(RoofDef roofDef, ThingDef? stuffDef, float baseDamage, float penetration, DamageInfo? damageDef, ref float effectiveDamage);
+  public delegate float ThermalConductivityHandler(Map map, IntVec3 cell, float baseConductivity);
+  public delegate int RoofMaxHitPointsHandler(Map map, IntVec3 cell, int baseMaxHp);
+  public delegate float RoofDamageThresholdHandler(Map map, IntVec3 cell, float baseDt);
+  public delegate float RoofArmorRatingHandler(Map map, IntVec3 cell, float baseArmor);
 }

@@ -86,6 +86,22 @@ public static class RoofGrid_Patch
     var currentRoof = ___map.roofGrid.RoofAt(c);
     if (currentRoof == __state) return;
 
+    var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          globalHandlers[i](___map, c, __state, currentRoof);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofChanged subscriber: {ex}");
+        }
+      }
+    }
+
     var registry = MapHookRegistry.Get(___map);
     if (registry != null)
     {

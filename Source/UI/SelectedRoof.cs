@@ -50,6 +50,7 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
 
   public void Dispose()
   {
+    RoofSelectionTracker.Instance.ClearSelectTimeFor(this);
     Find.World.GetComponent<RoofSelectionPool>()?.Return(this);
   }
 
@@ -79,7 +80,7 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
     {
       yield return new Command_Action
       {
-        
+
         defaultLabel = "Stratum_CancelRoofRemoval".Translate(),
         defaultDesc = "Stratum_CancelRoofRemovalDesc".Translate(),
         icon = ContentFinder<Texture2D>.Get("UI/Designators/Cancel"),

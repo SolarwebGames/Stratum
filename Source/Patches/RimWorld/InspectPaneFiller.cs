@@ -2,10 +2,10 @@ using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using System;
+
 using SolarWeb.Stratum.UI;
 using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.Stats;
-using System;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -57,7 +57,7 @@ public static class InspectPaneFiller_Patch
     if (integrity == null) return;
 
     int hp = integrity.GetHitPoints(sr.cell);
-    int maxHp = RoofStatCache.GetMaxHitPoints(sr.def, integrity.GetStuff(sr.cell));
+    int maxHp = integrity.GetMaxHitPoints(sr.cell);
     if (maxHp <= 0) return;
 
     float fillPct = (float)hp / maxHp;
