@@ -1,5 +1,6 @@
 using HarmonyLib;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 using UnityEngine;
 using Verse;
 
@@ -10,10 +11,34 @@ public static class GlowGrid_Patch
 {
   [HarmonyPatch(typeof(GlowGrid), nameof(GlowGrid.GroundGlowAt))]
   [HarmonyPrefix]
-  public static bool GroundGlowAt_Prefix(GlowGrid __instance, IntVec3 c, ref float __result, bool ignoreSky, Map ___map)
+  [HarmonyBefore("realtiltmod")]
+  public static bool GroundGlowAt_Prefix(GlowGrid __instance, IntVec3 c, ref float __result, bool ignoreCavePlants, bool ignoreSky, Map ___map)
   {
+    if (___map == null) return true;
+
+    var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.GroundGlowHandler>(MapHookRegistry.HookId.GroundGlow);
+    if (globalHandlers != null)
+    {
+      float result = 0f;
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          if (globalHandlers[i](__instance, ___map, c, ignoreCavePlants, ignoreSky, ref result))
+          {
+            __result = result;
+            return false;
+          }
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global GroundGlow handler: {ex}");
+        }
+      }
+    }
+
     if (ignoreSky) return true;
-    if (___map == null || ___map.skyManager == null || ___map.roofGrid == null) return true;
+    if (___map.skyManager == null || ___map.roofGrid == null) return true;
 
     var roof = ___map.roofGrid.RoofAt(c);
     if (roof != null && RoofStatCache.IsSkylight(roof))

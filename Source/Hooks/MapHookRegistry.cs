@@ -28,7 +28,8 @@ public class MapHookRegistry : MapComponent
     ThermalConductivity,
     RoofMaxHitPoints,
     RoofDamageThreshold,
-    RoofArmorRating
+    RoofArmorRating,
+    GroundGlow
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -306,4 +307,5 @@ public class MapHookRegistry : MapComponent
   public delegate int RoofMaxHitPointsHandler(Map map, IntVec3 cell, int baseMaxHp);
   public delegate float RoofDamageThresholdHandler(Map map, IntVec3 cell, float baseDt);
   public delegate float RoofArmorRatingHandler(Map map, IntVec3 cell, float baseArmor);
+  public delegate bool GroundGlowHandler(GlowGrid instance, Map map, IntVec3 cell, bool ignoreCavePlants, bool ignoreSky, ref float result);
 }
