@@ -38,7 +38,9 @@ public static class RoomTempTracker_Patch
       if (RoofStatCache.IsCustomRoof(roof))
       {
         var integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
-        totalConductivity += RoofStatCache.GetThermalConductivity(roof, integrity?.GetStuff(cell));
+        float conductivity = RoofStatCache.GetThermalConductivity(roof, integrity?.GetStuff(cell));
+        conductivity = Utilities.StratumHooks.GetCellThermalConductivityOverride(map, cell, conductivity);
+        totalConductivity += conductivity;
       }
       else
       {

@@ -215,6 +215,24 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     return hitPoints[map.cellIndices.CellToIndex(cell)];
   }
 
+  public void SetHitPoints(IntVec3 cell, short hp)
+  {
+    if (!cell.InBounds(map)) return;
+    int index = map.cellIndices.CellToIndex(cell);
+    var roof = map.roofGrid.RoofAt(cell);
+    if (roof == null) return;
+
+    short maxHP = GetMaxHitPoints(cell);
+    hitPoints[index] = (short)UnityEngine.Mathf.Clamp(hp, 0, maxHP);
+
+    if (hitPoints[index] < maxHP)
+      roofsNeedingRepair.Add(index);
+    else
+      roofsNeedingRepair.Remove(index);
+
+    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+  }
+
   public float GetEffectiveInsulation(IntVec3 cell)
   {
     if (!cell.InBounds(map)) return 0f;
@@ -228,7 +246,9 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     if (!cell.InBounds(map)) return 0;
     var roof = map.roofGrid.RoofAt(cell);
     if (roof == null) return 0;
-    return (short)RoofStatCache.GetMaxHitPoints(roof, GetStuff(cell));
+    int maxHp = RoofStatCache.GetMaxHitPoints(roof, GetStuff(cell));
+    maxHp = Utilities.StratumHooks.GetCellRoofMaxHitPointsOverride(map, cell, maxHp);
+    return (short)maxHp;
   }
 
   public ThingDef? GetStuff(IntVec3 cell)
@@ -262,7 +282,10 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
     var stuff = stuffDefs[index];
     float dt = RoofStatCache.GetDamageThreshold(roof, stuff);
+    dt = Utilities.StratumHooks.GetCellRoofDamageThresholdOverride(map, cell, dt);
+
     float ar = RoofStatCache.GetArmorRating(roof, stuff);
+    ar = Utilities.StratumHooks.GetCellRoofArmorRatingOverride(map, cell, ar);
 
     float effectiveDamage = amount;
 

@@ -27,6 +27,30 @@ public static class StratumHooks
   /// </summary>
   public static Func<RoofDef, float>? GlobalTransparencyCheck;
 
+  /// <summary>
+  /// Allows other mods to dynamically override or modify the thermal conductivity of a specific cell.
+  /// (Map, Cell, BaseConductivity) -> ModifiedConductivity
+  /// </summary>
+  public static Func<Map, IntVec3, float, float>? GetCellThermalConductivity;
+
+  /// <summary>
+  /// Allows other mods to dynamically override or modify the max hit points of a specific roof cell.
+  /// (Map, Cell, BaseMaxHP) -> ModifiedMaxHP
+  /// </summary>
+  public static Func<Map, IntVec3, int, int>? GetCellRoofMaxHitPoints;
+
+  /// <summary>
+  /// Allows other mods to dynamically override or modify the damage threshold of a specific roof cell.
+  /// (Map, Cell, BaseDT) -> ModifiedDT
+  /// </summary>
+  public static Func<Map, IntVec3, float, float>? GetCellRoofDamageThreshold;
+
+  /// <summary>
+  /// Allows other mods to dynamically override or modify the armor rating of a specific roof cell.
+  /// (Map, Cell, BaseArmor) -> ModifiedArmor
+  /// </summary>
+  public static Func<Map, IntVec3, float, float>? GetCellRoofArmorRating;
+
   public delegate bool RoofDamageCalculationHandler(RoofDef roof, ThingDef? stuff, float amount, float penetration, DamageInfo? dinfo, ref float effectiveDamage);
 
   /// <summary>
@@ -67,5 +91,49 @@ public static class StratumHooks
       max = Math.Max(max, check(def));
     }
     return max;
+  }
+
+  internal static float GetCellThermalConductivityOverride(Map map, IntVec3 c, float baseConductivity)
+  {
+    if (GetCellThermalConductivity == null) return baseConductivity;
+    float current = baseConductivity;
+    foreach (Func<Map, IntVec3, float, float> check in GetCellThermalConductivity.GetInvocationList())
+    {
+      current = check(map, c, current);
+    }
+    return current;
+  }
+
+  internal static int GetCellRoofMaxHitPointsOverride(Map map, IntVec3 c, int baseMaxHp)
+  {
+    if (GetCellRoofMaxHitPoints == null) return baseMaxHp;
+    int current = baseMaxHp;
+    foreach (Func<Map, IntVec3, int, int> check in GetCellRoofMaxHitPoints.GetInvocationList())
+    {
+      current = check(map, c, current);
+    }
+    return current;
+  }
+
+  internal static float GetCellRoofDamageThresholdOverride(Map map, IntVec3 c, float baseDt)
+  {
+    if (GetCellRoofDamageThreshold == null) return baseDt;
+    float current = baseDt;
+    foreach (Func<Map, IntVec3, float, float> check in GetCellRoofDamageThreshold.GetInvocationList())
+    {
+      current = check(map, c, current);
+    }
+    return current;
+  }
+
+  internal static float GetCellRoofArmorRatingOverride(Map map, IntVec3 c, float baseArmor)
+  {
+    if (GetCellRoofArmorRating == null) return baseArmor;
+    float current = baseArmor;
+    foreach (Func<Map, IntVec3, float, float> check in GetCellRoofArmorRating.GetInvocationList())
+    {
+      current = check(map, c, current);
+    }
+    return current;
   }
 }

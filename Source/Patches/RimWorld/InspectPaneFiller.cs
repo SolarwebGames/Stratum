@@ -57,7 +57,7 @@ public static class InspectPaneFiller_Patch
     if (integrity == null) return;
 
     int hp = integrity.GetHitPoints(sr.cell);
-    int maxHp = RoofStatCache.GetMaxHitPoints(sr.def, integrity.GetStuff(sr.cell));
+    int maxHp = integrity.GetMaxHitPoints(sr.cell);
     if (maxHp <= 0) return;
 
     float fillPct = (float)hp / maxHp;
