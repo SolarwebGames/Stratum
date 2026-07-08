@@ -4,6 +4,7 @@ using UnityEngine;
 using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -32,8 +33,12 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
   {
     base.FinalizeInit();
     dirty = true;
-    Utilities.StratumHooks.OnRoofChanged += Notify_RoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_RoofChanged);
+      registry.Register<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
+    }
 
     foreach (var cell in map.AllCells)
     {
@@ -50,8 +55,12 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
     base.MapRemoved();
     radiatorCells.Clear();
     powerDraws.Clear();
-    Utilities.StratumHooks.OnRoofChanged -= Notify_RoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_RoofChanged);
+      registry.Unregister<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
+    }
   }
 
   private void HandleEnergyGainRate(PowerNet net, ref float energyGainRate)

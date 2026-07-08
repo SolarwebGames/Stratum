@@ -4,6 +4,7 @@ using UnityEngine;
 using Verse;
 
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -37,14 +38,23 @@ public class RoofVFXMapComponent : MapComponent
       integrity.ExecuteScan();
     }
 
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+    }
   }
 
   public override void MapRemoved()
   {
     base.MapRemoved();
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+    }
   }
+
 
   private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
   {
@@ -53,6 +63,7 @@ public class RoofVFXMapComponent : MapComponent
 
   internal void AddTransparentCellInternal(int cellIdx)
   {
+    if (cellToIndex == null || cellIdx < 0 || cellIdx >= cellToIndex.Length) return;
     EnsureInitialized();
     if (cellToIndex[cellIdx] != -1) return;
 
@@ -85,6 +96,7 @@ public class RoofVFXMapComponent : MapComponent
 
   private void RemoveCellInternal(int cellIdx, int listIdx)
   {
+    if (cellToIndex == null || cellIdx < 0 || cellIdx >= cellToIndex.Length) return;
     int lastIdx = transparentCells.Count - 1;
     if (listIdx != lastIdx)
     {
@@ -165,49 +177,58 @@ public class RoofVFXMapComponent : MapComponent
 
   private void SpawnFlecks(float sunGlow)
   {
-    // Lifetime is 10s (600 ticks). 
-    // Target sparse distribution: approx 1 beam per 50 cells every 10s.
-    float spawnChancePerCell = 0.002f * sunGlow;
-    int spawnedThisTick = 0;
+    if (map.flecks == null || SolarWeb.Stratum.DefOf.FleckDefOf.Sunbeam == null || RimWorld.FleckDefOf.HeatGlow == null) return;
 
-    int startIndex = Rand.Range(0, transparentCells.Count);
-
-    for (int i = 0; i < transparentCells.Count; i++)
+    try
     {
-      if (spawnedThisTick >= MaxFlecksPerTick) break;
+      // Lifetime is 10s (600 ticks). 
+      // Target sparse distribution: approx 1 beam per 50 cells every 10s.
+      float spawnChancePerCell = 0.002f * sunGlow;
+      int spawnedThisTick = 0;
 
-      int listIndex = (startIndex + i) % transparentCells.Count;
-      if (Rand.Value > spawnChancePerCell) continue;
+      int startIndex = Rand.Range(0, transparentCells.Count);
 
-      int cellIdx = transparentCells[listIndex];
-      IntVec3 pos = map.cellIndices.IndexToCell(cellIdx);
-      var roof = map.roofGrid.RoofAt(cellIdx);
-      if (roof == null) continue;
+      for (int i = 0; i < transparentCells.Count; i++)
+      {
+        if (spawnedThisTick >= MaxFlecksPerTick) break;
 
-      float transparency = RoofStatCache.GetTransparency(roof);
-      if (transparency <= 0f) continue;
+        int listIndex = (startIndex + i) % transparentCells.Count;
+        if (Rand.Value > spawnChancePerCell) continue;
 
-      Color roofColor = RoofStatCache.GetGlassTint(roof, map, pos);
-      Vector3 center = pos.ToVector3Shifted();
-      center.y += 0.1f;
+        int cellIdx = transparentCells[listIndex];
+        IntVec3 pos = map.cellIndices.IndexToCell(cellIdx);
+        var roof = map.roofGrid.RoofAt(cellIdx);
+        if (roof == null) continue;
 
-      float effectivePower = sunGlow * Mathf.Sqrt(transparency);
+        float transparency = RoofStatCache.GetTransparency(roof);
+        if (transparency <= 0f) continue;
 
-      FleckCreationData data = FleckMaker.GetDataStatic(center + new Vector3(Rand.Range(-0.4f, 0.4f), 0, Rand.Range(-0.4f, 0.4f)), map, SolarWeb.Stratum.DefOf.FleckDefOf.Sunbeam);
-      data.scale = Rand.Range(0.8f, 1.2f);
-      Color beamColor = roofColor;
-      beamColor.a = Mathf.Lerp(0.4f, 1.0f, effectivePower);
-      data.instanceColor = beamColor;
-      map.flecks.CreateFleck(data);
+        Color roofColor = RoofStatCache.GetGlassTint(roof, map, pos);
+        Vector3 center = pos.ToVector3Shifted();
+        center.y += 0.1f;
 
-      FleckCreationData glowData = FleckMaker.GetDataStatic(center, map, RimWorld.FleckDefOf.HeatGlow);
-      glowData.scale = Rand.Range(1.5f, 2.0f);
-      Color glowColor = roofColor;
-      glowColor.a = Mathf.Lerp(0.2f, 0.6f, effectivePower);
-      glowData.instanceColor = glowColor;
-      map.flecks.CreateFleck(glowData);
+        float effectivePower = sunGlow * Mathf.Sqrt(transparency);
 
-      spawnedThisTick++;
+        FleckCreationData data = FleckMaker.GetDataStatic(center + new Vector3(Rand.Range(-0.4f, 0.4f), 0, Rand.Range(-0.4f, 0.4f)), map, SolarWeb.Stratum.DefOf.FleckDefOf.Sunbeam);
+        data.scale = Rand.Range(0.8f, 1.2f);
+        Color beamColor = roofColor;
+        beamColor.a = Mathf.Lerp(0.4f, 1.0f, effectivePower);
+        data.instanceColor = beamColor;
+        map.flecks.CreateFleck(data);
+
+        FleckCreationData glowData = FleckMaker.GetDataStatic(center, map, RimWorld.FleckDefOf.HeatGlow);
+        glowData.scale = Rand.Range(1.5f, 2.0f);
+        Color glowColor = roofColor;
+        glowColor.a = Mathf.Lerp(0.2f, 0.6f, effectivePower);
+        glowData.instanceColor = glowColor;
+        map.flecks.CreateFleck(glowData);
+
+        spawnedThisTick++;
+      }
+    }
+    catch (System.Exception ex)
+    {
+      StratumLog.Error($"Error in RoofVFXMapComponent.SpawnFlecks: {ex}");
     }
   }
 }

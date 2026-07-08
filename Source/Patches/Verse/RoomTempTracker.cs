@@ -3,6 +3,7 @@ using HarmonyLib;
 using Verse;
 
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -39,7 +40,7 @@ public static class RoomTempTracker_Patch
       {
         var integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
         float conductivity = RoofStatCache.GetThermalConductivity(roof, integrity?.GetStuff(cell));
-        conductivity = Utilities.StratumHooks.GetCellThermalConductivityOverride(map, cell, conductivity);
+        conductivity = MapHookRegistry.GetCellThermalConductivity(map, cell, conductivity);
         totalConductivity += conductivity;
       }
       else

@@ -1,7 +1,9 @@
 using HarmonyLib;
-using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.Stats;
 using Verse;
+
+using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
+using SolarWeb.Stratum.MapComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -36,31 +38,94 @@ public static class RoofGrid_Patch
 
   [HarmonyPatch(typeof(RoofGrid), nameof(RoofGrid.SetRoof))]
   [HarmonyPrefix]
-  public static void SetRoof_Prefix(IntVec3 c, Map ___map, out RoofDef? __state)
+  public static bool SetRoof_Prefix(IntVec3 c, ref RoofDef def, Map ___map, out RoofDef? __state)
   {
     if (___map == null || ___map.roofGrid == null)
     {
       __state = null;
-      return;
+      return true;
     }
-    __state = ___map.roofGrid.RoofAt(c);
+
+    var oldRoof = ___map.roofGrid.RoofAt(c);
+    __state = oldRoof;
+
+    var registry = MapHookRegistry.Get(___map);
+    if (registry != null)
+    {
+      bool allow = true;
+      RoofDef? newRoof = def;
+      var handlers = registry.GetHandlers<MapHookRegistry.BeforeSetRoofHandler>(MapHookRegistry.HookId.BeforeSetRoof);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            handlers[i](___map, c, oldRoof, ref newRoof, ref allow);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in BeforeSetRoof subscriber: {ex}");
+          }
+        }
+      }
+      def = newRoof!;
+      if (!allow)
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   [HarmonyPatch(typeof(RoofGrid), nameof(RoofGrid.SetRoof))]
   [HarmonyPostfix]
-  public static void SetRoof_Postfix(IntVec3 c, RoofDef def, Map ___map, RoofDef? __state)
+  public static void SetRoof_Postfix(IntVec3 c, Map ___map, RoofDef? __state)
   {
-    if (___map == null || ___map.roofGrid == null || ___map.areaManager == null) return;
+    if (___map == null || ___map.roofGrid == null) return;
     var currentRoof = ___map.roofGrid.RoofAt(c);
     if (currentRoof == __state) return;
 
-    Utilities.StratumHooks.Notify_RoofChanged(___map, c, __state, currentRoof);
-    
+    var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          globalHandlers[i](___map, c, __state, currentRoof);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofChanged subscriber: {ex}");
+        }
+      }
+    }
+
+    var registry = MapHookRegistry.Get(___map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            handlers[i](___map, c, __state, currentRoof);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in RoofChanged subscriber: {ex}");
+          }
+        }
+      }
+    }
+
     if (___map.areaManager.NoRoof != null)
     {
       ___map.areaManager.NoRoof[c] = false;
     }
-    
     if (___map.areaManager.BuildRoof != null)
     {
       ___map.areaManager.BuildRoof[c] = false;
@@ -79,7 +144,7 @@ public static class RoofGrid_Patch
     }
 
     var integrity = ___map.GetComponent<RoofIntegrityGrid>();
-    if (def != null && RoofStatCache.IsCustomRoof(def))
+    if (currentRoof != null && RoofStatCache.IsCustomRoof(currentRoof))
     {
       ThingDef? stuff = integrity?.GetStuff(c);
       UnityEngine.Color? tint = null;
@@ -93,9 +158,9 @@ public static class RoofGrid_Patch
         }
       }
 
-      if (stuff == null && def.isNatural)
+      if (stuff == null && currentRoof.isNatural)
       {
-        stuff = RoofIntegrityGrid.GetStonyStuffForCell(def, c, ___map);
+        stuff = RoofIntegrityGrid.GetStonyStuffForCell(currentRoof, c, ___map);
       }
 
       if (stuff == null && GravshipPlacementUtility_SpawnRoofs_Patch.CurrentLandingGravship != null)
@@ -105,16 +170,16 @@ public static class RoofGrid_Patch
             GravshipPlacementUtility_SpawnRoofs_Patch.CurrentRoofData.TryGetValue(local, out var cellData))
         {
           stuff = cellData.stuff;
-          integrity?.InitializeRoof(c, def, stuff, cellData.glassTint, cellData.hitPoints);
+          integrity?.InitializeRoof(c, currentRoof, stuff, cellData.glassTint, cellData.hitPoints);
         }
         else
         {
-          integrity?.InitializeRoof(c, def, stuff, tint);
+          integrity?.InitializeRoof(c, currentRoof, stuff, tint);
         }
       }
       else
       {
-        integrity?.InitializeRoof(c, def, stuff, tint);
+        integrity?.InitializeRoof(c, currentRoof, stuff, tint);
       }
     }
     else
@@ -128,7 +193,7 @@ public static class RoofGrid_Patch
       {
         if (Find.Selector.SelectedObjects[i] is UI.SelectedRoof sr && sr.map == ___map && sr.cell == c)
         {
-          if (def == null || sr.def != def)
+          if (currentRoof == null || sr.def != currentRoof)
           {
             Find.Selector.Deselect(sr);
           }

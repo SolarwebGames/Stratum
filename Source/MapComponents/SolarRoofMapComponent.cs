@@ -4,6 +4,7 @@ using RimWorld;
 using Verse;
 
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -30,8 +31,12 @@ public class SolarRoofMapComponent : MapComponent
   {
     base.FinalizeInit();
     dirty = true;
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate += HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+      registry.Register<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
+    }
   }
 
   internal void AddSolarCellInternal(int index)
@@ -49,9 +54,14 @@ public class SolarRoofMapComponent : MapComponent
       netToSolarPower.Clear();
       cellToPower.Clear();
     }
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
-    Utilities.StratumHooks.OnCalculateEnergyGainRate -= HandleEnergyGainRate;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+      registry.Unregister<MapHookRegistry.PowerNetEnergyGainHandler>(MapHookRegistry.HookId.PowerNetEnergyGain, HandleEnergyGainRate);
+    }
   }
+
 
   private void HandleEnergyGainRate(PowerNet net, ref float energyGainRate)
   {
@@ -217,7 +227,7 @@ public class SolarRoofMapComponent : MapComponent
       return;
     }
 
-    if (map.gameConditionManager.ElectricityDisabled(map))
+    if (map.gameConditionManager != null && map.gameConditionManager.ElectricityDisabled(map))
     {
       lock (lockObject)
       {
@@ -305,6 +315,10 @@ public class SolarRoofMapComponent : MapComponent
           netToSolarPower = netResults;
           cellToPower = cellResults;
         }
+      }
+      catch (System.Exception ex)
+      {
+        StratumLog.Error($"Error in SolarRoofMapComponent background thread: {ex}");
       }
       finally
       {

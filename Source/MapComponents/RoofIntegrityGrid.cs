@@ -4,6 +4,7 @@ using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.MapComponents;
 
@@ -94,7 +95,11 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       ExecuteScan();
     }
 
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+    }
     if (map.areaManager != null)
     {
       map.areaManager.BuildRoof?.Clear();
@@ -125,7 +130,11 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void MapRemoved()
   {
     base.MapRemoved();
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+    var registry = MapHookRegistry.Get(map);
+    if (registry != null)
+    {
+      registry.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
+    }
   }
 
   private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
@@ -247,7 +256,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     var roof = map.roofGrid.RoofAt(cell);
     if (roof == null) return 0;
     int maxHp = RoofStatCache.GetMaxHitPoints(roof, GetStuff(cell));
-    maxHp = Utilities.StratumHooks.GetCellRoofMaxHitPointsOverride(map, cell, maxHp);
+    maxHp = MapHookRegistry.GetCellRoofMaxHitPoints(map, cell, maxHp);
     return (short)maxHp;
   }
 
@@ -282,17 +291,17 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
     var stuff = stuffDefs[index];
     float dt = RoofStatCache.GetDamageThreshold(roof, stuff);
-    dt = Utilities.StratumHooks.GetCellRoofDamageThresholdOverride(map, cell, dt);
+    dt = MapHookRegistry.GetCellRoofDamageThreshold(map, cell, dt);
 
     float ar = RoofStatCache.GetArmorRating(roof, stuff);
-    ar = Utilities.StratumHooks.GetCellRoofArmorRatingOverride(map, cell, ar);
+    ar = MapHookRegistry.GetCellRoofArmorRating(map, cell, ar);
 
     float effectiveDamage = amount;
 
     bool handled = false;
-    if (Utilities.StratumHooks.OnCalculateDamage != null)
+    if (MapHookRegistry.Get(map)?.GetHandlers<MapHookRegistry.RoofDamageCalculationHandler>(MapHookRegistry.HookId.RoofDamageCalculation) is List<MapHookRegistry.RoofDamageCalculationHandler> handlers)
     {
-      foreach (Utilities.StratumHooks.RoofDamageCalculationHandler handler in Utilities.StratumHooks.OnCalculateDamage.GetInvocationList())
+      foreach (var handler in handlers)
       {
         if (handler(roof, stuff, amount, penetration, dinfo, ref effectiveDamage))
         {

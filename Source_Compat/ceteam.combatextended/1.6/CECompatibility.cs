@@ -8,6 +8,7 @@ using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Utilities;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
 
 namespace SolarWeb.Stratum.Patches.CE;
 
@@ -17,7 +18,7 @@ public static class CECompatibility
   static CECompatibility()
   {
     BlockerRegistry.RegisterImpactSomethingCallback(ImpactSomethingCallback);
-    StratumHooks.OnCalculateDamage += CalculateCEDamage;
+    MapHookRegistry.RegisterGlobal(MapHookRegistry.HookId.CalculateCEDamage, CalculateCEDamage);
   }
 
   public static bool CalculateCEDamage(RoofDef roof, ThingDef? stuff, float amount, float penetration, DamageInfo? dinfo, ref float effectiveDamage)

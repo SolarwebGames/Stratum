@@ -3,6 +3,8 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Hooks;
+
 namespace SolarWeb.Stratum.MapComponents;
 
 public class SkylightCoating(Map map) : MapComponent(map)
@@ -21,7 +23,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
   public override void FinalizeInit()
   {
     base.FinalizeInit();
-    Utilities.StratumHooks.OnRoofChanged += Notify_StratumRoofChanged;
+    MapHookRegistry.Get(map)?.Register<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
   }
 
   private void ExecuteScan()
@@ -47,13 +49,17 @@ public class SkylightCoating(Map map) : MapComponent(map)
   public override void MapRemoved()
   {
     base.MapRemoved();
-    Utilities.StratumHooks.OnRoofChanged -= Notify_StratumRoofChanged;
+    MapHookRegistry.Get(map)?.Unregister<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged, Notify_StratumRoofChanged);
   }
 
   private void Notify_StratumRoofChanged(Map m, IntVec3 c, RoofDef? oldRoof, RoofDef? newRoof)
   {
     if (m != map) return;
     int idx = map.cellIndices.CellToIndex(c);
+
+    dirtLevels[idx] = 0f;
+    dirtColors[idx] = Color.white;
+    snowLevels[idx] = 0f;
 
     bool isNewSkylight = newRoof != null && Stats.RoofStatCache.IsSkylight(newRoof);
     if (isNewSkylight)
@@ -63,7 +69,6 @@ public class SkylightCoating(Map map) : MapComponent(map)
     else
     {
       activeSkylightCells.Remove(idx);
-      dirtLevels[idx] = 0f;
     }
 
     bool isVisible = newRoof != null && Stats.RoofStatCache.IsVisibleRoof(newRoof);
@@ -74,7 +79,6 @@ public class SkylightCoating(Map map) : MapComponent(map)
     else
     {
       activeVisibleRoofedCells.Remove(idx);
-      snowLevels[idx] = 0f;
     }
   }
 
