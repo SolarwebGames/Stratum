@@ -4,6 +4,7 @@ using UnityEngine;
 using Verse;
 
 using SolarWeb.Stratum.UI;
+using SolarWeb.Stratum.WorldComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -21,12 +22,17 @@ public static class SelectionDrawer_Patch
     if (obj is SelectedRoof sr)
     {
       Vector3 center = sr.cell.ToVector3Shifted();
-      SelectionDrawerUtility.CalculateSelectionBracketPositionsWorld(bracketLocs, sr, center, Vector2.one, SelectionDrawer.SelectTimes, Vector2.one);
+
+      float selectTime = RoofSelectionTracker.Instance.GetSelectTimeFor(sr);
+
+      float num = Mathf.Max(0f, 1f - (Time.realtimeSinceStartup - selectTime) / 0.07f);
+      float offset = num * 0.2f;
       float highY = AltitudeLayer.MetaOverlays.AltitudeFor() + 0.1f;
-      for (int i = 0; i < 4; i++)
-      {
-        bracketLocs[i].y = highY;
-      }
+
+      bracketLocs[0] = new Vector3(center.x - offset, highY, center.z - offset);
+      bracketLocs[1] = new Vector3(center.x + offset, highY, center.z - offset);
+      bracketLocs[2] = new Vector3(center.x + offset, highY, center.z + offset);
+      bracketLocs[3] = new Vector3(center.x - offset, highY, center.z + offset);
 
       int angle = 0;
       for (int i = 0; i < 4; i++)
@@ -38,3 +44,4 @@ public static class SelectionDrawer_Patch
     }
   }
 }
+
