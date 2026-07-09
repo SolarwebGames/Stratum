@@ -5,5 +5,6 @@
     <li IfModActive="CETeam.CombatExtended">Compat/ceteam.combatextended/1.6</li>
     <li IfModActive="ReBuild.COTR.DoorsAndCorners">Compat/rebuild.cotr.doorsandcorners/1.6</li>
     <li IfModActive="Dubwise.DubsSkylights">Compat/dubwise.dubsskylights/1.6</li>
+    <li IfModActive="sjaandi.realtiltmod">Compat/sjaandi.realtiltmod/1.6</li>
   </v1.6>
 </LoadFolders>

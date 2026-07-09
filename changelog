@@ -1,3 +1,7 @@
+0.10.5:
+API: Changed the hooks API.
+Compatibility: Added compatibility for Tilt the Planet to handle some lighting effect artifacts.
+
 0.10.3:
 Compatibility: Added native compatibility for Dubs Skylights. Dubs Skylights frames now provide a bonus to hitpoints and insulation when built under Stratum skylights.
 Bug Fix: Stratum was crashing under some circumstances due to a conflict with Adaptive Storage Framework.
