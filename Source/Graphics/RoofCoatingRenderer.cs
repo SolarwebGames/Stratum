@@ -11,6 +11,9 @@ public class RoofCoatingRenderer : SectionLayer
   private static Material[]? dirtMats;
   private static Material[] DirtMats => dirtMats ??= LoadMatsFromDef(ThingDefOf.Filth_Dirt);
 
+  private static readonly Color DustColor = new(0.22f, 0.18f, 0.13f);
+  private static readonly Color PollenColor = new(0.3f, 0.28f, 0.1f);
+
   private static Material? snowMat;
   private static Material SnowMat
   {
@@ -104,10 +107,19 @@ public class RoofCoatingRenderer : SectionLayer
         float dirt = skylightDirt.GetDirtLevel(c);
         if (dirt > 0.01f)
         {
-          Color dirtCol = skylightDirt.GetDirtColor(c);
+          Color dirtCol = DustColor;
           dirtCol.a = dirt * 0.95f;
           Material dMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
           DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.02f, c.z + 0.5f), Vector2.one, dMat, dirtCol, Rot4.North);
+        }
+
+        float pollen = skylightDirt.GetPollenLevel(c);
+        if (pollen > 0.01f)
+        {
+          Color pollenCol = PollenColor;
+          pollenCol.a = pollen * 0.95f;
+          Material pMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
+          DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.025f, c.z + 0.5f), Vector2.one, pMat, pollenCol, Rot4.North);
         }
       }
 

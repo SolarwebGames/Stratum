@@ -34,7 +34,6 @@ public class SkylightDeposit : IncidentWorker
     Season season = GenLocalDate.Season(map);
     bool isPollen = (season == Season.Spring || season == Season.Summer);
 
-    Color dirtColor = isPollen ? new Color(0.3f, 0.28f, 0.1f) : new Color(0.22f, 0.18f, 0.13f);
     IntVec3 firstCell = IntVec3.Invalid;
 
     foreach (var cell in room.Cells)
@@ -42,8 +41,15 @@ public class SkylightDeposit : IncidentWorker
       var roof = map.roofGrid.RoofAt(cell);
       if (roof != null && Stats.RoofStatCache.IsSkylight(roof))
       {
-        dirt.SetDirtLevel(cell, 1.0f, dirtColor);
-        
+        if (isPollen)
+        {
+          dirt.SetPollenLevel(cell, 1.0f);
+        }
+        else
+        {
+          dirt.SetDirtLevel(cell, 1.0f);
+        }
+
         if (!firstCell.IsValid) firstCell = cell;
 
         FilthMaker.TryMakeFilth(cell, map, ThingDefOf.Filth_Dirt, 1);
@@ -53,10 +59,10 @@ public class SkylightDeposit : IncidentWorker
     if (firstCell.IsValid)
     {
       string roomLabel = room.Role?.label ?? "room";
-      string label = isPollen 
-        ? "SolarWeb_Stratum_PollenCoating_Label".Translate() 
+      string label = isPollen
+        ? "SolarWeb_Stratum_PollenCoating_Label".Translate()
         : "SolarWeb_Stratum_DustCoating_Label".Translate();
-      string text = isPollen 
+      string text = isPollen
         ? "SolarWeb_Stratum_PollenCoating_Description".Translate(roomLabel)
         : "SolarWeb_Stratum_DustCoating_Description".Translate(roomLabel);
 
@@ -71,7 +77,7 @@ public class SkylightDeposit : IncidentWorker
   {
     room = null!;
     var rooms = map.regionGrid.AllRooms.Where(r => !r.PsychologicallyOutdoors && r.CellCount > 0);
-    
+
     List<Room> candidates = [];
     foreach (var r in rooms)
     {

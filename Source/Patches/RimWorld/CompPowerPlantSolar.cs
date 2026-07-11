@@ -3,6 +3,7 @@ using RimWorld;
 using Verse;
 
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.MapComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -27,11 +28,17 @@ public static class CompPowerPlantSolar_Patch
       }
       else
       {
-        totalPassage += RoofStatCache.GetTransparency(roof);
+        float transparency = RoofStatCache.GetTransparency(roof);
+        var coating = map.GetComponent<SkylightCoating>();
+        if (coating != null)
+        {
+          transparency *= (1f - coating.GetCoatingOpacity(item));
+        }
+        totalPassage += transparency;
       }
     }
 
-    __result = totalPassage / (float)totalCells;
+    __result = totalPassage / totalCells;
     return false;
   }
 }
