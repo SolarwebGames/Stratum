@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <JoyGiverDef>
+    <defName>SolarWeb-Stratum-GreenhouseGaze</defName>
+    <giverClass>SolarWeb.Stratum.JoyGivers.GreenhouseGaze</giverClass>
+    <baseChance>2.0</baseChance>
+    <detailToGainSign>Gazing from greenhouse</detailToGainSign>
+    <jobDef>SolarWeb-Stratum-GreenhouseGaze</jobDef>
+    <joyKind>Meditative</joyKind>
+  </JoyGiverDef>
+</Defs>

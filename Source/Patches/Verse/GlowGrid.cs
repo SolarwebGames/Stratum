@@ -1,15 +1,17 @@
 using HarmonyLib;
-using SolarWeb.Stratum.Stats;
-using SolarWeb.Stratum.Hooks;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
+using SolarWeb.Stratum.MapComponents;
+
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(GlowGrid))]
 public static class GlowGrid_Patch
 {
-  [HarmonyPatch(typeof(GlowGrid), nameof(GlowGrid.GroundGlowAt))]
+  [HarmonyPatch(nameof(GlowGrid.GroundGlowAt))]
   [HarmonyPrefix]
   [HarmonyBefore("realtiltmod")]
   public static bool GroundGlowAt_Prefix(GlowGrid __instance, IntVec3 c, ref float __result, bool ignoreCavePlants, bool ignoreSky, Map ___map)
@@ -44,6 +46,11 @@ public static class GlowGrid_Patch
     if (roof != null && RoofStatCache.IsSkylight(roof))
     {
       float transparency = RoofStatCache.GetTransparency(roof);
+      var coating = ___map.GetComponent<SkylightCoating>();
+      if (coating != null)
+      {
+        transparency *= (1f - coating.GetCoatingOpacity(c));
+      }
       if (transparency > 0f)
       {
         float skyGlow = ___map.skyManager.CurSkyGlow * transparency;

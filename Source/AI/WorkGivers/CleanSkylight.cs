@@ -31,7 +31,7 @@ public class CleanSkylight : WorkGiver_Scanner
       var roof = map.roofGrid.RoofAt(cell);
       if (roof != null && Stats.RoofStatCache.IsSkylight(roof))
       {
-        if (dirt.GetDirtLevel(cell) > 0.2f || dirt.GetSnowLevel(cell) > 0.2f)
+        if (dirt.GetDirtLevel(cell) + dirt.GetPollenLevel(cell) + dirt.GetSnowLevel(cell) > 0.2f)
         {
           yield return cell;
         }
@@ -56,7 +56,7 @@ public class CleanSkylight : WorkGiver_Scanner
     }
 
     var dirt = map.GetComponent<SkylightCoating>();
-    if (dirt == null || (dirt.GetDirtLevel(cell) <= 0.2f && dirt.GetSnowLevel(cell) <= 0.2f)) return false;
+    if (dirt == null || (dirt.GetDirtLevel(cell) + dirt.GetPollenLevel(cell) + dirt.GetSnowLevel(cell) <= 0.2f)) return false;
 
     var roof = map.roofGrid.RoofAt(cell);
     if (roof == null || !Stats.RoofStatCache.IsSkylight(roof)) return false;

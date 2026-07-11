@@ -45,7 +45,8 @@ public class CleanSkylight : JobDriver
       var dirt = pawn.Map?.GetComponent<SkylightCoating>();
       if (dirt != null)
       {
-        dirt.SetDirtLevel(Cell, 0f, Color.white);
+        dirt.SetDirtLevel(Cell, 0f);
+        dirt.SetPollenLevel(Cell, 0f);
         dirt.SetSnowLevel(Cell, 0f);
       }
     });

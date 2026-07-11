@@ -25,6 +25,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
   public HashSet<int> RoofsNeedingRepair => roofsNeedingRepair;
   internal short[] HitPointsArray => hitPoints;
+  internal UnityEngine.Color?[] GlassTintsArray => glassTints;
   internal ThingDef?[] StuffDefsArray => stuffDefs;
 
   public override void ExposeData()

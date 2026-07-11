@@ -83,8 +83,7 @@ public class LightPoolRenderer : SectionLayer
       float transparency = RoofStatCache.GetTransparency(roof);
       if (skylightDirt != null)
       {
-        float opacity = Mathf.Clamp01(skylightDirt.GetDirtLevel(c) + skylightDirt.GetSnowLevel(c));
-        transparency *= (1f - opacity);
+        transparency *= (1f - skylightDirt.GetCoatingOpacity(c));
       }
       if (transparency <= 0f) continue;
 
