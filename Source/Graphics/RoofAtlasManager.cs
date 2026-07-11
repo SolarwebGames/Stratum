@@ -93,7 +93,8 @@ public static class RoofAtlasManager
       var cutout = new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Cutout" };
       cutout.renderQueue = 4500;
 
-      var trans = MaterialPool.MatFrom(tex, ShaderDatabase.Transparent, Color.white);
+      var trans = new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Transparent" };
+      trans.renderQueue = 4500;
 
       mats = (cutout, trans);
       materialCache[tex] = mats;
