@@ -1,3 +1,6 @@
+0.10.6:
+Performance: Implemented per-frame caching for lighting overlays
+
 0.10.5:
 API: Changed the hooks API.
 Compatibility: Added compatibility for Tilt the Planet to handle some lighting effect artifacts.
