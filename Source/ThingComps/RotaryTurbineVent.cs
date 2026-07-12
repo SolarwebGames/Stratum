@@ -61,16 +61,16 @@ public class RotaryTurbineVent : ThingComp
       {
         float baseCooling = Props != null ? Props.baseCoolingCapacity : 12f;
         float cooling = baseCooling * windSpeed;
-        sb.Append("SolarWeb_Stratum_RotaryTurbineVent_CoolingRate".Translate(cooling.ToString("F1")));
+        sb.Append("SolarWeb_Stratum_RotaryTurbineVent_CoolingRate".Translate(cooling.ToStringTemperatureOffset("F1")));
       }
       else
       {
-        sb.Append("SolarWeb_Stratum_RotaryTurbineVent_NoCooling".Translate());
+        sb.Append("SolarWeb_Stratum_RotaryTurbineVent_NoCooling".Translate(0f.ToStringTemperatureOffset("F1")));
       }
     }
     else
     {
-      sb.Append("SolarWeb_Stratum_RotaryTurbineVent_NoRoom".Translate());
+      sb.Append("SolarWeb_Stratum_RotaryTurbineVent_NoRoom".Translate(0f.ToStringTemperatureOffset("F1")));
     }
 
     return sb.ToString().TrimEndNewlines();

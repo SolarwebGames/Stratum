@@ -1,6 +1,6 @@
 using HarmonyLib;
 using RimWorld;
-using Verse;
+using UnityEngine;
 
 using SolarWeb.Stratum.Utilities;
 
@@ -27,10 +27,11 @@ public static class CompScanner_Patch
     float addedProgress = currentProgress - __state;
     if (addedProgress > 0f)
     {
-      float multiplier = DefModExtensions.ScannerBooster.GetBoosterMultiplier(__instance.parent.Map, __instance.parent.Position);
-      if (multiplier > 1f)
+      float baseSpeed = addedProgress * 60000f;
+      float effectiveSpeed = ScannerBoosterUtility.GetScanSpeed(__instance.parent, baseSpeed);
+      if (!Mathf.Approximately(effectiveSpeed, baseSpeed))
       {
-        daysWorkingSinceLastFindingRef(__instance) = __state + (addedProgress * multiplier);
+        daysWorkingSinceLastFindingRef(__instance) = __state + (effectiveSpeed / 60000f);
       }
     }
   }
@@ -39,7 +40,6 @@ public static class CompScanner_Patch
   [HarmonyPrefix]
   public static void TickDoesFind_Prefix(CompScanner __instance, ref float scanSpeed)
   {
-    float multiplier = DefModExtensions.ScannerBooster.GetBoosterMultiplier(__instance.parent.Map, __instance.parent.Position);
-    scanSpeed *= multiplier;
+    scanSpeed = ScannerBoosterUtility.GetScanSpeed(__instance.parent, scanSpeed);
   }
 }

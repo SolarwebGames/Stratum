@@ -321,35 +321,53 @@
     <thingClass>SolarWeb.Stratum.Things.RetractableRoofConsole</thingClass>
     <tickerType>Normal</tickerType>
     <graphicData>
-      <texPath>Things/Building/Misc/CommsConsole</texPath>
+      <texPath>Things/Building/Misc/AncientTerminal/AncientTerminal</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(2,2)</drawSize>
+      <drawOffsetNorth>(0,0,0.9)</drawOffsetNorth>
+      <drawOffsetSouth>(0,0,-0.9)</drawOffsetSouth>
+      <drawOffsetWest>(-0.9,0,0)</drawOffsetWest>
+      <drawOffsetEast>(0.9,0,0)</drawOffsetEast>
       <damageData>
-        <cornerTL>Damage/Corner</cornerTL>
-        <cornerTR>Damage/Corner</cornerTR>
-        <cornerBL>Damage/Corner</cornerBL>
-        <cornerBR>Damage/Corner</cornerBR>
+        <enabled>false</enabled>
       </damageData>
+      <drawSize>(0.5,0.5)</drawSize>
     </graphicData>
-    <altitudeLayer>Building</altitudeLayer>
-    <passability>PassThroughOnly</passability>
-    <pathCost>50</pathCost>
-    <blockWind>true</blockWind>
-    <fillPercent>0.5</fillPercent>
-    <canOverlapZones>false</canOverlapZones>
+    <altitudeLayer>BuildingOnTop</altitudeLayer>
+    <passability>Standable</passability>
+    <terrainAffordanceNeeded IsNull="True" />
+    <pathCost>0</pathCost>
     <statBases>
-      <MaxHitPoints>250</MaxHitPoints>
-      <WorkToBuild>2000</WorkToBuild>
-      <Mass>20</Mass>
-      <Flammability>0.5</Flammability>
+      <MaxHitPoints>50</MaxHitPoints>
+      <WorkToBuild>3000</WorkToBuild>
+      <Mass>10</Mass>
     </statBases>
-    <size>(2,2)</size>
+    <size>(1,1)</size>
     <costList>
-      <Steel>100</Steel>
-      <Plasteel>30</Plasteel>
+      <Steel>150</Steel>
+      <Plasteel>15</Plasteel>
       <ComponentIndustrial>3</ComponentIndustrial>
-      <ComponentSpacer>1</ComponentSpacer>
     </costList>
+    <altitudeLayer>BuildingOnTop</altitudeLayer>
+    <statBases>
+      <MarketValue>200</MarketValue>
+      <MaxHitPoints>80</MaxHitPoints>
+      <WorkToBuild>2000</WorkToBuild>
+      <Mass>8</Mass>
+    </statBases>
+    <minifiedDrawOffset>(0, 0, 0.2)</minifiedDrawOffset>
+    <building>
+      <isEdifice>false</isEdifice>
+      <isAttachment>true</isAttachment>
+      <expandHomeArea>false</expandHomeArea>
+    </building>
+    <placeWorkers>
+      <li>Placeworker_AttachedToWall</li>
+    </placeWorkers>
+    <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+    <researchPrerequisites>
+      <li>MicroelectronicsBasics</li>
+      <li>Fabrication</li>
+    </researchPrerequisites>
     <comps>
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
@@ -357,14 +375,6 @@
       </li>
       <li Class="CompProperties_Flickable" />
     </comps>
-    <interactionCellOffset>(0,0,1)</interactionCellOffset>
-    <hasInteractionCell>true</hasInteractionCell>
-    <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
-    <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
-    <researchPrerequisites>
-      <li>MicroelectronicsBasics</li>
-      <li>Fabrication</li>
-    </researchPrerequisites>
   </ThingDef>
 
 </Defs>

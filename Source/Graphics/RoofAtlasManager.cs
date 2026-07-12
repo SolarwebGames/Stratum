@@ -24,6 +24,7 @@ public static class RoofAtlasManager
   public static readonly Dictionary<string, AtlasEntry> uvMap = [];
   private static readonly Dictionary<(Texture2D, Color), (Material cutout, Material transparent)> materialColorCache = [];
   private static readonly Dictionary<Texture2D, Material> metaOverlayCache = [];
+  private static readonly Dictionary<(Texture2D, Color), (Material cutout, Material transparent)> transitionMaterialCache = [];
 
   public static void Initialize()
   {
@@ -136,6 +137,29 @@ public static class RoofAtlasManager
         new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Transparent", renderQueue = 2901 }
       );
       materialColorCache[(tex, color)] = mats;
+    }
+    return mats;
+  }
+
+  public static (Material cutout, Material transparent) GetTransitionMaterials(string path, Color color)
+  {
+    var entry = GetOrCreateEntry(path);
+    return GetTransitionMaterials(entry.BaseTexture, color);
+  }
+
+  private static (Material cutout, Material transparent) GetTransitionMaterials(Texture2D tex, Color color)
+  {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
+    if (!transitionMaterialCache.TryGetValue((tex, color), out var mats))
+    {
+      mats = (
+        new Material(ShaderDatabase.Cutout) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Cutout_Transition", renderQueue = 3165 },
+        new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Transparent_Transition", renderQueue = 3166 }
+      );
+      transitionMaterialCache[(tex, color)] = mats;
     }
     return mats;
   }

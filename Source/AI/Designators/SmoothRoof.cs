@@ -1,6 +1,7 @@
 using UnityEngine;
 using Verse;
 using RimWorld;
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.AI.Designators;
 
@@ -40,6 +41,12 @@ public class SmoothRoof : Designator_Smooth
     if (roof == null || (roof != RoofDefOf.RoofRockThin && roof != RoofDefOf.RoofRockThick))
     {
       return "SolarWeb_Stratum_MessageMustDesignateNaturalRoof".Translate();
+    }
+
+    var smoothedRoof = GetSmoothedVersion(roof);
+    if (!RoofBuildings.IsRoofValidForExistingBuildings(smoothedRoof, Map, c))
+    {
+      return "RoofAttachmentNotSupported".Translate();
     }
 
     if (Map.designationManager.DesignationAt(c, DefOf.DesignationDefOf.SmoothRoof) != null)

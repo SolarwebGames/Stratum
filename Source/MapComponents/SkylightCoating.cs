@@ -116,12 +116,18 @@ public class SkylightCoating(Map map) : MapComponent(map)
     return Mathf.Clamp01(dirtLevels[idx] + pollenLevels[idx] + snowLevels[idx]);
   }
 
+  private void NotifyCoatingChanged(IntVec3 cell)
+  {
+    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.GroundGlow);
+  }
+
   public void SetDirtLevel(IntVec3 cell, float level)
   {
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
     dirtLevels[idx] = Mathf.Clamp01(level);
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
   }
 
   public void SetDirtLevel(IntVec3 cell, float level, Color color)
@@ -130,7 +136,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     int idx = map.cellIndices.CellToIndex(cell);
     dirtLevels[idx] = Mathf.Clamp01(level);
     dirtColors[idx] = color;
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
   }
 
   public void SetPollenLevel(IntVec3 cell, float level)
@@ -138,7 +144,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
     pollenLevels[idx] = Mathf.Clamp01(level);
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
   }
 
   public void SetSnowLevel(IntVec3 cell, float level)
@@ -146,7 +152,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
     snowLevels[idx] = Mathf.Clamp01(level);
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
   }
 
   public override void MapComponentTick()
@@ -183,7 +189,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           if (curPollen < 1f)
           {
             pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
-            map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+            NotifyCoatingChanged(cell);
           }
         }
         else
@@ -192,7 +198,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           if (curDirt < 1f)
           {
             dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
-            map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+            NotifyCoatingChanged(cell);
           }
         }
       }
@@ -207,7 +213,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
         if (Rand.Value < curDirt * 0.10f)
         {
           dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
-          map.mapDrawer.MapMeshDirty(map.cellIndices.IndexToCell(idx), MapMeshFlagDefOf.Roofs);
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
 
@@ -217,7 +223,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
         if (Rand.Value < curPollen * 0.10f)
         {
           pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
-          map.mapDrawer.MapMeshDirty(map.cellIndices.IndexToCell(idx), MapMeshFlagDefOf.Roofs);
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
     }
@@ -243,7 +249,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
         }
         if (dirty)
         {
-          map.mapDrawer.MapMeshDirty(map.cellIndices.IndexToCell(idx), MapMeshFlagDefOf.Roofs);
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
     }

@@ -39,6 +39,8 @@ public class OnRoof : PlaceWorker
 
     foreach (IntVec3 cell in rect)
     {
+      if (!cell.InBounds(map)) return false;
+
       if (!map.roofGrid.Roofed(cell) || (map.areaManager?.NoRoof != null && map.areaManager.NoRoof[cell]))
       {
         return new AcceptanceReport("MustPlaceOnRoof".Translate());
@@ -62,6 +64,21 @@ public class OnRoof : PlaceWorker
           if (attachmentType == RoofAttachmentType.Rooftop && !roofExt.allowRooftopAttachments)
           {
             return new AcceptanceReport("RoofAttachmentNotSupported".Translate());
+          }
+        }
+      }
+
+      var thingList = cell.GetThingList(map);
+      for (int i = 0; i < thingList.Count; i++)
+      {
+        var t = thingList[i];
+        if (t == thingToIgnore || t == thing) continue;
+
+        if (RoofBuildings.IsRoofBuildingOrBlueprintOrFrame(t))
+        {
+          if (RoofBuildings.GetAttachmentType(t) == attachmentType)
+          {
+            return new AcceptanceReport("SpaceAlreadyOccupied".Translate());
           }
         }
       }

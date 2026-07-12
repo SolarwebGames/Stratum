@@ -26,6 +26,10 @@ public class RetractableRoofConsole : Building
   private RetractableRoofTracker? cachedTracker;
   private RoofIntegrityGrid? cachedIntegrityGrid;
   private RetractableRoofAnimator? cachedAnimator;
+  private readonly HashSet<IntVec3> simulatedRetracted = [];
+  private readonly HashSet<IntVec3> cellsToCheck = [];
+  private readonly Queue<IntVec3> supportCheckQueue = new();
+  private readonly HashSet<IntVec3> supportCheckVisited = [];
 
   public override void SpawnSetup(Map map, bool respawningAfterLoad)
   {
@@ -439,6 +443,42 @@ public class RetractableRoofConsole : Building
                 continue;
               }
 
+              // Check if retracting this cell would leave any other roof tile unsupported
+              bool wouldCauseCollapse = false;
+              simulatedRetracted.Clear();
+              simulatedRetracted.Add(cell);
+ 
+              cellsToCheck.Clear();
+              foreach (var c in canopyCells)
+              {
+                if (Map.roofGrid.RoofAt(c) != null && c != cell)
+                {
+                  cellsToCheck.Add(c);
+                }
+                for (int i = 0; i < 8; i++)
+                {
+                  IntVec3 adj = c + GenAdj.AdjacentCells[i];
+                  if (adj.InBounds(Map) && !canopyCells.Contains(adj) && Map.roofGrid.RoofAt(adj) != null)
+                  {
+                    cellsToCheck.Add(adj);
+                  }
+                }
+              }
+ 
+              foreach (var c in cellsToCheck)
+              {
+                if (IsCellSupported(c) && !IsCellSupported(c, simulatedRetracted))
+                {
+                  wouldCauseCollapse = true;
+                  break;
+                }
+              }
+
+              if (wouldCauseCollapse)
+              {
+                continue;
+              }
+
               var stuff = integrityGrid?.GetStuff(cell);
               var tint = integrityGrid?.GetGlassTint(cell);
               var hp = integrityGrid?.GetHitPoints(cell) ?? (short)180;
@@ -486,10 +526,13 @@ public class RetractableRoofConsole : Building
                       color.a = 1f - RoofStatCache.GetTransparency(roof);
                     }
                     
-                    var mats = Graphics.RoofAtlasManager.GetMaterials(gd.texPath, color);
-                    Material mat = RoofStatCache.IsSkylight(roof) ? mats.transparent : mats.cutout;
+                    var mats = Graphics.RoofAtlasManager.GetTransitionMaterials(gd.texPath, color);
+                    Material mat = roof.isNatural
+                      ? Graphics.RoofAtlasManager.GetMetaOverlay(gd.texPath)
+                      : (RoofStatCache.IsSkylight(roof) ? mats.transparent : mats.cutout);
                     
-                    animator.AddTransition(start, end, animationDuration, mat, color, uvs);
+                    Color vertexColor = roof.isNatural ? color : Color.white;
+                    animator.AddTransition(start, end, animationDuration, mat, vertexColor, uvs);
                   }
                 }
               }
@@ -545,10 +588,13 @@ public class RetractableRoofConsole : Building
                         color.a = 1f - RoofStatCache.GetTransparency(rDef);
                       }
                       
-                      var mats = Graphics.RoofAtlasManager.GetMaterials(gd.texPath, color);
-                      Material mat = RoofStatCache.IsSkylight(rDef) ? mats.transparent : mats.cutout;
+                      var mats = Graphics.RoofAtlasManager.GetTransitionMaterials(gd.texPath, color);
+                      Material mat = rDef.isNatural
+                        ? Graphics.RoofAtlasManager.GetMetaOverlay(gd.texPath)
+                        : (RoofStatCache.IsSkylight(rDef) ? mats.transparent : mats.cutout);
                       
-                      animator.AddTransition(start, end, animationDuration, mat, color, uvs);
+                      Color vertexColor = rDef.isNatural ? color : Color.white;
+                      animator.AddTransition(start, end, animationDuration, mat, vertexColor, uvs);
                     }
                   }
                 }
@@ -581,5 +627,68 @@ public class RetractableRoofConsole : Building
       StratumLog.Error($"Error in RetractableRoofConsole.Tick: {ex}");
       isTransitioning = false;
     }
+  }
+
+  private bool IsRoofHolder(IntVec3 c)
+  {
+    if (Map == null) return false;
+    Building edifice = c.GetEdifice(Map);
+    return edifice != null && edifice.def != null && edifice.def.holdsRoof;
+  }
+
+  private bool IsCellSupported(IntVec3 startCell, HashSet<IntVec3>? simulatedRetracted = null)
+  {
+    if (Map?.roofGrid == null) return false;
+    if (IsRoofHolder(startCell)) return true;
+
+    supportCheckQueue.Clear();
+    supportCheckVisited.Clear();
+
+    supportCheckQueue.Enqueue(startCell);
+    supportCheckVisited.Add(startCell);
+
+    while (supportCheckQueue.Count > 0)
+    {
+      IntVec3 curr = supportCheckQueue.Dequeue();
+
+      if (IsRoofHolder(curr))
+      {
+        if (ChebyshevDistance(startCell, curr) <= 6)
+        {
+          return true;
+        }
+      }
+
+      for (int i = 0; i < 4; i++)
+      {
+        IntVec3 n = curr + GenAdj.CardinalDirections[i];
+        if (!n.InBounds(Map)) continue;
+
+        if (IsRoofHolder(n))
+        {
+          if (ChebyshevDistance(startCell, n) <= 6)
+          {
+            return true;
+          }
+        }
+
+        if (!supportCheckVisited.Contains(n))
+        {
+          var roof = Map.roofGrid.RoofAt(n);
+          if (roof != null && (simulatedRetracted == null || !simulatedRetracted.Contains(n)))
+          {
+            supportCheckVisited.Add(n);
+            supportCheckQueue.Enqueue(n);
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private static int ChebyshevDistance(IntVec3 a, IntVec3 b)
+  {
+    return Mathf.Max(Mathf.Abs(a.x - b.x), Mathf.Abs(a.z - b.z));
   }
 }

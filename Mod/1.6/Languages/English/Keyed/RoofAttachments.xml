@@ -18,7 +18,7 @@
   <SolarWeb_Stratum_SpeakerDisconnected>Transmitter Connection: Disconnected</SolarWeb_Stratum_SpeakerDisconnected>
   <SolarWeb_Stratum_AeroponicsMisterBoost>Aeroponics Mister</SolarWeb_Stratum_AeroponicsMisterBoost>
 
-  <SolarWeb_Stratum_RotaryTurbineVent_CoolingRate>Current cooling rate: {0} heat/s</SolarWeb_Stratum_RotaryTurbineVent_CoolingRate>
-  <SolarWeb_Stratum_RotaryTurbineVent_NoCooling>Current cooling rate: 0.0 heat/s (room not warmer than outside)</SolarWeb_Stratum_RotaryTurbineVent_NoCooling>
-  <SolarWeb_Stratum_RotaryTurbineVent_NoRoom>Current cooling rate: 0.0 heat/s (no room or outdoors)</SolarWeb_Stratum_RotaryTurbineVent_NoRoom>
+  <SolarWeb_Stratum_RotaryTurbineVent_CoolingRate>Current cooling rate: {0}/s</SolarWeb_Stratum_RotaryTurbineVent_CoolingRate>
+  <SolarWeb_Stratum_RotaryTurbineVent_NoCooling>Current cooling rate: {0}/s (room not warmer than outside)</SolarWeb_Stratum_RotaryTurbineVent_NoCooling>
+  <SolarWeb_Stratum_RotaryTurbineVent_NoRoom>Current cooling rate: {0}/s (no room or outdoors)</SolarWeb_Stratum_RotaryTurbineVent_NoRoom>
 </LanguageData>

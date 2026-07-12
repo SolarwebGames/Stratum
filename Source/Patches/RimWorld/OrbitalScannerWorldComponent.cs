@@ -3,6 +3,7 @@ using HarmonyLib;
 using RimWorld.Planet;
 using Verse;
 
+using SolarWeb.Stratum.Hooks;
 using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches.RimWorld;
@@ -26,7 +27,7 @@ public static class OrbitalScannerWorldComponent_Patch
       var scanner = ___workingScanners[i] as ThingComp;
       if (scanner != null && scanner.parent != null)
       {
-        float mult = DefModExtensions.ScannerBooster.GetBoosterMultiplier(scanner.parent.Map, scanner.parent.Position);
+        float mult = ScannerBoosterUtility.GetScanSpeed(scanner.parent, 1f);
         totalWeight += mult;
       }
     }
@@ -44,6 +45,6 @@ public static class OrbitalScannerWorldComponent_Patch
     }
     ___workingScanners.Clear();
 
-    return false; // Skip original
+    return false;
   }
 }

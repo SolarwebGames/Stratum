@@ -34,7 +34,14 @@ public class GrowthBooster : ThingComp
     {
       if (Rand.Value < 0.3f)
       {
-        FleckMaker.ThrowSmoke(parent.DrawPos, parent.Map, Rand.Range(0.6f, 1.0f));
+        for (int i = 0; i < 3; i++)
+        {
+          var pos = parent.Position + GenRadial.RadialPattern[Rand.Range(0, GenRadial.RadialPattern.Length)];
+          if (pos.InBounds(parent.Map))
+          {
+            FleckMaker.ThrowSmoke(pos.ToVector3Shifted(), parent.Map, Rand.Range(0.6f, 1.0f));
+          }
+        }
       }
     }
   }

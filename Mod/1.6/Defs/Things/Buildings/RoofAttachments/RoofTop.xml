@@ -7,7 +7,7 @@
     <description>A copper rod mounted on top of a roof. Attracts lightning strikes within the colony, safely converting the electrical discharge into power stored directly in connected batteries.</description>
     <thingClass>Building</thingClass>
     <graphicData>
-      <texPath>Things/Building/Misc/FirefoamPopper</texPath>
+      <texPath>Things/Building/Joy/HorseshoesPin</texPath>
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(0.5, 1)</drawSize>
       <color>(55, 55, 55)</color>
@@ -51,65 +51,17 @@
   </ThingDef>
 
   <ThingDef ParentName="BuildingBase">
-    <defName>SolarWeb-Stratum-WindTurbine_Rooftop</defName>
-    <label>rooftop wind turbine</label>
-    <description>A compact vertical-axis wind turbine mounted on a roof. Generates power based on the map's wind speed, without requiring clear ground paths.</description>
-    <thingClass>Building</thingClass>
-    <graphicData>
-      <texPath>Things/Building/Power/WindTurbine/WindTurbineBody</texPath>
-      <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(3,1)</drawSize>
-    </graphicData>
-    <rotatable>false</rotatable>
-    <altitudeLayer>Building</altitudeLayer>
-    <passability>Standable</passability>
-    <pathCost>0</pathCost>
-    <size>(3,1)</size>
-    <building>
-      <isEdifice>false</isEdifice>
-    </building>
-    <statBases>
-      <MaxHitPoints>120</MaxHitPoints>
-      <WorkToBuild>1500</WorkToBuild>
-      <Flammability>0.1</Flammability>
-    </statBases>
-    <costList>
-      <Steel>100</Steel>
-      <ComponentIndustrial>3</ComponentIndustrial>
-    </costList>
-    <comps>
-      <li Class="CompProperties_Power">
-        <compClass>SolarWeb.Stratum.ThingComps.RooftopWindTurbine</compClass>
-        <basePowerConsumption>0</basePowerConsumption>
-        <transmitsPower>true</transmitsPower>
-      </li>
-    </comps>
-    <designationCategory>Power</designationCategory>
-    <uiOrder>2120</uiOrder>
-    <constructEffect>ConstructMetal</constructEffect>
-    <placeWorkers>
-      <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
-    </placeWorkers>
-    <modExtensions>
-      <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
-        <attachmentType>Rooftop</attachmentType>
-        <minifyOnRoofLoss>false</minifyOnRoofLoss>
-        <destroyOnRoofLoss>true</destroyOnRoofLoss>
-      </li>
-    </modExtensions>
-  </ThingDef>
-
-  <ThingDef ParentName="BuildingBase">
     <defName>SolarWeb-Stratum-RooftopScannerBooster</defName>
     <label>rooftop scan booster</label>
     <description>A high-gain tracking dish antenna mounted on the roof. By linking with advanced scanning arrays like long-range mineral scanners and orbital signals consoles, it boosts their scanning and signal acquisition speeds. Must be powered to function.</description>
     <thingClass>Building</thingClass>
     <graphicData>
-      <texPath>Things/Building/Ruins/AncientLamppost</texPath>
-      <graphicClass>Graphic_Random</graphicClass>
-      <drawSize>(1,1)</drawSize>
+      <texPath>Things/Building/Ruins/AncientMegacannonTripod/AncientMegacannonTripodA</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(2,2)</drawSize>
       <color>(160, 160, 180)</color>
     </graphicData>
+    <size>(2,2)</size>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
@@ -119,8 +71,9 @@
     </building>
     <statBases>
       <MaxHitPoints>120</MaxHitPoints>
-      <WorkToBuild>2500</WorkToBuild>
+      <WorkToBuild>4000</WorkToBuild>
       <Flammability>0.1</Flammability>
+      <SolarWeb-Stratum-ScanSpeed>0.5</SolarWeb-Stratum-ScanSpeed>
     </statBases>
     <costList>
       <Steel>80</Steel>
@@ -130,11 +83,21 @@
     <comps>
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
-        <basePowerConsumption>120</basePowerConsumption>
+        <basePowerConsumption>600</basePowerConsumption>
         <transmitsPower>true</transmitsPower>
       </li>
-      <li>
+      <li Class="SolarWeb.Stratum.CompProperties.ScannerBooster">
         <compClass>SolarWeb.Stratum.ThingComps.ScannerBooster</compClass>
+        <scanSpeedOffset>0.1</scanSpeedOffset>
+        <range>10</range>
+      </li>
+      <li Class="CompProperties_Facility">
+        <statOffsets>
+          <SolarWeb-Stratum-ScanSpeed>0.1</SolarWeb-Stratum-ScanSpeed>
+        </statOffsets>
+        <maxSimultaneous>1</maxSimultaneous>
+        <maxDistance>10</maxDistance>
+        <requiresLOS>false</requiresLOS>
       </li>
     </comps>
     <designationCategory>Misc</designationCategory>
@@ -143,16 +106,13 @@
     <placeWorkers>
       <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
       <li>SolarWeb.Stratum.AI.PlaceWorkers.PlaceWorker_ScannerBooster</li>
+      <li>PlaceWorker_ShowFacilitiesConnections</li>
     </placeWorkers>
     <modExtensions>
       <li Class="SolarWeb.Stratum.DefModExtensions.RoofBuilding">
         <attachmentType>Rooftop</attachmentType>
         <minifyOnRoofLoss>false</minifyOnRoofLoss>
         <destroyOnRoofLoss>true</destroyOnRoofLoss>
-      </li>
-      <li Class="SolarWeb.Stratum.DefModExtensions.ScannerBooster">
-        <scanSpeedMultiplier>1.5</scanSpeedMultiplier>
-        <range>20</range>
       </li>
     </modExtensions>
     <researchPrerequisites>
@@ -166,9 +126,12 @@
     <description>A vent with a built-in rotary turbine designed to pull hot air out of the room below it without using any power. Wind drives the turbine, so in periods of low wind this provides little benefit.</description>
     <thingClass>Building</thingClass>
     <graphicData>
-      <texPath>Things/Building/Misc/TempControl/Vent</texPath>
+      <texPath>Things/Building/Production/DeepDrill</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
+      <color>(155, 155, 155)</color>
+      <drawSize>(1,0.5)</drawSize>
     </graphicData>
+    <size>(1,1)</size>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>

@@ -78,7 +78,7 @@
     <stages>
       <li>
         <statOffsets>
-          <RestFallRateFactor>0.95</RestFallRateFactor>
+          <RestFallRateFactor>-0.05</RestFallRateFactor>
         </statOffsets>
       </li>
     </stages>

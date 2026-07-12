@@ -10,7 +10,6 @@
       <Beauty>-1.0</Beauty>
       <Flammability>1.5</Flammability>
       <SolarWeb-Stratum-Insulation>0.7</SolarWeb-Stratum-Insulation>
-      <SolarWeb-Stratum-Transparency>0.2</SolarWeb-Stratum-Transparency>
       <SolarWeb-Stratum-ThermalConductivity>0.3</SolarWeb-Stratum-ThermalConductivity>
     </statBases>
     <uiOrder>2000</uiOrder>
@@ -59,7 +58,6 @@
       <Beauty>-0.5</Beauty>
       <Flammability>1.5</Flammability>
       <SolarWeb-Stratum-Insulation>0.8</SolarWeb-Stratum-Insulation>
-      <SolarWeb-Stratum-Transparency>0.1</SolarWeb-Stratum-Transparency>
       <SolarWeb-Stratum-ThermalConductivity>0.2</SolarWeb-Stratum-ThermalConductivity>
       <SolarWeb-Stratum-DamageThreshold>1</SolarWeb-Stratum-DamageThreshold>
       <SolarWeb-Stratum-ArmorRating>0.05</SolarWeb-Stratum-ArmorRating>
@@ -166,7 +164,7 @@
       <WorkToBuild>250</WorkToBuild>
       <Beauty>2.0</Beauty>
       <SolarWeb-Stratum-Insulation>0.2</SolarWeb-Stratum-Insulation>
-      <SolarWeb-Stratum-Transparency>0.7</SolarWeb-Stratum-Transparency>
+      <SolarWeb-Stratum-Transparency>0.8</SolarWeb-Stratum-Transparency>
       <SolarWeb-Stratum-ThermalConductivity>0.8</SolarWeb-Stratum-ThermalConductivity>
       <SolarWeb-Stratum-ArmorRating>0.05</SolarWeb-Stratum-ArmorRating>
     </statBases>

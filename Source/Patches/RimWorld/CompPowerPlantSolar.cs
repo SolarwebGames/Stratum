@@ -43,12 +43,7 @@ public static class CompPowerPlantSolar_Patch
       }
       else
       {
-        float transparency = RoofStatCache.GetTransparency(roof);
-        var coating = map.GetComponent<SkylightCoating>();
-        if (coating != null)
-        {
-          transparency *= (1f - coating.GetCoatingOpacity(item));
-        }
+        float transparency = RoofStatCache.GetEffectiveTransparency(roof, map, item);
         totalPassage += transparency;
       }
     }

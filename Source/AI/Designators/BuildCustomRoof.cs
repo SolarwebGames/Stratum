@@ -20,7 +20,15 @@ public class BuildCustomRoof : Designator_Build
   private readonly BuildableRoofExtension ext;
   private Color? selectedTint;
 
-  public Color? SelectedTint => selectedTint;
+  public Color? SelectedTint
+  {
+    get => selectedTint;
+    set
+    {
+      selectedTint = value;
+      UpdateIcon();
+    }
+  }
   public override DrawStyleCategoryDef DrawStyleCategory => DrawStyleCategoryDefOf.Floors;
   protected override DesignationDef Designation => null!;
 
@@ -187,6 +195,11 @@ public class BuildCustomRoof : Designator_Build
           return "MessageRoofIncompatibleWithPlant".Translate(thing);
         }
       }
+    }
+
+    if (!RoofBuildings.IsRoofValidForExistingBuildings(roofDef, Map, c))
+    {
+      return "RoofAttachmentNotSupported".Translate();
     }
 
     return AcceptanceReport.WasAccepted;

@@ -160,6 +160,40 @@ public static class RoofBuildings
     return false;
   }
 
+  public static bool IsRoofValidForExistingBuildings(RoofDef roofDef, Map map, IntVec3 cell)
+  {
+    if (roofDef == null || map == null || !cell.InBounds(map)) return true;
+    var thingList = cell.GetThingList(map);
+    if (thingList == null) return true;
+
+    for (int i = 0; i < thingList.Count; i++)
+    {
+      var thing = thingList[i];
+      if (IsRoofBuildingOrBlueprintOrFrame(thing))
+      {
+        var attachmentType = GetAttachmentType(thing);
+        if (roofDef.isNatural && attachmentType == RoofAttachmentType.Rooftop)
+        {
+          return false;
+        }
+
+        var roofExt = roofDef.GetModExtension<BuildableRoofExtension>();
+        if (roofExt != null)
+        {
+          if (attachmentType == RoofAttachmentType.Hanging && !roofExt.allowHangingAttachments)
+          {
+            return false;
+          }
+          if (attachmentType == RoofAttachmentType.Rooftop && !roofExt.allowRooftopAttachments)
+          {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
   public static bool HasNonMinifiableRoofBuildingAt(Map map, IntVec3 cell)
   {
     if (map == null || !cell.InBounds(map)) return false;
@@ -329,7 +363,7 @@ public static class RoofBuildings
     {
       var typeNew = newDef.GetModExtension<RoofBuilding>().attachmentType;
       var typeOld = oldDef.GetModExtension<RoofBuilding>().attachmentType;
-      if (typeNew != typeOld)
+      if (typeNew == typeOld)
       {
         return false;
       }

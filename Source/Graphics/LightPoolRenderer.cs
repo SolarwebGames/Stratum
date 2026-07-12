@@ -80,11 +80,7 @@ public class LightPoolRenderer : SectionLayer
       RoofDef roof = roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
 
-      float transparency = RoofStatCache.GetTransparency(roof);
-      if (skylightDirt != null)
-      {
-        transparency *= (1f - skylightDirt.GetCoatingOpacity(c));
-      }
+      float transparency = RoofStatCache.GetEffectiveTransparency(roof, map, c);
       if (transparency <= 0f) continue;
 
       Color glassColor = RoofStatCache.GetColor(roof);

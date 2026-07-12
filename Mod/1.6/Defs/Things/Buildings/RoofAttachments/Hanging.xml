@@ -22,7 +22,7 @@
       <Mass>4.5</Mass>
     </statBases>
     <costList>
-      <Steel>40</Steel>
+      <Steel>60</Steel>
     </costList>
     <uiOrder>2995</uiOrder>
     <comps>
@@ -34,7 +34,7 @@
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
         <shortCircuitInRain>true</shortCircuitInRain>
-        <basePowerConsumption>2900</basePowerConsumption>
+        <basePowerConsumption>3000</basePowerConsumption>
       </li>
       <li Class="CompProperties_Schedule">
         <startTime>0.25</startTime>
@@ -83,12 +83,12 @@
     </building>
     <statBases>
       <MaxHitPoints>80</MaxHitPoints>
-      <WorkToBuild>800</WorkToBuild>
+      <WorkToBuild>1500</WorkToBuild>
       <Flammability>0</Flammability>
       <Mass>2.5</Mass>
     </statBases>
     <costList>
-      <Steel>30</Steel>
+      <Steel>75</Steel>
       <ComponentIndustrial>1</ComponentIndustrial>
     </costList>
     <comps>
@@ -152,7 +152,7 @@
     </researchPrerequisites>
   </ThingDef>
 
-  <ThingDef ParentName="BuildingBase">
+  <ThingDef ParentName="LampBase">
     <defName>SolarWeb-Stratum-LEDLight_Hanging</defName>
     <label>hanging LED lamp</label>
     <description>A low-profile lighting fixture suspended from the ceiling.</description>
@@ -169,6 +169,7 @@
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
+    <terrainAffordanceNeeded IsNull="True" />
     <pathCost>0</pathCost>
     <building>
       <isEdifice>false</isEdifice>
@@ -180,7 +181,6 @@
     </statBases>
     <costList>
       <Steel>15</Steel>
-      <ComponentIndustrial>1</ComponentIndustrial>
     </costList>
     <comps>
       <li Class="CompProperties_Power">
@@ -204,9 +204,6 @@
     <uiOrder>2852</uiOrder>
     <constructEffect>ConstructMetal</constructEffect>
     <minifiedDef>MinifiedThing</minifiedDef>
-    <thingCategories>
-      <li>BuildingsFurniture</li>
-    </thingCategories>
     <placeWorkers>
       <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
     </placeWorkers>
@@ -225,11 +222,12 @@
     <description>A small speaker suspended from the ceiling. Receives audio feeds from a powered PA Transmitter console on the same power grid and broadcasts transmissions to nearby colonists.</description>
     <thingClass>SolarWeb.Stratum.Things.BroadcastSpeaker</thingClass>
     <graphicData>
-      <texPath>Things/Building/Special/PsychicEmanator</texPath>
+      <texPath>Things/Building/Misc/PassiveCooler</texPath>
       <graphicClass>Graphic_Single</graphicClass>
-      <drawSize>(0.5,0.5)</drawSize>
+      <drawSize>(0.5,1)</drawSize>
+      <color>(55, 55, 55)</color>
     </graphicData>
-    <defaultPlacingRot>South</defaultPlacingRot>
+    <defaultPlacingRot>North</defaultPlacingRot>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
@@ -251,7 +249,7 @@
     <comps>
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
-        <basePowerConsumption>15</basePowerConsumption>
+        <basePowerConsumption>50</basePowerConsumption>
         <transmitsPower>false</transmitsPower>
       </li>
     </comps>
@@ -260,7 +258,7 @@
     <constructEffect>ConstructMetal</constructEffect>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories>
-      <li>BuildingsFurniture</li>
+      <li>BuildingsJoy</li>
     </thingCategories>
     <placeWorkers>
       <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
@@ -283,20 +281,11 @@
     <description>A console used to broadcast audio programs to all speakers connected on the same power grid.</description>
     <thingClass>SolarWeb.Stratum.Things.BroadcastTransmitter</thingClass>
     <graphicData>
-      <texPath>Things/Building/Misc/VitalsMonitor</texPath>
+      <texPath>Things/Building/Ruins/AncientCommsConsole</texPath>
       <graphicClass>Graphic_Multi</graphicClass>
-      <shadowData>
-        <volume>(0.55, 0.30, 0.40)</volume>
-      </shadowData>
-      <color>(100, 100, 100)</color>
-      <damageData>
-        <rectN>(0.078125,0.46875,0.859375,0.53125)</rectN>
-        <rectS>(0.078125,0.46875,0.859375,0.53125)</rectS>
-        <rectE>(0.125,0.46875,0.625,0.296875)</rectE>
-        <rectW>(0.25,0.46875,0.625,0.296875)</rectW>
-        <cornerTR>Damage/Corner</cornerTR>
-      </damageData>
+      <drawSize>(2, 1)</drawSize>
     </graphicData>
+    <size>(2,1)</size>
     <rotatable>true</rotatable>
     <defaultPlacingRot>South</defaultPlacingRot>
     <altitudeLayer>Building</altitudeLayer>
@@ -320,7 +309,7 @@
     <comps>
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>
-        <basePowerConsumption>100</basePowerConsumption>
+        <basePowerConsumption>150</basePowerConsumption>
         <transmitsPower>true</transmitsPower>
       </li>
     </comps>
@@ -329,7 +318,7 @@
     <constructEffect>ConstructMetal</constructEffect>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories>
-      <li>BuildingsFurniture</li>
+      <li>BuildingsJoy</li>
     </thingCategories>
     <researchPrerequisites>
       <li>Electricity</li>
@@ -342,7 +331,7 @@
     <description>A powered, ceiling-mounted fan that circulates air, raising the comfortable temperature range of nearby pawns to make hot rooms more tolerable.</description>
     <thingClass>SolarWeb.Stratum.Things.CeilingFan</thingClass>
     <graphicData>
-      <texPath>Things/Building/Furniture/LampStanding</texPath>
+      <texPath>Things/Building/Ruins/AncientTankTrap/AncientTankTrapB</texPath>
       <graphicClass>Graphic_Single</graphicClass>
       <drawSize>(1,1)</drawSize>
     </graphicData>
@@ -417,13 +406,13 @@
     </building>
     <statBases>
       <MaxHitPoints>80</MaxHitPoints>
-      <WorkToBuild>800</WorkToBuild>
+      <WorkToBuild>1200</WorkToBuild>
       <Flammability>0.5</Flammability>
       <Mass>2.5</Mass>
     </statBases>
     <costList>
-      <Steel>30</Steel>
-      <ComponentIndustrial>1</ComponentIndustrial>
+      <Steel>40</Steel>
+      <ComponentIndustrial>2</ComponentIndustrial>
     </costList>
     <comps>
       <li Class="CompProperties_Power">
@@ -470,14 +459,14 @@
   <ThingDef ParentName="BuildingBase">
     <defName>SolarWeb-Stratum-AeroponicsMister_Hanging</defName>
     <label>aeroponics mister</label>
-    <description>A powered, ceiling-mounted automated mister designed for agricultural use. Periodically releases a fine mist of nutrient-enriched water, slightly boosting the growth rate (+15%) of plants directly under its spray radius.</description>
+    <description>A powered, ceiling-mounted automated mister designed for agricultural use. Periodically releases a fine mist of nutrient-enriched water, slightly boosting the growth rate of nearby plants.</description>
     <thingClass>Building</thingClass>
     <graphicData>
-      <texPath>Things/Building/Furniture/WallLamp/WallLamp</texPath>
-      <graphicClass>Graphic_Multi</graphicClass>
-      <drawSize>(1,1)</drawSize>
+      <texPath>Things/Building/Ruins/AncientDisplayBank_south</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+      <drawSize>(0.5,1)</drawSize>
     </graphicData>
-    <defaultPlacingRot>South</defaultPlacingRot>
+    <defaultPlacingRot>North</defaultPlacingRot>
     <rotatable>false</rotatable>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
@@ -512,7 +501,7 @@
     <constructEffect>ConstructMetal</constructEffect>
     <minifiedDef>MinifiedThing</minifiedDef>
     <thingCategories>
-      <li>BuildingsFurniture</li>
+      <li>BuildingsProduction</li>
     </thingCategories>
     <placeWorkers>
       <li>SolarWeb.Stratum.AI.PlaceWorkers.OnRoof</li>
@@ -524,8 +513,8 @@
         <destroyOnRoofLoss>false</destroyOnRoofLoss>
       </li>
       <li Class="SolarWeb.Stratum.DefModExtensions.GrowthBooster">
-        <growthRateFactor>1.15</growthRateFactor>
-        <radius>5.9</radius>
+        <growthRateFactor>1.05</growthRateFactor>
+        <radius>2.9</radius>
         <emitMist>true</emitMist>
       </li>
     </modExtensions>
