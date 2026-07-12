@@ -54,6 +54,11 @@ public class RepairCustomRoof : WorkGiver_Scanner
       return false;
     }
 
+    if (!pawn.CanReach(cell, PathEndMode.Touch, Danger.Deadly, false, false, TraverseMode.ByPawn))
+    {
+      return false;
+    }
+
     return true;
   }
 

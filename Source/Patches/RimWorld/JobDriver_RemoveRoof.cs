@@ -1,69 +1,74 @@
-using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using RimWorld;
-using SolarWeb.Stratum.DefModExtensions;
-using Verse;
+
+using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Patches;
 
 [HarmonyPatch(typeof(JobDriver_RemoveRoof))]
 public static class JobDriver_RemoveRoof_Patch
 {
-  public static PropertyInfo CellProperty = AccessTools.Property(typeof(JobDriver_RemoveRoof), "Cell");
-
-  public struct RemovalState
+  private class JobStartState
   {
-    public IntVec3 cell;
-    public Map map;
-    public RoofDef roof;
-    public ThingDef stuff;
+    public bool HadBuilding;
+  }
+
+  private static readonly ConditionalWeakTable<JobDriver_RemoveRoof, JobStartState> jobStartBuildings =
+    new ConditionalWeakTable<JobDriver_RemoveRoof, JobStartState>();
+
+  [HarmonyPatch("MakeNewToils")]
+  [HarmonyPrefix]
+  public static void MakeNewToils_Prefix(JobDriver_RemoveRoof __instance)
+  {
+    if (__instance.pawn != null && __instance.pawn.Map != null && __instance.job != null)
+    {
+      var map = __instance.pawn.Map;
+      var cell = __instance.job.targetA.Cell;
+      bool hadBuilding = RoofBuildings.HasConstructedRoofBuildingAt(map, cell);
+      jobStartBuildings.AddOrUpdate(__instance, new JobStartState { HadBuilding = hadBuilding });
+    }
   }
 
   [HarmonyPatch("DoEffect")]
   [HarmonyPrefix]
-  public static void DoEffect_Prefix(JobDriver_RemoveRoof __instance, out RemovalState __state)
+  public static void DoEffect_Prefix()
   {
-    var map = __instance.pawn.Map;
-    var cell = (IntVec3)CellProperty.GetValue(__instance);
-    var roof = map.roofGrid.RoofAt(cell);
-    var stuff = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetStuff(cell);
-
-    __state = new RemovalState
-    {
-      cell = cell,
-      map = map,
-      roof = roof,
-      stuff = stuff!
-    };
+    RoofBuildings.isDeconstructingRoof = true;
   }
 
   [HarmonyPatch("DoEffect")]
   [HarmonyPostfix]
-  public static void DoEffect_Postfix(RemovalState __state)
+  public static void DoEffect_Postfix()
   {
-    if (__state.roof == null) return;
+    RoofBuildings.isDeconstructingRoof = false;
+  }
 
-    var extension = __state.roof.GetModExtension<BuildableRoofExtension>();
-    var bDef = extension?.buildableDef;
+  [HarmonyPatch("DoWorkFailOn")]
+  [HarmonyPostfix]
+  public static void DoWorkFailOn_Postfix(JobDriver_RemoveRoof __instance, ref bool __result)
+  {
+    if (__result) return;
 
-    if (bDef != null)
+    if (__instance.pawn != null && __instance.pawn.Map != null && __instance.job != null)
     {
-      var costList = bDef.CostListAdjusted(__state.stuff);
-      if (!costList.NullOrEmpty())
+      var map = __instance.pawn.Map;
+      var cell = __instance.job.targetA.Cell;
+
+      if (RoofBuildings.HasNonMinifiableRoofBuildingAt(map, cell))
       {
-        float fraction = bDef.resourcesFractionWhenDeconstructed;
-        foreach (var cost in costList)
+        __result = true;
+        return;
+      }
+
+      if (jobStartBuildings.TryGetValue(__instance, out var state))
+      {
+        if (!state.HadBuilding && RoofBuildings.HasConstructedRoofBuildingAt(map, cell))
         {
-          int count = GenMath.RoundRandom(cost.count * fraction);
-          if (count <= 0) continue;
-          var thing = ThingMaker.MakeThing(cost.thingDef);
-          thing.stackCount = count;
-          GenPlace.TryPlaceThing(thing, __state.cell, __state.map, ThingPlaceMode.Near);
+          __result = true;
         }
       }
     }
-
-    __state.map.GetComponent<MapComponents.RoofIntegrityGrid>()?.RemoveRoof(__state.cell);
-    __state.map.mapDrawer.MapMeshDirty(__state.cell, MapMeshFlagDefOf.Roofs);
   }
 }
+

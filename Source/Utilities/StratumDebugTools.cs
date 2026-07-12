@@ -115,12 +115,12 @@ public static class StratumDebugTools
           foreach (var kvp in atlasEntry.SeamlessGrid.OrderBy(k => k.Key.row).ThenBy(k => k.Key.col))
           {
             var coord = kvp.Key;
-            var uvEntry = kvp.Value;
+            var uvs = kvp.Value;
             XElement tileElement = new XElement("Tile",
                 new XAttribute("col", coord.col),
                 new XAttribute("row", coord.row),
                 new XElement("UVs",
-                    string.Join(" | ", uvEntry.Uvs.Select(u => $"({u.x:F4}, {u.y:F4})"))
+                    string.Join(" | ", uvs.Select(u => $"({u.x:F4}, {u.y:F4})"))
                 )
             );
             gridElement.Add(tileElement);
@@ -133,10 +133,10 @@ public static class StratumDebugTools
           XElement variantsElement = new XElement("FlatVariants");
           for (int i = 0; i < atlasEntry.FlatVariants.Count; i++)
           {
-            var uvEntry = atlasEntry.FlatVariants[i];
+            var uvs = atlasEntry.FlatVariants[i];
             variantsElement.Add(new XElement("Variant",
                 new XAttribute("index", i),
-                new XElement("UVs", string.Join(" | ", uvEntry.Uvs.Select(u => $"({u.x:F4}, {u.y:F4})")))
+                new XElement("UVs", string.Join(" | ", uvs.Select(u => $"({u.x:F4}, {u.y:F4})")))
             ));
           }
           atlasElement.Add(variantsElement);

@@ -1,3 +1,10 @@
+0.11.0:
+Feature: Added Roof Attachments System, allowing construction of Hanging and Rooftop buildings.
+Feature: Added new roof-attached buildings: Hanging Sun Lamp, Hanging Fire Sprinkler, Hanging LED Light, Ceiling Fan, Surgical Spotlight, Aeroponics Mister, Broadcast Speaker and Broadcaster, Rooftop Lightning Rod, Rooftop Scan Booster, and Rooftop Rotary Turbine Vent.
+Feature: Added Greenhouse Gazing recreational activity. Colonists can now lay face-up under skylights in Greenhouses to relax alone or with companions.
+Graphics: Improved lighting and shadow rendering with a new section layer for skylight tinting and custom shadows.
+UI: Added map controls button to toggle showing/hiding roof-attached buildings.
+
 0.10.7:
 Bug Fix: Some transparent roofs were rendering underneath pawns and items.
 

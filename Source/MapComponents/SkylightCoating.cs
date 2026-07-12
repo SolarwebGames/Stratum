@@ -11,12 +11,14 @@ public class SkylightCoating(Map map) : MapComponent(map)
 {
   private readonly float[] dirtLevels = new float[map.cellIndices.NumGridCells];
   private readonly Color[] dirtColors = new Color[map.cellIndices.NumGridCells];
+  private readonly float[] pollenLevels = new float[map.cellIndices.NumGridCells];
   private readonly float[] snowLevels = new float[map.cellIndices.NumGridCells];
   private readonly HashSet<int> activeSkylightCells = [];
   private readonly HashSet<int> activeVisibleRoofedCells = [];
 
   private Dictionary<int, float>? loadedDirtLevels;
   private Dictionary<int, Color>? loadedDirtColors;
+  private Dictionary<int, float>? loadedPollenLevels;
   private Dictionary<int, float>? loadedSnowLevels;
   private bool hasScanned = false;
 
@@ -59,6 +61,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
 
     dirtLevels[idx] = 0f;
     dirtColors[idx] = Color.white;
+    pollenLevels[idx] = 0f;
     snowLevels[idx] = 0f;
 
     bool isNewSkylight = newRoof != null && Stats.RoofStatCache.IsSkylight(newRoof);
@@ -94,10 +97,37 @@ public class SkylightCoating(Map map) : MapComponent(map)
     return dirtColors[map.cellIndices.CellToIndex(cell)];
   }
 
+  public float GetPollenLevel(IntVec3 cell)
+  {
+    if (!cell.InBounds(map)) return 0f;
+    return pollenLevels[map.cellIndices.CellToIndex(cell)];
+  }
+
   public float GetSnowLevel(IntVec3 cell)
   {
     if (!cell.InBounds(map)) return 0f;
     return snowLevels[map.cellIndices.CellToIndex(cell)];
+  }
+
+  public float GetCoatingOpacity(IntVec3 cell)
+  {
+    if (!cell.InBounds(map)) return 0f;
+    int idx = map.cellIndices.CellToIndex(cell);
+    return Mathf.Clamp01(dirtLevels[idx] + pollenLevels[idx] + snowLevels[idx]);
+  }
+
+  private void NotifyCoatingChanged(IntVec3 cell)
+  {
+    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.GroundGlow);
+  }
+
+  public void SetDirtLevel(IntVec3 cell, float level)
+  {
+    if (!cell.InBounds(map)) return;
+    int idx = map.cellIndices.CellToIndex(cell);
+    dirtLevels[idx] = Mathf.Clamp01(level);
+    NotifyCoatingChanged(cell);
   }
 
   public void SetDirtLevel(IntVec3 cell, float level, Color color)
@@ -106,7 +136,15 @@ public class SkylightCoating(Map map) : MapComponent(map)
     int idx = map.cellIndices.CellToIndex(cell);
     dirtLevels[idx] = Mathf.Clamp01(level);
     dirtColors[idx] = color;
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
+  }
+
+  public void SetPollenLevel(IntVec3 cell, float level)
+  {
+    if (!cell.InBounds(map)) return;
+    int idx = map.cellIndices.CellToIndex(cell);
+    pollenLevels[idx] = Mathf.Clamp01(level);
+    NotifyCoatingChanged(cell);
   }
 
   public void SetSnowLevel(IntVec3 cell, float level)
@@ -114,7 +152,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
     snowLevels[idx] = Mathf.Clamp01(level);
-    map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
+    NotifyCoatingChanged(cell);
   }
 
   public override void MapComponentTick()
@@ -135,6 +173,9 @@ public class SkylightCoating(Map map) : MapComponent(map)
   private void AccumulateNaturalDirt()
   {
     int cellsToTick = Mathf.Max(1, map.Area / 2000);
+    Season season = GenLocalDate.Season(map);
+    bool isPollenSeason = (season == Season.Spring || season == Season.Summer);
+
     for (int k = 0; k < cellsToTick; k++)
     {
       IntVec3 cell = new(Rand.Range(0, map.Size.x), 0, Rand.Range(0, map.Size.z));
@@ -142,44 +183,47 @@ public class SkylightCoating(Map map) : MapComponent(map)
       if (roof != null && Stats.RoofStatCache.IsSkylight(roof))
       {
         int idx = map.cellIndices.CellToIndex(cell);
-        float curDirt = dirtLevels[idx];
-        if (curDirt < 1f)
+        if (isPollenSeason)
         {
-          float baseAccumulation = 0.05f;
-          float newDirt = Mathf.Min(1f, curDirt + baseAccumulation);
-          dirtLevels[idx] = newDirt;
-
-          Color seasonalColor = GetSeasonalDirtColor();
-          if (curDirt <= 0.001f)
+          float curPollen = pollenLevels[idx];
+          if (curPollen < 1f)
           {
-            dirtColors[idx] = seasonalColor;
+            pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
+            NotifyCoatingChanged(cell);
           }
-          else
+        }
+        else
+        {
+          float curDirt = dirtLevels[idx];
+          if (curDirt < 1f)
           {
-            dirtColors[idx] = Color.Lerp(dirtColors[idx], seasonalColor, 0.3f);
+            dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
+            NotifyCoatingChanged(cell);
           }
-
-          map.mapDrawer.MapMeshDirty(cell, MapMeshFlagDefOf.Roofs);
         }
       }
     }
 
-    // Compounding dirt accumulation: dirty roofs are more likely to gather more dirt
+    // Compounding dirt/pollen accumulation
     foreach (int idx in activeSkylightCells)
     {
       float curDirt = dirtLevels[idx];
       if (curDirt > 0.01f && curDirt < 1f)
       {
-        // Probability scales with current dirt level, e.g. up to 10% chance per 250 ticks
         if (Rand.Value < curDirt * 0.10f)
         {
-          float newDirt = Mathf.Min(1f, curDirt + 0.05f);
-          dirtLevels[idx] = newDirt;
+          dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
+        }
+      }
 
-          Color seasonalColor = GetSeasonalDirtColor();
-          dirtColors[idx] = Color.Lerp(dirtColors[idx], seasonalColor, 0.3f);
-
-          map.mapDrawer.MapMeshDirty(map.cellIndices.IndexToCell(idx), MapMeshFlagDefOf.Roofs);
+      float curPollen = pollenLevels[idx];
+      if (curPollen > 0.01f && curPollen < 1f)
+      {
+        if (Rand.Value < curPollen * 0.10f)
+        {
+          pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
     }
@@ -192,28 +236,34 @@ public class SkylightCoating(Map map) : MapComponent(map)
     {
       foreach (int idx in activeSkylightCells)
       {
+        bool dirty = false;
         if (dirtLevels[idx] > 0.001f)
         {
           dirtLevels[idx] = Mathf.Max(0f, dirtLevels[idx] - 0.05f);
-          map.mapDrawer.MapMeshDirty(map.cellIndices.IndexToCell(idx), MapMeshFlagDefOf.Roofs);
+          dirty = true;
+        }
+        if (pollenLevels[idx] > 0.001f)
+        {
+          pollenLevels[idx] = Mathf.Max(0f, pollenLevels[idx] - 0.05f);
+          dirty = true;
+        }
+        if (dirty)
+        {
+          NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
     }
   }
-
-
 
   public Color GetSeasonalDirtColor()
   {
     Season season = GenLocalDate.Season(map);
     if (season == Season.Spring || season == Season.Summer)
     {
-      // Greenish-yellow pollen color
       return new Color(0.3f, 0.28f, 0.1f);
     }
     else
     {
-      // Sandy-brown dust/grime color
       return new Color(0.22f, 0.18f, 0.13f);
     }
   }
@@ -226,6 +276,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     {
       loadedDirtLevels = [];
       loadedDirtColors = [];
+      loadedPollenLevels = [];
       loadedSnowLevels = [];
       for (int i = 0; i < dirtLevels.Length; i++)
       {
@@ -233,6 +284,10 @@ public class SkylightCoating(Map map) : MapComponent(map)
         {
           loadedDirtLevels[i] = dirtLevels[i];
           loadedDirtColors[i] = dirtColors[i];
+        }
+        if (pollenLevels[i] > 0.001f)
+        {
+          loadedPollenLevels[i] = pollenLevels[i];
         }
         if (snowLevels[i] > 0.001f)
         {
@@ -243,6 +298,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
 
     Scribe_Collections.Look(ref loadedDirtLevels, "dirtLevels", LookMode.Value, LookMode.Value);
     Scribe_Collections.Look(ref loadedDirtColors, "dirtColors", LookMode.Value, LookMode.Value);
+    Scribe_Collections.Look(ref loadedPollenLevels, "pollenLevels", LookMode.Value, LookMode.Value);
     Scribe_Collections.Look(ref loadedSnowLevels, "snowLevels", LookMode.Value, LookMode.Value);
 
     if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -261,6 +317,13 @@ public class SkylightCoating(Map map) : MapComponent(map)
           dirtColors[kvp.Key] = kvp.Value;
         }
       }
+      if (loadedPollenLevels != null)
+      {
+        foreach (var kvp in loadedPollenLevels)
+        {
+          pollenLevels[kvp.Key] = kvp.Value;
+        }
+      }
       if (loadedSnowLevels != null)
       {
         foreach (var kvp in loadedSnowLevels)
@@ -271,6 +334,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
 
       loadedDirtLevels = null;
       loadedDirtColors = null;
+      loadedPollenLevels = null;
       loadedSnowLevels = null;
     }
   }

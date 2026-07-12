@@ -1,15 +1,19 @@
 using HarmonyLib;
-using SolarWeb.Stratum.Stats;
-using SolarWeb.Stratum.Hooks;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.Hooks;
+using SolarWeb.Stratum.MapComponents;
+
 namespace SolarWeb.Stratum.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(GlowGrid))]
 public static class GlowGrid_Patch
 {
-  [HarmonyPatch(typeof(GlowGrid), nameof(GlowGrid.GroundGlowAt))]
+
+
+  [HarmonyPatch(nameof(GlowGrid.GroundGlowAt))]
   [HarmonyPrefix]
   [HarmonyBefore("realtiltmod")]
   public static bool GroundGlowAt_Prefix(GlowGrid __instance, IntVec3 c, ref float __result, bool ignoreCavePlants, bool ignoreSky, Map ___map)
@@ -43,7 +47,7 @@ public static class GlowGrid_Patch
     var roof = ___map.roofGrid.RoofAt(c);
     if (roof != null && RoofStatCache.IsSkylight(roof))
     {
-      float transparency = RoofStatCache.GetTransparency(roof);
+      float transparency = RoofStatCache.GetEffectiveTransparency(roof, ___map, c);
       if (transparency > 0f)
       {
         float skyGlow = ___map.skyManager.CurSkyGlow * transparency;
@@ -60,7 +64,6 @@ public static class GlowGrid_Patch
           return false;
         }
 
-        // Original game logic for roofs uses max component of accumulated glow scaled by 3.6, capped at 0.5.
         float maxAccumulated = (float)Mathf.Max(accumulated.r, Mathf.Max(accumulated.g, accumulated.b)) / 255f * 3.6f;
         maxAccumulated = Mathf.Min(0.5f, maxAccumulated);
         __result = Mathf.Max(skyGlow, maxAccumulated);

@@ -18,6 +18,10 @@ public static class ThingDefOf
   [DefAlias($"{DefOfConstants.DefAliasPrefix}RetractableRoofConsole")]
   public static ThingDef RetractableRoofConsole = default!;
 
+  [DefAlias($"{DefOfConstants.DefAliasPrefix}LightningRod")]
+  public static ThingDef LightningRod = default!;
+
+
   static ThingDefOf()
   {
     DefOfHelper.EnsureInitializedInCtor(typeof(ThingDefOf));

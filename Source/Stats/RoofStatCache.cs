@@ -301,6 +301,22 @@ public static class RoofStatCache
     return max;
   }
 
+  public static float GetEffectiveTransparency(RoofDef def, Map? map, IntVec3 cell)
+  {
+    if (def == null) return 0f;
+    float baseTrans = GetTransparency(def);
+    if (baseTrans <= 0f) return 0f;
+    if (map != null && cell.IsValid)
+    {
+      var coating = map.GetComponent<MapComponents.SkylightCoating>();
+      if (coating != null)
+      {
+        baseTrans *= Mathf.Clamp01(1f - coating.GetCoatingOpacity(cell));
+      }
+    }
+    return baseTrans;
+  }
+
   public static bool GetIsAirtight(RoofDef def, ThingDef? stuff = null)
   {
     if (def == null) return false;

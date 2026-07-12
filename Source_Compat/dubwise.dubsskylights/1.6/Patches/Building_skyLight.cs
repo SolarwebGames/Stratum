@@ -1,9 +1,10 @@
 using HarmonyLib;
 using Dubs_Skylight;
 using Verse;
+using UnityEngine;
+
 using SolarWeb.Stratum.MapComponents;
 using SolarWeb.Stratum.Stats;
-using UnityEngine;
 
 namespace SolarWeb.Stratum.DubsSkylights.Patches;
 

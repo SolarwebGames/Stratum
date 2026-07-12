@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using Verse;
@@ -27,6 +28,97 @@ public static class WeatherEvent_LightningStrike_Patch
           map);
       }
 
+      var rodDef = DefOf.ThingDefOf.LightningRod;
+      if (rodDef != null && map.listerBuildings != null)
+      {
+        var rods = map.listerBuildings.AllBuildingsColonistOfDef(rodDef);
+        if (rods != null && rods.Count > 0)
+        {
+          Building? closestRod = null;
+          float closestDistance = float.MaxValue;
+          for (int i = 0; i < rods.Count; i++)
+          {
+            if (rods[i] == null) continue;
+            float dist = strikeLoc.DistanceTo(rods[i].Position);
+            if (dist < closestDistance)
+            {
+              closestDistance = dist;
+              closestRod = rods[i];
+            }
+          }
+
+          if (closestRod != null && closestDistance <= 20f)
+          {
+            if (Rand.Value < 0.8f)
+            {
+              strikeLoc = closestRod.Position;
+
+              float absorbedEnergy = 0f;
+              var powerComp = closestRod.GetComp<CompPower>();
+              if (powerComp != null && powerComp.PowerNet != null)
+              {
+                var batteries = powerComp.PowerNet.batteryComps;
+                if (batteries != null && batteries.Count > 0)
+                {
+                  List<CompPowerBattery> validBatteries = new List<CompPowerBattery>();
+                  float totalCanAccept = 0f;
+                  for (int j = 0; j < batteries.Count; j++)
+                  {
+                    if (batteries[j] != null)
+                    {
+                      float accept = batteries[j].AmountCanAccept;
+                      if (accept > 0f)
+                      {
+                        validBatteries.Add(batteries[j]);
+                        totalCanAccept += accept;
+                      }
+                    }
+                  }
+
+                  if (validBatteries.Count > 0)
+                  {
+                    absorbedEnergy = Mathf.Min(1000f, totalCanAccept);
+                    float energyPerBat = absorbedEnergy / validBatteries.Count;
+                    for (int j = 0; j < validBatteries.Count; j++)
+                    {
+                      if (validBatteries[j] != null)
+                      {
+                        validBatteries[j].AddEnergy(energyPerBat);
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (absorbedEnergy < 1000f)
+              {
+                GenExplosion.DoExplosion(strikeLoc, map, 1.9f, DamageDefOf.Flame, null);
+                closestRod.TakeDamage(new DamageInfo(DamageDefOf.Flame, 60));
+              }
+              else
+              {
+                closestRod.TakeDamage(new DamageInfo(DamageDefOf.Flame, 20));
+              }
+
+              boltMesh = LightningBoltMeshPool.RandomBoltMesh;
+              SoundInfo info = SoundInfo.InMap(new TargetInfo(strikeLoc, map));
+              if (SoundDefOf.Thunder_OnMap != null)
+              {
+                SoundDefOf.Thunder_OnMap.PlayOneShot(info);
+              }
+
+              Vector3 loc = strikeLoc.ToVector3Shifted();
+              for (int i = 0; i < 6; i++)
+              {
+                FleckMaker.ThrowMicroSparks(loc, map);
+                FleckMaker.ThrowLightningGlow(loc, map, 2.0f);
+              }
+
+              return false;
+            }
+          }
+        }
+      }
     }
     catch (System.Exception ex)
     {

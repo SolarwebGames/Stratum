@@ -12,6 +12,7 @@ public static class ParallelMapScanner
   {
     public readonly List<int> solar = new();
     public readonly List<int> vfx = new();
+    public readonly List<int> damagedRoofs = new();
     public readonly Map map;
     public readonly RoofGrid roofGrid;
     public readonly RoofIntegrityGrid integrity;
@@ -19,9 +20,10 @@ public static class ParallelMapScanner
     public readonly RoofVFXMapComponent vfxComponent;
     public readonly List<int> finalSolar;
     public readonly List<int> finalVfx;
+    public readonly List<int> finalDamagedRoofs;
     public readonly object sharedLock;
 
-    public LocalState(Map map, RoofGrid roofGrid, RoofIntegrityGrid integrity, SolarRoofMapComponent solarComponent, RoofVFXMapComponent vfxComponent, List<int> finalSolar, List<int> finalVfx, object sharedLock)
+    public LocalState(Map map, RoofGrid roofGrid, RoofIntegrityGrid integrity, SolarRoofMapComponent solarComponent, RoofVFXMapComponent vfxComponent, List<int> finalSolar, List<int> finalVfx, List<int> finalDamagedRoofs, object sharedLock)
     {
       this.map = map;
       this.roofGrid = roofGrid;
@@ -30,6 +32,7 @@ public static class ParallelMapScanner
       this.vfxComponent = vfxComponent;
       this.finalSolar = finalSolar;
       this.finalVfx = finalVfx;
+      this.finalDamagedRoofs = finalDamagedRoofs;
       this.sharedLock = sharedLock;
     }
   }
@@ -44,10 +47,11 @@ public static class ParallelMapScanner
     var roofGrid = map.roofGrid;
     var finalSolar = new List<int>();
     var finalVfx = new List<int>();
+    var finalDamagedRoofs = new List<int>();
     var sharedLock = new object();
 
     Parallel.For(0, numCells,
-      () => new LocalState(map, roofGrid, integrity, solar, vfx, finalSolar, finalVfx, sharedLock),
+      () => new LocalState(map, roofGrid, integrity, solar, vfx, finalSolar, finalVfx, finalDamagedRoofs, sharedLock),
       LoopBody,
       LoopFinally
     );
@@ -60,6 +64,11 @@ public static class ParallelMapScanner
     if (vfx != null)
     {
       foreach (int idx in finalVfx) vfx.AddTransparentCellInternal(idx);
+    }
+
+    foreach (int idx in finalDamagedRoofs)
+    {
+      integrity.RoofsNeedingRepair.Add(idx);
     }
   }
 
@@ -106,6 +115,10 @@ public static class ParallelMapScanner
       if (local.vfx.Count > 0)
       {
         local.finalVfx.AddRange(local.vfx);
+      }
+      if (local.damagedRoofs.Count > 0)
+      {
+        local.finalDamagedRoofs.AddRange(local.damagedRoofs);
       }
     }
   }

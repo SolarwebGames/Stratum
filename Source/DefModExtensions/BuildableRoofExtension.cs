@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
+
 using SolarWeb.Stratum.Graphics;
 
 namespace SolarWeb.Stratum.DefModExtensions;
@@ -20,5 +21,7 @@ public class BuildableRoofExtension : DefModExtension
 
   public bool isRetractable = false;
 
+  public bool allowHangingAttachments = true;
+  public bool allowRooftopAttachments = true;
   public readonly Dictionary<TerrainDef, ThingDef> terrainToStuff = [];
 }

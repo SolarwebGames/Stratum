@@ -2,10 +2,10 @@ using HarmonyLib;
 using RimWorld;
 using UnityEngine;
 using Verse;
+using System;
+
 using SolarWeb.Stratum.UI;
 using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.Stats;
-using System;
 
 namespace SolarWeb.Stratum.Patches;
 

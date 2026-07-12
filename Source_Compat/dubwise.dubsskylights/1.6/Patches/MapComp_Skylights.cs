@@ -1,6 +1,7 @@
 using HarmonyLib;
 using Dubs_Skylight;
 using Verse;
+
 using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.DubsSkylights.Patches;

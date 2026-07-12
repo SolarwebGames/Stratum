@@ -63,6 +63,7 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
     }
   }
 
+
   private void HandleEnergyGainRate(PowerNet net, ref float energyGainRate)
   {
     if (net.Map != map) return;
@@ -203,170 +204,177 @@ public class ActiveRadiatorManager(Map map) : MapComponent(map)
 
   private void TickRare()
   {
-    powerDraws.Clear();
-    if (radiatorCells.Count == 0) return;
-    if (map.powerNetGrid == null || map.mapTemperature == null) return;
-
-    roomGroups.Clear();
-    listPoolIndex = 0;
-    netRequests.Clear();
-    cellToNet.Clear();
-    poweredNets.Clear();
-    roomStats.Clear();
-
-    var thermostatTracker = map.GetComponent<ThermostatTracker>();
-    var availableNets = new List<PowerNet>();
-
-    foreach (var cluster in roofClusters)
+    try
     {
-      if (cluster.Count == 0) continue;
+      powerDraws.Clear();
+      if (radiatorCells.Count == 0) return;
+      if (map.powerNetGrid == null || map.mapTemperature == null) return;
 
-      availableNets.Clear();
-      Room? primaryRoom = null;
+      roomGroups.Clear();
+      listPoolIndex = 0;
+      netRequests.Clear();
+      cellToNet.Clear();
+      poweredNets.Clear();
+      roomStats.Clear();
 
-      foreach (int idx in cluster)
+      var thermostatTracker = map.GetComponent<ThermostatTracker>();
+      var availableNets = new List<PowerNet>();
+
+      foreach (var cluster in roofClusters)
       {
-        IntVec3 cell = map.cellIndices.IndexToCell(idx);
-        if (primaryRoom == null)
-        {
-          Room r = cell.GetRoom(map);
-          if (r != null && !r.TouchesMapEdge && !r.UsesOutdoorTemperature)
-            primaryRoom = r;
-        }
+        if (cluster.Count == 0) continue;
 
-        PowerNet net = map.powerNetGrid.TransmittedPowerNetAt(cell);
-        if (net != null && !availableNets.Contains(net))
-        {
-          availableNets.Add(net);
-        }
-      }
-
-      if (availableNets.Count > 0)
-      {
-        int offset = 0;
-        if (primaryRoom != null && thermostatTracker != null)
-        {
-          offset = thermostatTracker.GetNetworkOffsetForRoom(primaryRoom);
-        }
-
-        PowerNet chosenNet = availableNets[offset % availableNets.Count];
+        availableNets.Clear();
+        Room? primaryRoom = null;
 
         foreach (int idx in cluster)
         {
-          cellToNet[idx] = chosenNet;
+          IntVec3 cell = map.cellIndices.IndexToCell(idx);
+          if (primaryRoom == null)
+          {
+            Room r = cell.GetRoom(map);
+            if (r != null && !r.TouchesMapEdge && !r.UsesOutdoorTemperature)
+              primaryRoom = r;
+          }
+
+          PowerNet net = map.powerNetGrid.TransmittedPowerNetAt(cell);
+          if (net != null && !availableNets.Contains(net))
+          {
+            availableNets.Add(net);
+          }
         }
-      }
-    }
 
-    foreach (var idx in radiatorCells)
-    {
-      IntVec3 cell = map.cellIndices.IndexToCell(idx);
-      Room room = cell.GetRoom(map);
-      if (room == null || room.TouchesMapEdge || room.UsesOutdoorTemperature) continue;
-
-      if (!roomGroups.TryGetValue(room, out var list))
-      {
-        list = GetList();
-        roomGroups[room] = list;
-      }
-      list.Add(idx);
-    }
-
-    float outdoorTemp = map.mapTemperature.OutdoorTemp;
-
-    foreach (var kvp in roomGroups)
-    {
-      Room room = kvp.Key;
-      var cells = kvp.Value;
-      if (cells.Count == 0) continue;
-
-      IntVec3 firstCell = map.cellIndices.IndexToCell(cells[0]);
-      RoofDef roof = map.roofGrid.RoofAt(firstCell);
-      var ext = GetExtension(roof);
-      if (ext == null) continue;
-
-      float targetTemp = ext.targetTemperature;
-      if (thermostatTracker != null && thermostatTracker.TryGetLowestTargetTemperature(room, out float thermostatTemp))
-        targetTemp = thermostatTemp;
-
-      bool needsCooling = room.Temperature > targetTemp;
-
-      foreach (var idx in cells)
-      {
-        if (cellToNet.TryGetValue(idx, out PowerNet net))
+        if (availableNets.Count > 0)
         {
-          float draw = needsCooling ? ext.powerDrawActive : ext.powerDrawStandby;
-          if (!netRequests.ContainsKey(net)) netRequests[net] = 0f;
-          netRequests[net] += draw;
+          int offset = 0;
+          if (primaryRoom != null && thermostatTracker != null)
+          {
+            offset = thermostatTracker.GetNetworkOffsetForRoom(primaryRoom);
+          }
+
+          PowerNet chosenNet = availableNets[offset % availableNets.Count];
+
+          foreach (int idx in cluster)
+          {
+            cellToNet[idx] = chosenNet;
+          }
+        }
+      }
+
+      foreach (var idx in radiatorCells)
+      {
+        IntVec3 cell = map.cellIndices.IndexToCell(idx);
+        Room room = cell.GetRoom(map);
+        if (room == null || room.TouchesMapEdge || room.UsesOutdoorTemperature) continue;
+
+        if (!roomGroups.TryGetValue(room, out var list))
+        {
+          list = GetList();
+          roomGroups[room] = list;
+        }
+        list.Add(idx);
+      }
+
+      float outdoorTemp = map.mapTemperature.OutdoorTemp;
+
+      foreach (var kvp in roomGroups)
+      {
+        Room room = kvp.Key;
+        var cells = kvp.Value;
+        if (cells.Count == 0) continue;
+
+        IntVec3 firstCell = map.cellIndices.IndexToCell(cells[0]);
+        RoofDef roof = map.roofGrid.RoofAt(firstCell);
+        var ext = GetExtension(roof);
+        if (ext == null) continue;
+
+        float targetTemp = ext.targetTemperature;
+        if (thermostatTracker != null && thermostatTracker.TryGetLowestTargetTemperature(room, out float thermostatTemp))
+          targetTemp = thermostatTemp;
+
+        bool needsCooling = room.Temperature > targetTemp;
+
+        foreach (var idx in cells)
+        {
+          if (cellToNet.TryGetValue(idx, out PowerNet net))
+          {
+            float draw = needsCooling ? ext.powerDrawActive : ext.powerDrawStandby;
+            if (!netRequests.ContainsKey(net)) netRequests[net] = 0f;
+            netRequests[net] += draw;
+          }
+        }
+      }
+
+      foreach (var kvp in netRequests)
+      {
+        PowerNet net = kvp.Key;
+        float requested = kvp.Value;
+
+        if (net.CurrentStoredEnergy() > 0f || (net.CurrentEnergyGainRate() * 60000f) >= requested)
+        {
+          poweredNets.Add(net);
+          powerDraws[net] = requested;
+        }
+      }
+
+      foreach (var kvp in roomGroups)
+      {
+        Room room = kvp.Key;
+        var cells = kvp.Value;
+        if (cells.Count == 0) continue;
+
+        IntVec3 firstCell = map.cellIndices.IndexToCell(cells[0]);
+        RoofDef roof = map.roofGrid.RoofAt(firstCell);
+        var ext = GetExtension(roof);
+        if (ext == null) continue;
+
+        float targetTemp = ext.targetTemperature;
+        if (thermostatTracker != null && thermostatTracker.TryGetLowestTargetTemperature(room, out float thermostatTemp))
+          targetTemp = thermostatTemp;
+
+        bool needsCooling = room.Temperature > targetTemp;
+
+        float activeTiles = 0f;
+        float powerDraw = 0f;
+        foreach (var idx in cells)
+        {
+          if (cellToNet.TryGetValue(idx, out PowerNet net) && poweredNets.Contains(net))
+          {
+            activeTiles++;
+            powerDraw += needsCooling ? ext.powerDrawActive : ext.powerDrawStandby;
+          }
+        }
+
+        roomStats[room] = (cells.Count, (int)activeTiles, needsCooling, powerDraw);
+
+        if (!needsCooling) continue;
+
+        float roomCoolingEfficiency = 1f;
+        if (outdoorTemp > room.Temperature)
+        {
+          float tempDiff = outdoorTemp - room.Temperature;
+          roomCoolingEfficiency = Mathf.Max(0.1f, 1f - (tempDiff / 80f));
+        }
+
+        if (activeTiles > 0)
+        {
+          // 4.1666665f is the 250-tick multiplier for energyPerSecond used by vanilla CompTempControl
+          float energyPerSecond = ext.coolingCapacity * activeTiles * roomCoolingEfficiency;
+          float actualHeat = -energyPerSecond * 4.1666665f;
+
+          float tempChange = actualHeat / (room.CellCount * 1.2f);
+          if (room.Temperature + tempChange < targetTemp)
+          {
+            actualHeat = (targetTemp - room.Temperature) * (room.CellCount * 1.2f);
+          }
+
+          GenTemperature.PushHeat(firstCell, map, actualHeat);
         }
       }
     }
-
-    foreach (var kvp in netRequests)
+    catch (System.Exception ex)
     {
-      PowerNet net = kvp.Key;
-      float requested = kvp.Value;
-
-      if (net.CurrentStoredEnergy() > 0f || (net.CurrentEnergyGainRate() * 60000f) >= requested)
-      {
-        poweredNets.Add(net);
-        powerDraws[net] = requested;
-      }
-    }
-
-    foreach (var kvp in roomGroups)
-    {
-      Room room = kvp.Key;
-      var cells = kvp.Value;
-      if (cells.Count == 0) continue;
-
-      IntVec3 firstCell = map.cellIndices.IndexToCell(cells[0]);
-      RoofDef roof = map.roofGrid.RoofAt(firstCell);
-      var ext = GetExtension(roof);
-      if (ext == null) continue;
-
-      float targetTemp = ext.targetTemperature;
-      if (thermostatTracker != null && thermostatTracker.TryGetLowestTargetTemperature(room, out float thermostatTemp))
-        targetTemp = thermostatTemp;
-
-      bool needsCooling = room.Temperature > targetTemp;
-
-      float activeTiles = 0f;
-      float powerDraw = 0f;
-      foreach (var idx in cells)
-      {
-        if (cellToNet.TryGetValue(idx, out PowerNet net) && poweredNets.Contains(net))
-        {
-          activeTiles++;
-          powerDraw += needsCooling ? ext.powerDrawActive : ext.powerDrawStandby;
-        }
-      }
-
-      roomStats[room] = (cells.Count, (int)activeTiles, needsCooling, powerDraw);
-
-      if (!needsCooling) continue;
-
-      float roomCoolingEfficiency = 1f;
-      if (outdoorTemp > room.Temperature)
-      {
-        float tempDiff = outdoorTemp - room.Temperature;
-        roomCoolingEfficiency = Mathf.Max(0.1f, 1f - (tempDiff / 80f));
-      }
-
-      if (activeTiles > 0)
-      {
-        // 4.1666665f is the 250-tick multiplier for energyPerSecond used by vanilla CompTempControl
-        float energyPerSecond = ext.coolingCapacity * activeTiles * roomCoolingEfficiency;
-        float actualHeat = -energyPerSecond * 4.1666665f;
-
-        float tempChange = actualHeat / (room.CellCount * 1.2f);
-        if (room.Temperature + tempChange < targetTemp)
-        {
-          actualHeat = (targetTemp - room.Temperature) * (room.CellCount * 1.2f);
-        }
-
-        GenTemperature.PushHeat(firstCell, map, actualHeat);
-      }
+      StratumLog.Error($"Error in ActiveRadiatorManager.TickRare: {ex}");
     }
   }
 }

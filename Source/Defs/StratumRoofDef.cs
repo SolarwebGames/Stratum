@@ -3,6 +3,7 @@ using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.Stats;
+using SolarWeb.Stratum.UI;
 
 namespace SolarWeb.Stratum.Defs;
 
@@ -28,13 +29,38 @@ public class StratumRoofDef : RoofDef
   {
     get
     {
-      var map = Find.CurrentMap;
-      if (map == null)
-        return base.LabelCap;
+      SelectedRoof? selectedRoof = null;
+      var selectedObjects = Find.Selector.SelectedObjects;
+      if (selectedObjects != null)
+      {
+        for (int i = 0; i < selectedObjects.Count; i++)
+        {
+          if (selectedObjects[i] is SelectedRoof sr && sr.def == this)
+          {
+            selectedRoof = sr;
+            break;
+          }
+        }
+      }
 
-      var cell = Verse.UI.MouseCell();
-      if (!cell.InBounds(map) || map.roofGrid.RoofAt(cell) != this)
-        return base.LabelCap;
+      Map map;
+      IntVec3 cell;
+
+      if (selectedRoof != null)
+      {
+        map = selectedRoof.map;
+        cell = selectedRoof.cell;
+      }
+      else
+      {
+        map = Find.CurrentMap;
+        if (map == null)
+          return base.LabelCap;
+
+        cell = Verse.UI.MouseCell();
+        if (!cell.InBounds(map) || map.roofGrid.RoofAt(cell) != this)
+          return base.LabelCap;
+      }
 
       var integrityGrid = map.GetComponent<MapComponents.RoofIntegrityGrid>();
       if (integrityGrid == null)
@@ -58,16 +84,18 @@ public class StratumRoofDef : RoofDef
       if (coating != null)
       {
         float dirt = coating.GetDirtLevel(cell);
+        float pollen = coating.GetPollenLevel(cell);
         float snow = coating.GetSnowLevel(cell);
         List<string> details = [];
 
         if (dirt > 0.01f)
         {
-          RimWorld.Season season = RimWorld.GenLocalDate.Season(map);
-          string dirtType = (season == RimWorld.Season.Spring || season == RimWorld.Season.Summer)
-            ? "SolarWeb_Stratum_Pollen".Translate()
-            : "SolarWeb_Stratum_Dust".Translate();
-          details.Add($"{dirtType}: {dirt.ToStringPercent("F0")}");
+          details.Add($"{"SolarWeb_Stratum_Dust".Translate()}: {dirt.ToStringPercent("F0")}");
+        }
+
+        if (pollen > 0.01f)
+        {
+          details.Add($"{"SolarWeb_Stratum_Pollen".Translate()}: {pollen.ToStringPercent("F0")}");
         }
 
         if (snow > 0.01f)

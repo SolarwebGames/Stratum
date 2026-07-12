@@ -13,41 +13,63 @@ public static class RoofIconUtility
     var gd = RoofStatCache.GetGraphicData(roofDef);
     var bDef = ext.buildableDef;
 
-    if ((icon == null || icon == BaseContent.BadTex || bDef?.uiIcon == icon) && gd != null && RoofAtlasManager.TryGetUv(gd.texPath, out var uvs, out var mat))
+    if ((icon == null || icon == BaseContent.BadTex || bDef?.uiIcon == icon) && gd != null)
     {
-      if (mat == null)
-      {
-        mat = MaterialPool.MatFrom(gd.texPath, ShaderDatabase.Cutout, gd.color);
-      }
+      var uvs = RoofAtlasManager.GetIconUvs(gd.texPath);
 
       if (uvs != null && uvs.Length >= 4)
       {
-        float minU = uvs[0].x;
-        float minV = uvs[0].y;
-        float maxU = uvs[2].x;
-        float maxV = uvs[2].y;
+        Material mat = RoofAtlasManager.GetMaterials(gd.texPath, gd.color).cutout;
 
-        RenderTexture rt = RenderTexture.GetTemporary(64, 64, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
-        Vector2 scale = new(maxU - minU, maxV - minV);
-        Vector2 offset = new(minU, minV);
-        UnityEngine.Graphics.Blit(mat.mainTexture, rt, scale, offset);
+        if (mat != null && mat.mainTexture != null)
+        {
+          float minU = uvs[0].x;
+          float minV = uvs[0].y;
+          float maxU = uvs[2].x;
+          float maxV = uvs[2].y;
 
-        RenderTexture prev = RenderTexture.active;
-        RenderTexture.active = rt;
-        Texture2D resolvedIcon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
-        resolvedIcon.ReadPixels(new Rect(0, 0, 64, 64), 0, 0);
-        resolvedIcon.Apply();
-        RenderTexture.active = prev;
-        RenderTexture.ReleaseTemporary(rt);
+          RenderTexture rt = RenderTexture.GetTemporary(64, 64, 0, RenderTextureFormat.Default, RenderTextureReadWrite.Linear);
+          Vector2 scale = new(maxU - minU, maxV - minV);
+          Vector2 offset = new(minU, minV);
+          UnityEngine.Graphics.Blit(mat.mainTexture, rt, scale, offset);
 
-        icon = resolvedIcon;
-        iconTexCoords = new Rect(0, 0, 1, 1);
+          RenderTexture prev = RenderTexture.active;
+          RenderTexture.active = rt;
+          Texture2D resolvedIcon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
+          resolvedIcon.ReadPixels(new Rect(0, 0, 64, 64), 0, 0);
+          resolvedIcon.Apply();
+          RenderTexture.active = prev;
+          RenderTexture.ReleaseTemporary(rt);
 
-        if (bDef != null) bDef.uiIcon = resolvedIcon;
+          icon = resolvedIcon;
+          iconTexCoords = new Rect(0, 0, 1, 1);
+
+          if (bDef != null) bDef.uiIcon = resolvedIcon;
+        }
+        else
+        {
+          var fallbackTex = ContentFinder<Texture2D>.Get(gd.texPath, false);
+          if (fallbackTex != null)
+          {
+            icon = fallbackTex;
+          }
+        }
       }
       else
       {
-        icon = mat.mainTexture;
+        Material mat = RoofAtlasManager.GetMaterials(gd.texPath, gd.color).cutout;
+        if (mat != null && mat.mainTexture != null)
+        {
+          icon = mat.mainTexture;
+        }
+        else
+        {
+          var fallbackTex = ContentFinder<Texture2D>.Get(gd.texPath, false);
+          if (fallbackTex != null)
+          {
+            icon = fallbackTex;
+          }
+        }
       }
     }
   }

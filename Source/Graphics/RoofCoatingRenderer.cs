@@ -6,10 +6,14 @@ using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.Graphics;
 
+[StaticConstructorOnStartup]
 public class RoofCoatingRenderer : SectionLayer
 {
   private static Material[]? dirtMats;
   private static Material[] DirtMats => dirtMats ??= LoadMatsFromDef(ThingDefOf.Filth_Dirt);
+
+  private static readonly Color DustColor = new(0.22f, 0.18f, 0.13f);
+  private static readonly Color PollenColor = new(0.3f, 0.28f, 0.1f);
 
   private static Material? snowMat;
   private static Material SnowMat
@@ -35,7 +39,7 @@ public class RoofCoatingRenderer : SectionLayer
         Material[] mats = new Material[array.Length];
         for (int i = 0; i < array.Length; i++)
         {
-          mats[i] = MaterialPool.MatFrom(array[i].path, ShaderDatabase.Transparent, Color.white);
+          mats[i] = MaterialPool.MatFrom(array[i].path, ShaderDatabase.MetaOverlay, Color.white);
         }
         return mats;
       }
@@ -104,10 +108,19 @@ public class RoofCoatingRenderer : SectionLayer
         float dirt = skylightDirt.GetDirtLevel(c);
         if (dirt > 0.01f)
         {
-          Color dirtCol = skylightDirt.GetDirtColor(c);
+          Color dirtCol = DustColor;
           dirtCol.a = dirt * 0.95f;
           Material dMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
           DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.02f, c.z + 0.5f), Vector2.one, dMat, dirtCol, Rot4.North);
+        }
+
+        float pollen = skylightDirt.GetPollenLevel(c);
+        if (pollen > 0.01f)
+        {
+          Color pollenCol = PollenColor;
+          pollenCol.a = pollen * 0.95f;
+          Material pMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
+          DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.025f, c.z + 0.5f), Vector2.one, pMat, pollenCol, Rot4.North);
         }
       }
 
@@ -128,16 +141,39 @@ public class RoofCoatingRenderer : SectionLayer
             new(1f, 1f, 1f, alphaBR * 0.95f),
           ];
 
-          if (RoofAtlasManager.TryGetSeamlessUv("Snow", c.x, c.z, out var uv, out var mat) ||
-              RoofAtlasManager.TryGetUv("Snow", c.GetHashCode(), out uv, out mat))
+          if (RoofAtlasManager.uvMap.TryGetValue("Snow", out var entry))
           {
-            mat!.renderQueue = 4550;
-            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.03f, c.z + 0.5f), Vector2.one, mat!, Color.white, Rot4.North, uv!, vColors);
+            var transparent = RoofAtlasManager.GetMetaOverlay("Snow");
+            transparent.renderQueue = 4550;
+
+            Vector2[]? uv = null;
+            if (entry.IsSeamless && entry.SeamlessGrid != null)
+            {
+              int col = c.x % entry.GridWidth;
+              if (col < 0) col += entry.GridWidth;
+
+              int row = c.z % entry.GridHeight;
+              if (row < 0) row += entry.GridHeight;
+
+              entry.SeamlessGrid.TryGetValue((col, row), out uv);
+            }
+            else if (entry.FlatVariants.Count > 0)
+            {
+              uv = entry.FlatVariants[Mathf.Abs(c.GetHashCode()) % entry.FlatVariants.Count];
+            }
+
+            if (uv != null)
+            {
+              DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.03f, c.z + 0.5f), Vector2.one, transparent, Color.white, Rot4.North, uv, vColors);
+            }
+            else
+            {
+              DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.03f, c.z + 0.5f), Vector2.one, SnowMat, Color.white, Rot4.North, null, vColors);
+            }
           }
           else
           {
-            Material sMat = SnowMat;
-            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.03f, c.z + 0.5f), Vector2.one, sMat, Color.white, Rot4.North, null, vColors);
+            DrawQuadCustom(new Vector3(c.x + 0.5f, altitude + 0.03f, c.z + 0.5f), Vector2.one, SnowMat, Color.white, Rot4.North, null, vColors);
           }
         }
       }

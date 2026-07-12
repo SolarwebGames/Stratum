@@ -8,6 +8,8 @@ namespace SolarWeb.Stratum.UI;
 
 public class SkylightTintPicker : Dialog_ColorPickerBase
 {
+  public override Vector2 InitialSize => new Vector2(600f, 500f);
+
   private readonly Action<Color> callback;
   private readonly Color defaultColor;
 

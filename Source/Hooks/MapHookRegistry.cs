@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RimWorld;
 using UnityEngine;
 using Verse;
 
@@ -29,7 +30,8 @@ public class MapHookRegistry : MapComponent
     RoofMaxHitPoints,
     RoofDamageThreshold,
     RoofArmorRating,
-    GroundGlow
+    GroundGlow,
+    ScanSpeed
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -288,6 +290,61 @@ public class MapHookRegistry : MapComponent
     return current;
   }
 
+  public static float GetScanSpeed(Thing scanner, float baseSpeed = 1f)
+  {
+    if (scanner == null) return baseSpeed;
+    float current = baseSpeed;
+    if (DefOf.StatDefOf.ScanSpeed != null)
+    {
+      float statValue = scanner.GetStatValue(DefOf.StatDefOf.ScanSpeed, true);
+      current += (statValue - 1f);
+    }
+    if (DefOf.StatDefOf.ScanSpeedOffset != null)
+    {
+      float offset = scanner.GetStatValue(DefOf.StatDefOf.ScanSpeedOffset, true);
+      current += offset;
+    }
+    var globalHandlers = GetGlobalHandlers<ScanSpeedHandler>(HookId.ScanSpeed);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](scanner, current);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global ScanSpeed handler: {ex}");
+        }
+      }
+    }
+    var map = scanner.MapHeld ?? scanner.Map;
+    if (map != null)
+    {
+      var registry = Get(map);
+      if (registry != null)
+      {
+        var handlers = registry.GetHandlers<ScanSpeedHandler>(HookId.ScanSpeed);
+        if (handlers != null)
+        {
+          for (int i = 0; i < handlers.Count; i++)
+          {
+            try
+            {
+              current = handlers[i](scanner, current);
+            }
+            catch (Exception ex)
+            {
+              StratumLog.Error($"Error in ScanSpeed handler: {ex}");
+            }
+          }
+        }
+      }
+    }
+    return Mathf.Max(0f, current);
+  }
+
   public delegate void RoofChangedHandler(Map map, IntVec3 cell, RoofDef? oldRoof, RoofDef? newRoof);
   public delegate void BeforeSetRoofHandler(Map map, IntVec3 cell, RoofDef? oldRoof, ref RoofDef? newRoof, ref bool allow);
   public delegate bool AirtightCheckHandler(RoofDef def);
@@ -308,4 +365,5 @@ public class MapHookRegistry : MapComponent
   public delegate float RoofDamageThresholdHandler(Map map, IntVec3 cell, float baseDt);
   public delegate float RoofArmorRatingHandler(Map map, IntVec3 cell, float baseArmor);
   public delegate bool GroundGlowHandler(GlowGrid instance, Map map, IntVec3 cell, bool ignoreCavePlants, bool ignoreSky, ref float result);
+  public delegate float ScanSpeedHandler(Thing scanner, float currentSpeed);
 }

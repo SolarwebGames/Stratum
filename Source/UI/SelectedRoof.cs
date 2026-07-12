@@ -6,6 +6,8 @@ using Verse;
 
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.WorldComponents;
+using SolarWeb.Stratum.DefModExtensions;
+using SolarWeb.Stratum.Graphics;
 
 namespace SolarWeb.Stratum.UI;
 
@@ -56,6 +58,53 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
 
   public IEnumerable<Gizmo> GetGizmos()
   {
+    var ext = def.GetModExtension<BuildableRoofExtension>();
+    if (ext != null && BuildableRoofGenerator.RoofToDesignator.TryGetValue(def, out var designator))
+    {
+      var stuff = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetStuff(cell);
+      var tint = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetGlassTint(cell);
+
+      Color defaultIconColor = Color.white;
+      var bDef = ext.buildableDef;
+      var gd = RoofStatCache.GetGraphicData(def);
+      if (bDef != null)
+      {
+        if (gd != null)
+        {
+          defaultIconColor = gd.color;
+        }
+        else if (bDef.graphicData != null)
+        {
+          defaultIconColor = bDef.graphicData.color;
+        }
+      }
+
+      yield return new Command_BuildCopyRoof
+      {
+        defaultLabel = "CommandBuildCopy".Translate(),
+        defaultDesc = "CommandBuildCopyDesc".Translate(),
+        icon = designator.icon,
+        iconTexCoords = designator.iconTexCoords,
+        hotKey = KeyBindingDefOf.Misc11,
+        roofDef = def,
+        stuffDef = stuff,
+        selectedTint = tint,
+        defaultIconColor = defaultIconColor,
+        action = delegate
+        {
+          if (stuff != null)
+          {
+            designator.SetStuffDef(stuff);
+          }
+          if (RoofStatCache.IsSkylight(def))
+          {
+            designator.SelectedTint = tint;
+          }
+          Find.DesignatorManager.Select(designator);
+        }
+      };
+    }
+
     var disabled = def?.isThickRoof == true || map.areaManager.NoRoof[cell];
     var disabledReason = def?.isThickRoof == true ? "MessageNothingCanRemoveThickRoofs".Translate()
       : map.areaManager.NoRoof[cell] ? "Stratum_AlreadyRemoving".Translate() : null;
@@ -160,5 +209,17 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
     {
       map.areaManager.NoRoof[cell] = false;
     }
+  }
+}
+
+public class Command_BuildCopyRoof : Command_Action
+{
+  public RoofDef roofDef = null!;
+  public ThingDef? stuffDef;
+  public Color? selectedTint;
+
+  public override void DrawIcon(Rect rect, Material? buttonMat, GizmoRenderParms parms)
+  {
+    RoofIconUtility.DrawDesignatorIcon(rect, roofDef, stuffDef, selectedTint, defaultIconColor, icon, iconTexCoords, buttonMat, parms);
   }
 }

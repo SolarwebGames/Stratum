@@ -11,18 +11,20 @@ namespace SolarWeb.Stratum.Graphics;
 [StaticConstructorOnStartup]
 public static class RoofAtlasManager
 {
-  internal record struct UvEntry(Vector2[] Uvs, Material Mat);
-
-  internal class AtlasEntry
+  public class AtlasEntry
   {
-    public List<UvEntry> FlatVariants = [];
-    public Dictionary<(int col, int row), UvEntry>? SeamlessGrid;
+    public Texture2D BaseTexture = null!;
+    public List<Vector2[]> FlatVariants = [];
+    public Dictionary<(int col, int row), Vector2[]>? SeamlessGrid;
     public int GridWidth;
     public int GridHeight;
+    public bool IsSeamless => SeamlessGrid != null;
   }
 
-  internal static readonly Dictionary<string, AtlasEntry> uvMap = [];
-  private static readonly Dictionary<Texture2D, (Material cutout, Material transparent)> materialCache = [];
+  public static readonly Dictionary<string, AtlasEntry> uvMap = [];
+  private static readonly Dictionary<(Texture2D, Color), (Material cutout, Material transparent)> materialColorCache = [];
+  private static readonly Dictionary<Texture2D, Material> metaOverlayCache = [];
+  private static readonly Dictionary<(Texture2D, Color), (Material cutout, Material transparent)> transitionMaterialCache = [];
 
   public static void Initialize()
   {
@@ -53,8 +55,7 @@ public static class RoofAtlasManager
 
       if (matchingSprites.Count > 0)
       {
-        bool isSkylight = RoofStatCache.IsSkylight(def);
-        CacheUv(gd.texPath, gd.isSeamless, isSkylight, matchingSprites);
+        CacheUv(gd.texPath, gd.isSeamless, matchingSprites);
       }
       else
       {
@@ -77,7 +78,7 @@ public static class RoofAtlasManager
 
       if (matchingSprites.Count > 0)
       {
-        CacheUv(atlasDef.texPath, atlasDef.isSeamless, atlasDef.isTransparent, matchingSprites);
+        CacheUv(atlasDef.texPath, atlasDef.isSeamless, matchingSprites);
       }
       else
       {
@@ -86,27 +87,110 @@ public static class RoofAtlasManager
     }
   }
 
-  private static (Material cutout, Material transparent) GetMaterials(Texture2D tex)
+  public static AtlasEntry GetOrCreateEntry(string path)
   {
-    if (!materialCache.TryGetValue(tex, out var mats))
+    if (path.NullOrEmpty())
     {
-      var cutout = new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Cutout" };
-      cutout.renderQueue = 4500;
+      path = "fallback_empty";
+    }
 
-      var trans = new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_Transparent" };
-      trans.renderQueue = 4500;
+    if (!uvMap.TryGetValue(path, out var entry))
+    {
+      StratumLog.Warning($"No UV entry found for '{path}', creating fallback entry.");
+      var fallbackTex = ContentFinder<Texture2D>.Get(path, false) ?? BaseContent.BadTex ?? Texture2D.whiteTexture;
+      entry = new AtlasEntry
+      {
+        BaseTexture = fallbackTex
+      };
+      entry.FlatVariants.Add([
+        new Vector2(0f, 0f),
+        new Vector2(0f, 1f),
+        new Vector2(1f, 1f),
+        new Vector2(1f, 0f)
+      ]);
+      uvMap[path] = entry;
+    }
+    return entry;
+  }
 
-      mats = (cutout, trans);
-      materialCache[tex] = mats;
+  public static AtlasEntry GetEntry(string path)
+  {
+    return GetOrCreateEntry(path);
+  }
+
+  public static (Material cutout, Material transparent) GetMaterials(string path, Color color)
+  {
+    var entry = GetOrCreateEntry(path);
+    return GetMaterials(entry.BaseTexture, color);
+  }
+
+  private static (Material cutout, Material transparent) GetMaterials(Texture2D tex, Color color)
+  {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
+    if (!materialColorCache.TryGetValue((tex, color), out var mats))
+    {
+      mats = (
+        new Material(ShaderDatabase.Cutout) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Cutout", renderQueue = 2900 },
+        new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Transparent", renderQueue = 2901 }
+      );
+      materialColorCache[(tex, color)] = mats;
     }
     return mats;
   }
 
-  private static void CacheUv(string path, bool isSeamless, bool isTransparent, List<Sprite> spriteList)
+  public static (Material cutout, Material transparent) GetTransitionMaterials(string path, Color color)
+  {
+    var entry = GetOrCreateEntry(path);
+    return GetTransitionMaterials(entry.BaseTexture, color);
+  }
+
+  private static (Material cutout, Material transparent) GetTransitionMaterials(Texture2D tex, Color color)
+  {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
+    if (!transitionMaterialCache.TryGetValue((tex, color), out var mats))
+    {
+      mats = (
+        new Material(ShaderDatabase.Cutout) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Cutout_Transition", renderQueue = 3165 },
+        new Material(ShaderDatabase.Transparent) { mainTexture = tex, color = color, name = $"RoofAtlas_{tex.name}_Transparent_Transition", renderQueue = 3166 }
+      );
+      transitionMaterialCache[(tex, color)] = mats;
+    }
+    return mats;
+  }
+
+  public static Material GetMetaOverlay(string path)
+  {
+    var entry = GetOrCreateEntry(path);
+    return GetMetaOverlay(entry.BaseTexture);
+  }
+
+  public static Material GetMetaOverlay(Texture2D tex)
+  {
+    if (tex == null)
+    {
+      tex = BaseContent.BadTex ?? Texture2D.whiteTexture;
+    }
+    if (!metaOverlayCache.TryGetValue(tex, out var mat))
+    {
+      mat = new Material(ShaderDatabase.MetaOverlay) { mainTexture = tex, color = Color.white, name = $"RoofAtlas_{tex.name}_MetaOverlay" };
+      mat.renderQueue = 4500;
+      metaOverlayCache[tex] = mat;
+    }
+    return mat;
+  }
+
+  private static void CacheUv(string path, bool isSeamless, List<Sprite> spriteList)
   {
     if (uvMap.ContainsKey(path)) return;
 
     var entry = new AtlasEntry();
+    entry.BaseTexture = spriteList[0].texture;
 
     if (isSeamless)
     {
@@ -130,9 +214,7 @@ public static class RoofAtlasManager
         int col = Mathf.RoundToInt((sprite.rect.x - minX) / firstWidth);
         int row = Mathf.RoundToInt((sprite.rect.y - minY) / firstHeight);
 
-        var mats = GetMaterials(sprite.texture);
-        var mat = isTransparent ? mats.transparent : mats.cutout;
-        entry.SeamlessGrid[(col, row)] = new UvEntry(ExtractQuadUvs(sprite), mat);
+        entry.SeamlessGrid[(col, row)] = ExtractQuadUvs(sprite);
       }
 
       StratumLog.Debug($"Seamless '{Path.GetFileNameWithoutExtension(path)}': {spriteList.Count} sprites, grid {entry.GridWidth}x{entry.GridHeight}");
@@ -141,61 +223,37 @@ public static class RoofAtlasManager
     {
       foreach (var sprite in spriteList)
       {
-        var mats = GetMaterials(sprite.texture);
-        var mat = isTransparent ? mats.transparent : mats.cutout;
-        entry.FlatVariants.Add(new UvEntry(ExtractQuadUvs(sprite), mat));
+        entry.FlatVariants.Add(ExtractQuadUvs(sprite));
       }
     }
 
     uvMap[path] = entry;
   }
 
-  public static bool TryGetUv(string path, out Vector2[]? uvs, out Material? mat)
-    => TryGetUv(path, 0, out uvs, out mat);
-
-  public static bool TryGetUv(string path, int variantIndex, out Vector2[]? uvs, out Material? mat)
+  public static Vector2[]? GetIconUvs(string path)
   {
-    if (uvMap.TryGetValue(path, out var entry))
+    if (path.NullOrEmpty()) return null;
+    var entry = GetOrCreateEntry(path);
+    if (entry.FlatVariants.Count > 0)
     {
-      if (entry.FlatVariants.Count > 0)
-      {
-        var e = entry.FlatVariants[Mathf.Abs(variantIndex) % entry.FlatVariants.Count];
-        uvs = e.Uvs;
-        mat = e.Mat;
-        return true;
-      }
-
-      if (entry.SeamlessGrid != null && entry.SeamlessGrid.Count > 0)
-      {
-        // For seamless atlases, we pick the first available tile as a representative icon
-        var e = entry.SeamlessGrid.Values.First();
-        uvs = e.Uvs;
-        mat = e.Mat;
-        return true;
-      }
+      return entry.FlatVariants[0];
     }
-    uvs = null;
-    mat = null;
-    return false;
+    if (entry.SeamlessGrid != null && entry.SeamlessGrid.Count > 0)
+    {
+      return entry.SeamlessGrid.Values.First();
+    }
+    return null;
   }
 
-  public static bool TryGetSeamlessUv(string path, int worldX, int worldZ, out Vector2[]? uvs, out Material? mat)
+  public static Vector2[]? GetUvs(string path, int variantIndex)
   {
-    if (uvMap.TryGetValue(path, out var entry) && entry.SeamlessGrid != null)
+    if (path.NullOrEmpty()) return null;
+    var entry = GetOrCreateEntry(path);
+    if (entry.FlatVariants.Count > 0)
     {
-      int col = ((worldX % entry.GridWidth) + entry.GridWidth) % entry.GridWidth;
-      int row = ((worldZ % entry.GridHeight) + entry.GridHeight) % entry.GridHeight;
-
-      if (entry.SeamlessGrid.TryGetValue((col, row), out var e))
-      {
-        uvs = e.Uvs;
-        mat = e.Mat;
-        return true;
-      }
+      return entry.FlatVariants[Mathf.Abs(variantIndex) % entry.FlatVariants.Count];
     }
-    uvs = null;
-    mat = null;
-    return false;
+    return null;
   }
 
   private static Vector2[] ExtractQuadUvs(Sprite sprite)
