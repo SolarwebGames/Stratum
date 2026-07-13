@@ -13,6 +13,7 @@ public static class DropPodUtility_Patch
   [HarmonyPrefix]
   public static void MakeDropPodAt_Prefix(ref IntVec3 c, Map map, ActiveTransporterInfo info, Faction faction)
   {
+    if (!Stratum.Settings.enableDropPodInterception) return;
     if (map == null || !c.IsValid || !c.InBounds(map)) return;
 
     var roof = map.roofGrid.RoofAt(c);

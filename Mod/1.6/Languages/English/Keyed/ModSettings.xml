@@ -3,4 +3,20 @@
   <Stratum_ModSettings_EnableRoofFires>Enable roof fires</Stratum_ModSettings_EnableRoofFires>
   <Stratum_ModSettings_RoofFiresEnabled_Description>Fires will be able to spread to roofs and ignite them, and roof fires will be able to spread to other roofs.</Stratum_ModSettings_RoofFiresEnabled_Description>
   <Stratum_ModSettings_RoofFiresDisabled_Description>Roofs will not catch on fire, and fires will not be able to spread to roofs.</Stratum_ModSettings_RoofFiresDisabled_Description>
+  
+  <Stratum_ModSettings_EnableDropPodInterception>Enable drop pod interception</Stratum_ModSettings_EnableDropPodInterception>
+  <Stratum_ModSettings_EnableDropPodInterception_Desc>High-integrity buildable roofs will block and redirect incoming drop pods and skyfallers (like meteorites and spaceship debris) to prevent them from landing directly inside your rooms.</Stratum_ModSettings_EnableDropPodInterception_Desc>
+
+  <Stratum_ModSettings_EnableSkylightCoating>Enable skylight dirt &amp; snow</Stratum_ModSettings_EnableSkylightCoating>
+  <Stratum_ModSettings_EnableSkylightCoating_Desc>Skylights will passively accumulate dirt, pollen, and snow over time. This reduces the light passing through them and requires manual cleaning by pawns.</Stratum_ModSettings_EnableSkylightCoating_Desc>
+  <Stratum_ModSettings_SkylightDirtAccumulationRate>Skylight dirt accumulation rate: {0}</Stratum_ModSettings_SkylightDirtAccumulationRate>
+
+  <Stratum_ModSettings_EnableLightningStrikesTargetRoofs>Lightning strikes target roofs</Stratum_ModSettings_EnableLightningStrikesTargetRoofs>
+  <Stratum_ModSettings_EnableLightningStrikesTargetRoofs_Desc>Lightning strikes can target cells covered by oofs. If disabled, lightning will only strike completely unroofed areas.</Stratum_ModSettings_EnableLightningStrikesTargetRoofs_Desc>
+
+  <Stratum_ModSettings_EnableRoofLightningExplosions>Roof lightning explosions</Stratum_ModSettings_EnableRoofLightningExplosions>
+  <Stratum_ModSettings_EnableRoofLightningExplosions_Desc>Lightning strikes hitting a roof will cause a rooftop explosion and fire.</Stratum_ModSettings_EnableRoofLightningExplosions_Desc>
+
+  <Stratum_ModSettings_EnableSkylightShadows>Enable skylight shadows &amp; lighting</Stratum_ModSettings_EnableSkylightShadows>
+  <Stratum_ModSettings_EnableSkylightShadows_Desc>Toggles high-quality corner shadow fading, dynamic light pools, and overhead shadow mesh updates under skylights. Disabling this can improve performance on low-end PCs or very large maps.</Stratum_ModSettings_EnableSkylightShadows_Desc>
 </LanguageData>

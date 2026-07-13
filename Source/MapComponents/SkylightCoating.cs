@@ -111,6 +111,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
 
   public float GetCoatingOpacity(IntVec3 cell)
   {
+    if (!Stratum.Settings.enableSkylightCoating) return 0f;
     if (!cell.InBounds(map)) return 0f;
     int idx = map.cellIndices.CellToIndex(cell);
     return Mathf.Clamp01(dirtLevels[idx] + pollenLevels[idx] + snowLevels[idx]);
@@ -155,6 +156,21 @@ public class SkylightCoating(Map map) : MapComponent(map)
     NotifyCoatingChanged(cell);
   }
 
+  public void ClearAllCoating()
+  {
+    for (int i = 0; i < dirtLevels.Length; i++)
+    {
+      if (dirtLevels[i] > 0f || pollenLevels[i] > 0f || snowLevels[i] > 0f)
+      {
+        dirtLevels[i] = 0f;
+        dirtColors[i] = Color.white;
+        pollenLevels[i] = 0f;
+        snowLevels[i] = 0f;
+        NotifyCoatingChanged(map.cellIndices.IndexToCell(i));
+      }
+    }
+  }
+
   public override void MapComponentTick()
   {
     base.MapComponentTick();
@@ -165,6 +181,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     }
 
     if (Find.TickManager.TicksGame % 250 != 0) return;
+    if (!Stratum.Settings.enableSkylightCoating) return;
 
     AccumulateNaturalDirt();
     WashDirtWithRain();
@@ -175,6 +192,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     int cellsToTick = Mathf.Max(1, map.Area / 2000);
     Season season = GenLocalDate.Season(map);
     bool isPollenSeason = (season == Season.Spring || season == Season.Summer);
+    float rate = Stratum.Settings.skylightDirtAccumulationRate;
 
     for (int k = 0; k < cellsToTick; k++)
     {
@@ -188,7 +206,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           float curPollen = pollenLevels[idx];
           if (curPollen < 1f)
           {
-            pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
+            pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f * rate);
             NotifyCoatingChanged(cell);
           }
         }
@@ -197,7 +215,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           float curDirt = dirtLevels[idx];
           if (curDirt < 1f)
           {
-            dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
+            dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f * rate);
             NotifyCoatingChanged(cell);
           }
         }
@@ -210,9 +228,9 @@ public class SkylightCoating(Map map) : MapComponent(map)
       float curDirt = dirtLevels[idx];
       if (curDirt > 0.01f && curDirt < 1f)
       {
-        if (Rand.Value < curDirt * 0.10f)
+        if (Rand.Value < curDirt * 0.10f * rate)
         {
-          dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f);
+          dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f * rate);
           NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
@@ -220,9 +238,9 @@ public class SkylightCoating(Map map) : MapComponent(map)
       float curPollen = pollenLevels[idx];
       if (curPollen > 0.01f && curPollen < 1f)
       {
-        if (Rand.Value < curPollen * 0.10f)
+        if (Rand.Value < curPollen * 0.10f * rate)
         {
-          pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f);
+          pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f * rate);
           NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }

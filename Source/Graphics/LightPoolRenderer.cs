@@ -28,7 +28,7 @@ public class LightPoolRenderer : SectionLayer
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs;
   }
 
-  public override bool Visible => true;
+  public override bool Visible => SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows;
 
   public override void DrawLayer()
   {
@@ -52,6 +52,7 @@ public class LightPoolRenderer : SectionLayer
   public override void Regenerate()
   {
     ClearSubMeshes(MeshParts.All);
+    if (!SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows) return;
 
     Map map = base.Map;
     if (map == null || map.roofGrid == null) return;

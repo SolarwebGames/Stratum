@@ -12,6 +12,7 @@ public static class SectionLayer_LightingOverlay_Patch
     Map map,
     LayerSubMesh subMesh)
   {
+    if (!SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows) return;
     if (map == null || map.roofGrid == null || subMesh?.mesh == null) return;
 
     var colors = subMesh.mesh.colors32;

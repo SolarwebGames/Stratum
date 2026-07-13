@@ -12,6 +12,7 @@ public class SkylightDeposit : IncidentWorker
 {
   protected override bool CanFireNowSub(IncidentParms parms)
   {
+    if (!SolarWeb.Stratum.Stratum.Settings.enableSkylightCoating) return false;
     Map map = (Map)parms.target;
     if (map == null) return false;
 

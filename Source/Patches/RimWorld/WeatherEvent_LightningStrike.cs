@@ -24,7 +24,8 @@ public static class WeatherEvent_LightningStrike_Patch
       if (!strikeLoc.IsValid)
       {
         strikeLoc = CellFinderLoose.RandomCellWith((IntVec3 sq) =>
-          sq.Standable(map) && (map.roofGrid == null || !map.roofGrid.Roofed(sq) || map.roofGrid.RoofAt(sq) == null || !map.roofGrid.RoofAt(sq).isThickRoof),
+          sq.Standable(map) && (map.roofGrid == null || !map.roofGrid.Roofed(sq) || 
+            (SolarWeb.Stratum.Stratum.Settings.enableLightningStrikesTargetRoofs && (map.roofGrid.RoofAt(sq) == null || !map.roofGrid.RoofAt(sq).isThickRoof))),
           map);
       }
 
@@ -126,7 +127,7 @@ public static class WeatherEvent_LightningStrike_Patch
     }
 
     RoofDef roof = strikeLoc.GetRoof(map);
-    if (roof != null && !roof.isThickRoof)
+    if (SolarWeb.Stratum.Stratum.Settings.enableRoofLightningExplosions && roof != null && !roof.isThickRoof)
     {
       SoundStarter.PlayOneShotOnCamera(SoundDefOf.Thunder_OffMap, map);
       boltMesh = LightningBoltMeshPool.RandomBoltMesh;

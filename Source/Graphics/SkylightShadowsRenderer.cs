@@ -38,7 +38,7 @@ public class SkylightShadowsRenderer : SectionLayer
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.FogOfWar;
   }
 
-  public override bool Visible => true;
+  public override bool Visible => SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows;
 
   public override void DrawLayer()
   {
@@ -48,6 +48,7 @@ public class SkylightShadowsRenderer : SectionLayer
   public override void Regenerate()
   {
     ClearSubMeshes(MeshParts.All);
+    if (!SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows) return;
 
     Map map = base.Map;
     if (map == null || map.roofGrid == null || map.fogGrid == null) return;
