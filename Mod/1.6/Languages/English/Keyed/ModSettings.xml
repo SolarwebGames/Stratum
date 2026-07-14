@@ -1,22 +1,51 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
+  <Stratum_ModSettings_Category_Gameplay>Gameplay Mechanics</Stratum_ModSettings_Category_Gameplay>
+  <Stratum_ModSettings_Category_Skylights>Skylight Coatings</Stratum_ModSettings_Category_Skylights>
+  <Stratum_ModSettings_Category_Graphics>Graphics &amp; Performance</Stratum_ModSettings_Category_Graphics>
+
   <Stratum_ModSettings_EnableRoofFires>Enable roof fires</Stratum_ModSettings_EnableRoofFires>
   <Stratum_ModSettings_RoofFiresEnabled_Description>Fires will be able to spread to roofs and ignite them, and roof fires will be able to spread to other roofs.</Stratum_ModSettings_RoofFiresEnabled_Description>
   <Stratum_ModSettings_RoofFiresDisabled_Description>Roofs will not catch on fire, and fires will not be able to spread to roofs.</Stratum_ModSettings_RoofFiresDisabled_Description>
   
   <Stratum_ModSettings_EnableDropPodInterception>Enable drop pod interception</Stratum_ModSettings_EnableDropPodInterception>
-  <Stratum_ModSettings_EnableDropPodInterception_Desc>High-integrity buildable roofs will block and redirect incoming drop pods and skyfallers (like meteorites and spaceship debris) to prevent them from landing directly inside your rooms.</Stratum_ModSettings_EnableDropPodInterception_Desc>
+  <Stratum_ModSettings_DropPodInterceptionEnabled_Desc>High-integrity buildable roofs will block and redirect incoming drop pods and skyfallers (like meteorites and spaceship debris) to prevent them from landing directly inside your rooms.</Stratum_ModSettings_DropPodInterceptionEnabled_Desc>
+  <Stratum_ModSettings_DropPodInterceptionDisabled_Desc>Drop pods and skyfallers will ignore buildable roofs and land normally.</Stratum_ModSettings_DropPodInterceptionDisabled_Desc>
 
   <Stratum_ModSettings_EnableSkylightCoating>Enable skylight dirt &amp; snow</Stratum_ModSettings_EnableSkylightCoating>
-  <Stratum_ModSettings_EnableSkylightCoating_Desc>Skylights will passively accumulate dirt, pollen, and snow over time. This reduces the light passing through them and requires manual cleaning by pawns.</Stratum_ModSettings_EnableSkylightCoating_Desc>
+  <Stratum_ModSettings_SkylightCoatingEnabled_Desc>Skylights will passively accumulate dirt, pollen, and snow over time, reducing light transmission.</Stratum_ModSettings_SkylightCoatingEnabled_Desc>
+  <Stratum_ModSettings_SkylightCoatingDisabled_Desc>Skylights will remain perfectly clean, allowing maximum light passage indefinitely.</Stratum_ModSettings_SkylightCoatingDisabled_Desc>
   <Stratum_ModSettings_SkylightDirtAccumulationRate>Skylight dirt accumulation rate: {0}</Stratum_ModSettings_SkylightDirtAccumulationRate>
 
   <Stratum_ModSettings_EnableLightningStrikesTargetRoofs>Lightning strikes target roofs</Stratum_ModSettings_EnableLightningStrikesTargetRoofs>
-  <Stratum_ModSettings_EnableLightningStrikesTargetRoofs_Desc>Lightning strikes can target cells covered by oofs. If disabled, lightning will only strike completely unroofed areas.</Stratum_ModSettings_EnableLightningStrikesTargetRoofs_Desc>
+  <Stratum_ModSettings_LightningStrikesTargetRoofsEnabled_Desc>Lightning strikes can target cells covered by roofs.</Stratum_ModSettings_LightningStrikesTargetRoofsEnabled_Desc>
+  <Stratum_ModSettings_LightningStrikesTargetRoofsDisabled_Desc>Lightning strikes will only target completely unroofed areas.</Stratum_ModSettings_LightningStrikesTargetRoofsDisabled_Desc>
 
   <Stratum_ModSettings_EnableRoofLightningExplosions>Roof lightning explosions</Stratum_ModSettings_EnableRoofLightningExplosions>
-  <Stratum_ModSettings_EnableRoofLightningExplosions_Desc>Lightning strikes hitting a roof will cause a rooftop explosion and fire.</Stratum_ModSettings_EnableRoofLightningExplosions_Desc>
+  <Stratum_ModSettings_RoofLightningExplosionsEnabled_Desc>Lightning strikes hitting a roof will cause a rooftop explosion and fire.</Stratum_ModSettings_RoofLightningExplosionsEnabled_Desc>
+  <Stratum_ModSettings_RoofLightningExplosionsDisabled_Desc>Lightning strikes hitting a roof will not cause rooftop explosions or fires.</Stratum_ModSettings_RoofLightningExplosionsDisabled_Desc>
 
-  <Stratum_ModSettings_EnableSkylightShadows>Enable skylight shadows &amp; lighting</Stratum_ModSettings_EnableSkylightShadows>
-  <Stratum_ModSettings_EnableSkylightShadows_Desc>Toggles high-quality corner shadow fading, dynamic light pools, and overhead shadow mesh updates under skylights. Disabling this can improve performance on low-end PCs or very large maps.</Stratum_ModSettings_EnableSkylightShadows_Desc>
+  <Stratum_ModSettings_EnableSkylightLighting>Enable skylight lighting</Stratum_ModSettings_EnableSkylightLighting>
+  <Stratum_ModSettings_SkylightLightingEnabled_Desc>Natural light passes through skylights visually with light pools and floor illumination.</Stratum_ModSettings_SkylightLightingEnabled_Desc>
+  <Stratum_ModSettings_SkylightLightingDisabled_Desc>Skylight lighting and glow pools are disabled.</Stratum_ModSettings_SkylightLightingDisabled_Desc>
+
+  <Stratum_ModSettings_EnableSkylightShadows>Enable skylight floor shadows</Stratum_ModSettings_EnableSkylightShadows>
+  <Stratum_ModSettings_SkylightShadowsEnabled_Desc>Dynamic floor shadows are cast under skylights by dirt, pollen, and snow coatings.</Stratum_ModSettings_SkylightShadowsEnabled_Desc>
+  <Stratum_ModSettings_SkylightShadowsDisabled_Desc>Dynamic floor shadows under skylights are disabled.</Stratum_ModSettings_SkylightShadowsDisabled_Desc>
+
+  <Stratum_ModSettings_EnableDirtGraphics>Render dirt details</Stratum_ModSettings_EnableDirtGraphics>
+  <Stratum_ModSettings_DirtGraphicsEnabled_Desc>Render dirt overlay coatings on skylights and their shadows on the floor.</Stratum_ModSettings_DirtGraphicsEnabled_Desc>
+  <Stratum_ModSettings_DirtGraphicsDisabled_Desc>Dirt coatings and floor shadows are disabled.</Stratum_ModSettings_DirtGraphicsDisabled_Desc>
+
+  <Stratum_ModSettings_EnablePollenGraphics>Render pollen details</Stratum_ModSettings_EnablePollenGraphics>
+  <Stratum_ModSettings_PollenGraphicsEnabled_Desc>Render pollen overlay coatings on skylights and their shadows on the floor.</Stratum_ModSettings_PollenGraphicsEnabled_Desc>
+  <Stratum_ModSettings_PollenGraphicsDisabled_Desc>Pollen coatings and floor shadows are disabled.</Stratum_ModSettings_PollenGraphicsDisabled_Desc>
+
+  <Stratum_ModSettings_EnableSnowGraphics>Render snow details</Stratum_ModSettings_EnableSnowGraphics>
+  <Stratum_ModSettings_SnowGraphicsEnabled_Desc>Render snow overlay coatings on roofs/skylights and their shadows on the floor.</Stratum_ModSettings_SnowGraphicsEnabled_Desc>
+  <Stratum_ModSettings_SnowGraphicsDisabled_Desc>Snow coatings and floor shadows are disabled.</Stratum_ModSettings_SnowGraphicsDisabled_Desc>
+
+  <Stratum_ModSettings_EnableRoofDamageScratches>Render roof damage scratches</Stratum_ModSettings_EnableRoofDamageScratches>
+  <Stratum_ModSettings_RoofDamageScratchesEnabled_Desc>Render scratches overlay on damaged roofs.</Stratum_ModSettings_RoofDamageScratchesEnabled_Desc>
+  <Stratum_ModSettings_RoofDamageScratchesDisabled_Desc>Damaged roofs will not display scratch visual overlays.</Stratum_ModSettings_RoofDamageScratchesDisabled_Desc>
 </LanguageData>

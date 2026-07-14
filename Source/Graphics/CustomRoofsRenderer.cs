@@ -160,7 +160,7 @@ public class CustomRoofsRenderer : SectionLayer
         }
       }
 
-      if (integrityGrid != null)
+      if (integrityGrid != null && Stratum.Settings.enableRoofDamageScratches)
       {
         short hp = integrityGrid.GetHitPoints(c);
         short maxHp = integrityGrid.GetMaxHitPoints(c);

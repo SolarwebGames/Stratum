@@ -12,7 +12,7 @@ public static class SectionLayer_LightingOverlay_Patch
     Map map,
     LayerSubMesh subMesh)
   {
-    if (!SolarWeb.Stratum.Stratum.Settings.enableSkylightShadows) return;
+    if (!Stratum.Settings.enableSkylightLighting) return;
     if (map == null || map.roofGrid == null || subMesh?.mesh == null) return;
 
     var colors = subMesh.mesh.colors32;
@@ -37,10 +37,10 @@ public static class SectionLayer_LightingOverlay_Patch
           if (c.InBounds(map))
           {
             RoofDef roof = roofGrid.RoofAt(c);
-            if (roof != null && SolarWeb.Stratum.Stats.RoofStatCache.IsSkylight(roof))
+            if (roof != null && Stats.RoofStatCache.IsSkylight(roof))
             {
               hasSkylight = true;
-              float t = SolarWeb.Stratum.Stats.RoofStatCache.GetEffectiveTransparency(roof, map, c);
+              float t = Stats.RoofStatCache.GetEffectiveTransparency(roof, map, c);
               if (t > maxTrans) maxTrans = t;
             }
           }
@@ -50,7 +50,7 @@ public static class SectionLayer_LightingOverlay_Patch
       if (hasSkylight)
       {
         byte baseA = (byte)Mathf.Clamp(100f * (1f - maxTrans), 0f, 100f);
-        colors[i].a = SolarWeb.Stratum.Graphics.SectionLayer_RoofLightingAndShadows.GetSkylightCornerShadowAlpha(map, roofGrid, vx, vz, baseA);
+        colors[i].a = Graphics.SectionLayer_RoofLightingAndShadows.GetSkylightCornerShadowAlpha(map, roofGrid, vx, vz, baseA);
       }
     }
 
