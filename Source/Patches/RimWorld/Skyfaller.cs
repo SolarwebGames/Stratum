@@ -13,6 +13,7 @@ public static class Skyfaller_Patch
   [HarmonyPrefix]
   public static bool HitRoof_Prefix(Skyfaller __instance)
   {
+    if (!Stratum.Settings.enableDropPodInterception) return true;
     var map = __instance.Map;
     if (map == null) return true;
 

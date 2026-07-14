@@ -28,7 +28,7 @@ public class LightPoolRenderer : SectionLayer
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs;
   }
 
-  public override bool Visible => true;
+  public override bool Visible => Stratum.Settings.enableSkylightLighting;
 
   public override void DrawLayer()
   {
@@ -52,8 +52,9 @@ public class LightPoolRenderer : SectionLayer
   public override void Regenerate()
   {
     ClearSubMeshes(MeshParts.All);
+    if (!Stratum.Settings.enableSkylightLighting) return;
 
-    Map map = base.Map;
+    Map map = Map;
     if (map == null || map.roofGrid == null) return;
     RoofGrid roofGrid = map.roofGrid;
     CellRect cellRect = section.CellRect;
@@ -70,8 +71,6 @@ public class LightPoolRenderer : SectionLayer
 
     LayerSubMesh subMesh = GetSubMesh(PoolMat);
     if (subMesh == null) return;
-
-    var skylightDirt = map.GetComponent<SkylightCoating>();
 
     foreach (IntVec3 c in cellRect)
     {

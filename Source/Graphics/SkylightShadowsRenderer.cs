@@ -38,7 +38,7 @@ public class SkylightShadowsRenderer : SectionLayer
     relevantChangeTypes = (ulong)MapMeshFlagDefOf.Roofs | (ulong)MapMeshFlagDefOf.FogOfWar;
   }
 
-  public override bool Visible => true;
+  public override bool Visible => Stratum.Settings.enableSkylightShadows;
 
   public override void DrawLayer()
   {
@@ -48,8 +48,9 @@ public class SkylightShadowsRenderer : SectionLayer
   public override void Regenerate()
   {
     ClearSubMeshes(MeshParts.All);
+    if (!Stratum.Settings.enableSkylightShadows) return;
 
-    Map map = base.Map;
+    Map map = Map;
     if (map == null || map.roofGrid == null || map.fogGrid == null) return;
 
     var skylightDirt = map.GetComponent<MapComponents.SkylightCoating>();
@@ -79,27 +80,36 @@ public class SkylightShadowsRenderer : SectionLayer
 
       if (RoofStatCache.IsSkylight(roof))
       {
-        float dirt = skylightDirt.GetDirtLevel(c);
-        if (dirt > 0.01f)
+        if (Stratum.Settings.enableDirtGraphics)
         {
-          Color shadowCol = new(0f, 0f, 0f, dirt * 0.5f);
-          Material dMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
-          DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.001f, c.z + 0.5f), Vector2.one, dMat, shadowCol, Rot4.North);
+          float dirt = skylightDirt.GetDirtLevel(c);
+          if (dirt > 0.01f)
+          {
+            Color shadowCol = new(0f, 0f, 0f, dirt * 0.5f);
+            Material dMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
+            DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.001f, c.z + 0.5f), Vector2.one, dMat, shadowCol, Rot4.North);
+          }
         }
 
-        float pollen = skylightDirt.GetPollenLevel(c);
-        if (pollen > 0.01f)
+        if (Stratum.Settings.enablePollenGraphics)
         {
-          Color shadowCol = new(0f, 0f, 0f, pollen * 0.4f);
-          Material pMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
-          DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.002f, c.z + 0.5f), Vector2.one, pMat, shadowCol, Rot4.North);
+          float pollen = skylightDirt.GetPollenLevel(c);
+          if (pollen > 0.01f)
+          {
+            Color shadowCol = new(0f, 0f, 0f, pollen * 0.4f);
+            Material pMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
+            DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.002f, c.z + 0.5f), Vector2.one, pMat, shadowCol, Rot4.North);
+          }
         }
 
-        float snow = skylightDirt.GetSnowLevel(c);
-        if (snow > 0.01f)
+        if (Stratum.Settings.enableSnowGraphics)
         {
-          Color shadowCol = new(0f, 0f, 0f, snow * 0.6f);
-          DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.003f, c.z + 0.5f), Vector2.one, SnowMat, shadowCol, Rot4.North);
+          float snow = skylightDirt.GetSnowLevel(c);
+          if (snow > 0.01f)
+          {
+            Color shadowCol = new(0f, 0f, 0f, snow * 0.6f);
+            DrawQuadCustom(new Vector3(c.x + 0.5f, baseAltitude + 0.003f, c.z + 0.5f), Vector2.one, SnowMat, shadowCol, Rot4.North);
+          }
         }
       }
     }

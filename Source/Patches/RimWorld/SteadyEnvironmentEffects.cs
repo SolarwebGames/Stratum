@@ -21,6 +21,7 @@ public static class SteadyEnvironmentEffects_Patch
   [HarmonyPostfix]
   public static void DoCellSteadyEffects_Postfix(SteadyEnvironmentEffects __instance, IntVec3 c, Map ___map)
   {
+    if (!Stratum.Settings.enableSkylightCoating) return;
     var roof = ___map.roofGrid.RoofAt(c);
     if (roof == null || !RoofStatCache.IsCustomRoof(roof)) return;
 
