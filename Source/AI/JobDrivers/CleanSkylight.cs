@@ -19,10 +19,10 @@ public class CleanSkylight : JobDriver
 
   protected override IEnumerable<Toil> MakeNewToils()
   {
-    this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.OnCell, Danger.Deadly));
+    this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.Touch, Danger.Deadly));
     this.FailOn(() => pawn.Faction == Faction.OfPlayer && !pawn.Map.areaManager.Home[Cell] && !job.playerForced);
 
-    yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.OnCell);
+    yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.Touch);
 
     Toil clean = ToilMaker.MakeToil("MakeNewToils");
     clean.defaultCompleteMode = ToilCompleteMode.Delay;
@@ -50,7 +50,7 @@ public class CleanSkylight : JobDriver
         dirt.SetSnowLevel(Cell, 0f);
       }
     });
-    clean.FailOnCannotTouch(TargetIndex.A, PathEndMode.OnCell);
+    clean.FailOnCannotTouch(TargetIndex.A, PathEndMode.Touch);
     clean.WithEffect(EffecterDefOf.Clean, TargetIndex.A);
 
     yield return clean;
