@@ -303,16 +303,19 @@ public static class RoofStatCache
 
   public static float GetEffectiveTransparency(RoofDef def, Map? map, IntVec3 cell)
   {
+    return GetEffectiveTransparency(def, map?.GetComponent<MapComponents.SkylightCoating>(), cell);
+  }
+
+  // Overload for hot paths that already hold the coating component, avoiding a
+  // GetComponent list scan per cell
+  public static float GetEffectiveTransparency(RoofDef def, MapComponents.SkylightCoating? coating, IntVec3 cell)
+  {
     if (def == null) return 0f;
     float baseTrans = GetTransparency(def);
     if (baseTrans <= 0f) return 0f;
-    if (map != null && cell.IsValid)
+    if (coating != null && cell.IsValid)
     {
-      var coating = map.GetComponent<MapComponents.SkylightCoating>();
-      if (coating != null)
-      {
-        baseTrans *= Mathf.Clamp01(1f - coating.GetCoatingOpacity(cell));
-      }
+      baseTrans *= Mathf.Clamp01(1f - coating.GetCoatingOpacity(cell));
     }
     return baseTrans;
   }

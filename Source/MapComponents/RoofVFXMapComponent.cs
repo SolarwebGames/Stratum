@@ -71,14 +71,37 @@ public class RoofVFXMapComponent : MapComponent
     transparentCells.Add(cellIdx);
 
     IntVec3 cell = map.cellIndices.IndexToCell(cellIdx);
-    IntVec2 sectionPos = new IntVec2(cell.x / 17, cell.z / 17);
-
-    if (!sectionTransparentCounts.TryGetValue(sectionPos, out int count))
+    GetInfluencedSections(cell, tmpSections);
+    foreach (IntVec2 sectionPos in tmpSections)
     {
-      count = 0;
-      activeSections.Add(sectionPos);
+      if (!sectionTransparentCounts.TryGetValue(sectionPos, out int count))
+      {
+        count = 0;
+        activeSections.Add(sectionPos);
+      }
+      sectionTransparentCounts[sectionPos] = count + 1;
     }
-    sectionTransparentCounts[sectionPos] = count + 1;
+  }
+
+  private static readonly List<IntVec2> tmpSections = new(4);
+
+  // A border cell's light reaches shared mesh verts in the neighboring section, so that
+  // section must also regenerate as sky glow changes or a stale seam line appears.
+  private void GetInfluencedSections(IntVec3 cell, List<IntVec2> sections)
+  {
+    sections.Clear();
+    int maxX = map.Size.x - 1;
+    int maxZ = map.Size.z - 1;
+    for (int dx = -1; dx <= 1; dx++)
+    {
+      for (int dz = -1; dz <= 1; dz++)
+      {
+        int x = Mathf.Clamp(cell.x + dx, 0, maxX);
+        int z = Mathf.Clamp(cell.z + dz, 0, maxZ);
+        IntVec2 s = new(x / 17, z / 17);
+        if (!sections.Contains(s)) sections.Add(s);
+      }
+    }
   }
 
   private void EnsureInitialized()
@@ -109,18 +132,20 @@ public class RoofVFXMapComponent : MapComponent
     cellToIndex[cellIdx] = -1;
 
     IntVec3 cell = map.cellIndices.IndexToCell(cellIdx);
-    IntVec2 sectionPos = new IntVec2(cell.x / 17, cell.z / 17);
-
-    if (sectionTransparentCounts.TryGetValue(sectionPos, out int count))
+    GetInfluencedSections(cell, tmpSections);
+    foreach (IntVec2 sectionPos in tmpSections)
     {
-      if (count <= 1)
+      if (sectionTransparentCounts.TryGetValue(sectionPos, out int count))
       {
-        sectionTransparentCounts.Remove(sectionPos);
-        activeSections.Remove(sectionPos);
-      }
-      else
-      {
-        sectionTransparentCounts[sectionPos] = count - 1;
+        if (count <= 1)
+        {
+          sectionTransparentCounts.Remove(sectionPos);
+          activeSections.Remove(sectionPos);
+        }
+        else
+        {
+          sectionTransparentCounts[sectionPos] = count - 1;
+        }
       }
     }
   }
@@ -146,25 +171,15 @@ public class RoofVFXMapComponent : MapComponent
     }
   }
 
-  private float lastSkyGlow = -1f;
-
   public override void MapComponentTick()
   {
     if (map.skyManager == null) return;
     float curSkyGlow = map.skyManager.CurSkyGlow;
 
-    if (Mathf.Abs(curSkyGlow - lastSkyGlow) > 0.05f)
-    {
-      lastSkyGlow = curSkyGlow;
-      if (map.mapDrawer != null)
-      {
-        foreach (var section in activeSections)
-        {
-          var sect = map.mapDrawer.SectionAt(new IntVec3(section.x * 17, 0, section.z * 17));
-          if (sect != null) sect.dirtyFlags |= MapMeshFlagDefOf.GroundGlow;
-        }
-      }
-    }
+    // No sky-glow-based mesh dirtying: the lighting overlay bakes nothing time-of-day
+    // dependent (the sky term animates via the material color), so regenerating sections as
+    // the sky changes is wasted work — and sections regenerating at different times produced
+    // stale seams and mismatched section brightness.
 
     if (Find.TickManager.TicksGame % TickInterval == 0 && transparentCells.Count > 0)
     {

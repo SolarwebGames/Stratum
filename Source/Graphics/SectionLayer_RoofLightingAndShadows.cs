@@ -67,6 +67,7 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     if (map == null || map.roofGrid == null) return;
 
     RoofGrid roofGrid = map.roofGrid;
+    var coating = map.GetComponent<MapComponents.SkylightCoating>();
     LayerSubMesh tintMesh = GetSubMesh(SkylightTintMat);
     float y = AltitudeLayer.LightingOverlay.AltitudeFor() + 0.002f;
     CellRect rect = section.CellRect;
@@ -75,10 +76,18 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     {
       for (int x = rect.minX; x <= rect.maxX; x++)
       {
-        Color32 cBL = GetTintVertexColor(map, roofGrid, x, z);
-        Color32 cBR = GetTintVertexColor(map, roofGrid, x + 1, z);
-        Color32 cTL = GetTintVertexColor(map, roofGrid, x, z + 1);
-        Color32 cTR = GetTintVertexColor(map, roofGrid, x + 1, z + 1);
+        // The tint is the view through the glass: it may only ever be drawn on glass cells.
+        // Emitting quads on neighboring cells (because a shared corner carries tint) multiplies
+        // the surrounding floor by a partially-tinted color — a permanent shadow ring around
+        // every skylight. Corner colors feather to white at the boundary, so the mesh edge
+        // ending exactly at the glass edge leaves no seam.
+        RoofDef roof = roofGrid.RoofAt(new IntVec3(x, 0, z));
+        if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
+
+        Color32 cBL = GetTintVertexColor(map, roofGrid, coating, x, z);
+        Color32 cBR = GetTintVertexColor(map, roofGrid, coating, x + 1, z);
+        Color32 cTL = GetTintVertexColor(map, roofGrid, coating, x, z + 1);
+        Color32 cTR = GetTintVertexColor(map, roofGrid, coating, x + 1, z + 1);
 
         if (HasTint(cBL) || HasTint(cBR) || HasTint(cTL) || HasTint(cTR))
         {
@@ -94,10 +103,13 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     }
   }
 
-  private static bool HasTint(Color32 c) => c.r > 0 || c.g > 0 || c.b > 0;
+  private static bool HasTint(Color32 c) => c.r < 255 || c.g < 255 || c.b < 255;
 
-  private static Color32 GetTintVertexColor(Map map, RoofGrid roofGrid, int vx, int vz)
+  private static Color32 GetTintVertexColor(Map map, RoofGrid roofGrid, MapComponents.SkylightCoating? coating, int vx, int vz)
   {
+    // This mesh is a second multiplicative lighting pass, so "no tint" must be white with
+    // alpha 255 (alpha 255 = fully roof-covered, which makes the shader use the vertex
+    // color alone). Anything darker double-darkens the scene under and around the skylight.
     float sumR = 0f, sumG = 0f, sumB = 0f;
     int count = 0;
 
@@ -108,89 +120,34 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
         IntVec3 c = new(vx + dx, 0, vz + dz);
         if (!c.InBounds(map)) continue;
 
-        RoofDef roof = roofGrid.RoofAt(c);
-        if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
-
-        Color tint = RoofStatCache.GetGlassTint(roof, map, c);
-        if (tint == Color.white) continue;
-
-        float trans = RoofStatCache.GetEffectiveTransparency(roof, map, c);
-        if (trans <= 0f) continue;
-
-        float strength = trans * 0.70f;
-        sumR += tint.r * 255f * strength;
-        sumG += tint.g * 255f * strength;
-        sumB += tint.b * 255f * strength;
         count++;
+        float strength = 0f;
+        Color tint = Color.white;
+
+        RoofDef roof = roofGrid.RoofAt(c);
+        if (roof != null && RoofStatCache.IsSkylight(roof))
+        {
+          tint = RoofStatCache.GetGlassTint(roof, map, c);
+          if (tint != Color.white)
+          {
+            strength = RoofStatCache.GetEffectiveTransparency(roof, coating, c) * 0.70f;
+          }
+        }
+
+        sumR += Mathf.Lerp(1f, tint.r, strength) * 255f;
+        sumG += Mathf.Lerp(1f, tint.g, strength) * 255f;
+        sumB += Mathf.Lerp(1f, tint.b, strength) * 255f;
       }
     }
 
-    if (count == 0) return new Color32(0, 0, 0, 0);
+    if (count == 0) return new Color32(255, 255, 255, 255);
 
     return new Color32(
       (byte)Mathf.Clamp(sumR / count, 0f, 255f),
       (byte)Mathf.Clamp(sumG / count, 0f, 255f),
       (byte)Mathf.Clamp(sumB / count, 0f, 255f),
-      0
+      255
     );
-  }
-
-  public static byte GetSkylightCornerShadowAlpha(Map map, RoofGrid roofGrid, int vx, int vz, byte baseA)
-  {
-    for (int dx = -1; dx <= 0; dx++)
-    {
-      for (int dz = -1; dz <= 0; dz++)
-      {
-        if (IsOpaqueRoof(map, roofGrid, vx + dx, vz + dz))
-        {
-          return (byte)Mathf.Max(baseA, 80);
-        }
-      }
-    }
-    return baseA;
-  }
-
-  public static bool IsOpaqueRoof(Map map, RoofGrid roofGrid, int x, int z)
-  {
-    IntVec3 c = new(x, 0, z);
-    if (!c.InBounds(map)) return false;
-    RoofDef roof = roofGrid.RoofAt(c);
-    if (roof == null) return false;
-    return !RoofStatCache.IsSkylight(roof) || RoofStatCache.GetEffectiveTransparency(roof, map, c) <= 0f;
-  }
-
-  private static void AppendQuad(LayerSubMesh sm, float minX, float minZ, float maxX, float maxZ, float y,
-                                 byte aBL, byte aBR, byte aTL, byte aTR)
-  {
-    AppendQuadCorners(sm, minX, minZ, maxX, maxZ, y, aBL, aBR, aTL, aTR);
-  }
-
-  private static void AppendQuadHorizontalGrad(LayerSubMesh sm, float minX, float minZ, float maxX, float maxZ, float y,
-                                               byte aLeft, byte aRight)
-  {
-    AppendQuadCorners(sm, minX, minZ, maxX, maxZ, y, aLeft, aRight, aLeft, aRight);
-  }
-
-  private static void AppendQuadCorners(LayerSubMesh sm, float minX, float minZ, float maxX, float maxZ, float y,
-                                        byte aBL, byte aBR, byte aTL, byte aTR)
-  {
-    int i = sm.verts.Count;
-    sm.verts.Add(new Vector3(minX, y, minZ)); // botLeft
-    sm.verts.Add(new Vector3(minX, y, maxZ)); // topLeft
-    sm.verts.Add(new Vector3(maxX, y, maxZ)); // topRight
-    sm.verts.Add(new Vector3(maxX, y, minZ)); // botRight
-
-    sm.colors.Add(new Color32(0, 0, 0, aBL));
-    sm.colors.Add(new Color32(0, 0, 0, aTL));
-    sm.colors.Add(new Color32(0, 0, 0, aTR));
-    sm.colors.Add(new Color32(0, 0, 0, aBR));
-
-    sm.tris.Add(i);
-    sm.tris.Add(i + 1);
-    sm.tris.Add(i + 2);
-    sm.tris.Add(i);
-    sm.tris.Add(i + 2);
-    sm.tris.Add(i + 3);
   }
 
   private static void AppendQuadColored(LayerSubMesh sm, float minX, float minZ, float maxX, float maxZ, float y,
