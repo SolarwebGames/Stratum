@@ -3,7 +3,7 @@
   <name>Stratum</name>
   <packageId>SolarWeb.Stratum</packageId>
   <author>SolarWeb Studios</author>
-  <modVersion>0.11.4</modVersion>
+  <modVersion>0.11.5</modVersion>
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
