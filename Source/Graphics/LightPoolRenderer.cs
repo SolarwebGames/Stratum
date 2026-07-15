@@ -79,6 +79,9 @@ public class LightPoolRenderer : SectionLayer
       RoofDef roof = roofGrid.RoofAt(c);
       if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
 
+      Building edifice = c.GetEdifice(map);
+      if (edifice != null && edifice.def.staticSunShadowHeight > 0f) continue;
+
       float transparency = RoofStatCache.GetEffectiveTransparency(roof, map, c);
       if (transparency <= 0f) continue;
 
