@@ -1,3 +1,7 @@
+0.11.7:
+Bug Fix: Pawns could get stuck in jobs in some cases.
+Bug Fix: Fixed roof shadowing artifacts.
+
 0.11.5:
 Bug Fix: Debug logging was unintentionally released, spamming user logs.
 
