@@ -53,7 +53,8 @@ public class GreenhouseGaze : JoyGiver
                 adjCell.Walkable(map) &&
                 !adjCell.IsForbidden(pawn) &&
                 pawn.CanReach(adjCell, PathEndMode.OnCell, Danger.None) &&
-                adjCell.GetRoom(map) == room)
+                adjCell.GetRoom(map) == room &&
+                !IsCellOccupied(adjCell, map))
             {
               var roof = map.roofGrid.RoofAt(adjCell);
               if (roof != null && RoofStatCache.IsSkylight(roof))
@@ -93,7 +94,10 @@ public class GreenhouseGaze : JoyGiver
 
     foreach (var cell in targetRoom.Cells)
     {
-      if (cell.Walkable(map) && !cell.IsForbidden(pawn) && pawn.CanReach(cell, PathEndMode.OnCell, Danger.None))
+      if (cell.Walkable(map) &&
+          !cell.IsForbidden(pawn) &&
+          pawn.CanReach(cell, PathEndMode.OnCell, Danger.None) &&
+          !IsCellOccupied(cell, map))
       {
         var roof = map.roofGrid.RoofAt(cell);
         if (roof != null && RoofStatCache.IsSkylight(roof))
@@ -142,6 +146,19 @@ public class GreenhouseGaze : JoyGiver
       }
     }
 
+    return false;
+  }
+
+  private static bool IsCellOccupied(IntVec3 cell, Map map)
+  {
+    List<Thing> things = cell.GetThingList(map);
+    for (int i = 0; i < things.Count; i++)
+    {
+      if (things[i] is Building or Plant)
+      {
+        return true;
+      }
+    }
     return false;
   }
 }
