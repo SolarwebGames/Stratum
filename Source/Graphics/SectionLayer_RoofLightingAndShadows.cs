@@ -1,11 +1,12 @@
 using RimWorld;
-using SolarWeb.Stratum.MapComponents;
-using SolarWeb.Stratum.Stats;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Stats;
+
 namespace SolarWeb.Stratum.Graphics;
 
+[StaticConstructorOnStartup]
 public class SectionLayer_RoofLightingAndShadows : SectionLayer
 {
   private static Material? roofOverlayMat;
