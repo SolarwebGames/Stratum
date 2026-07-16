@@ -23,6 +23,11 @@ public class RepairCustomRoof : JobDriver
   {
     this.FailOn(() => !pawn.CanReach(Cell, PathEndMode.Touch, Danger.Deadly));
     this.FailOn(() => pawn.Faction == Faction.OfPlayer && !pawn.Map.areaManager.Home[Cell] && !job.playerForced);
+    this.FailOn(() =>
+    {
+      var grid = pawn.Map?.GetComponent<RoofIntegrityGrid>();
+      return grid == null || grid.GetHitPoints(Cell) <= 0;
+    });
 
     yield return Toils_Goto.GotoCell(TargetIndex.A, PathEndMode.Touch);
 

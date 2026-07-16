@@ -31,7 +31,7 @@ public class DeliverRoofIngredients : JobDriver
 
   protected override IEnumerable<Toil> MakeNewToils()
   {
-    this.FailOn(() => CurrentFrame == null || CurrentFrame.Faction != pawn.Faction || CurrentFrame.IsForbidden(pawn));
+    this.FailOn(() => CurrentFrame == null || CurrentFrame.Destroyed || !CurrentFrame.Spawned || CurrentFrame.Faction != pawn.Faction || CurrentFrame.IsForbidden(pawn));
 
     Toil gotoStack = Toils_Goto.GotoThing(StackInd, PathEndMode.ClosestTouch)
       .FailOnDespawnedNullOrForbidden(StackInd)
