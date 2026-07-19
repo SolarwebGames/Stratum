@@ -133,6 +133,7 @@
     </graphicData>
     <size>(1,1)</size>
     <rotatable>false</rotatable>
+    <tickerType>Rare</tickerType>
     <altitudeLayer>Building</altitudeLayer>
     <passability>Standable</passability>
     <pathCost>0</pathCost>
@@ -212,6 +213,7 @@
       </li>
     </comps>
     <rotatable>false</rotatable>
+    <tickerType>Normal</tickerType>
     <selectable>true</selectable>
     <terrainAffordanceNeeded>Light</terrainAffordanceNeeded>
     <designationCategory>Power</designationCategory>
