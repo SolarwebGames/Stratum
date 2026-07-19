@@ -59,7 +59,7 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
   public IEnumerable<Gizmo> GetGizmos()
   {
     var ext = def.GetModExtension<BuildableRoofExtension>();
-    if (ext != null && BuildableRoofGenerator.RoofToDesignator.TryGetValue(def, out var designator))
+    if (ext != null && BuildableRoofGenerator.RoofToDesignator.TryGetValue(def, out var designator) && designator.Visible)
     {
       var stuff = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetStuff(cell);
       var tint = map.GetComponent<MapComponents.RoofIntegrityGrid>()?.GetGlassTint(cell);
@@ -78,7 +78,7 @@ public class SelectedRoof : ISelectable, IRenameable, ICancelableByDesignator
           defaultIconColor = bDef.graphicData.color;
         }
       }
-
+      
       yield return new Command_BuildCopyRoof
       {
         defaultLabel = "CommandBuildCopy".Translate(),
