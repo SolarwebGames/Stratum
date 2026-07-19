@@ -1,3 +1,12 @@
+0.11.14:
+Bug Fix: Adjusted roof repair workgiver to Vanilla Repair job priority. Allow non-colonists to repair roofs.
+Bug Fix: Pawns need an unoccupied cell to greenhouse gaze.
+Balance: Removed solar roofing (solar roofing you have built already will remain).
+Minor Feature: Added solar power plants that can be built on top of roofs.
+Bug Fix: Roofs and attachments now select in the proper order.
+Bug Fix: Building roofs respects the auto-expand home area setting.
+Bug Fix: Selecting a roof you didn't have research for could still let you build a copy.
+
 0.11.7:
 Bug Fix: Pawns could get stuck in jobs in some cases.
 Bug Fix: Fixed roof shadowing artifacts.
