@@ -127,10 +127,6 @@
     </costList>
     <uiOrder>2220</uiOrder>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
-    <researchPrerequisites>
-      <li>AdvancedFabrication</li>
-      <li>SolarPanels</li>
-    </researchPrerequisites>
   </ThingDef>
 
   <SolarWeb.Stratum.Defs.StratumRoofDef>
@@ -205,6 +201,8 @@
         <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <isSkylight>true</isSkylight>
         <glassTint>(0.8, 0.9, 1.0)</glassTint>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Glass Panel</Name>

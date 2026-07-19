@@ -14,6 +14,38 @@ public static class RoofBuildings
   public static bool showRoofBuildings = false;
   public static bool isDeconstructingRoof = false;
 
+  private static readonly System.Collections.Generic.Dictionary<ThingDef, RoofDef> buildableToRoof = new();
+  private static readonly System.Collections.Generic.Dictionary<ThingDef, BuildableRoofExtension> buildableToExtension = new();
+
+  static RoofBuildings()
+  {
+    foreach (var roofDef in DefDatabase<RoofDef>.AllDefs)
+    {
+      var ext = roofDef.GetModExtension<BuildableRoofExtension>();
+      if (ext != null && ext.buildableDef != null)
+      {
+        buildableToRoof[ext.buildableDef] = roofDef;
+        buildableToExtension[ext.buildableDef] = ext;
+      }
+    }
+  }
+
+  public static BuildableRoofExtension? GetBuildableRoofExtension(BuildableDef def)
+  {
+    if (def is ThingDef thingDef)
+    {
+      if (thingDef.entityDefToBuild is ThingDef buildDef)
+      {
+        thingDef = buildDef;
+      }
+      if (buildableToExtension.TryGetValue(thingDef, out var ext))
+      {
+        return ext;
+      }
+    }
+    return null;
+  }
+
   private static Texture2D? showRoofBuildingsIcon;
   public static Texture2D ShowRoofBuildingsIcon => showRoofBuildingsIcon ??= CreateDefaultToggleIcon();
 
@@ -339,10 +371,33 @@ public static class RoofBuildings
 
       if (floorDef != null)
       {
-        bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
-        if (isImpassable && attachmentType != RoofAttachmentType.Rooftop)
+        var roofExt = GetBuildableRoofExtension(floorDef);
+        if (roofExt != null)
         {
-          return true;
+          if (attachmentType == RoofAttachmentType.Hanging && !roofExt.allowHangingAttachments)
+          {
+            return true;
+          }
+          if (attachmentType == RoofAttachmentType.Rooftop && !roofExt.allowRooftopAttachments)
+          {
+            return true;
+          }
+        }
+        else
+        {
+          if (attachmentType == RoofAttachmentType.Hanging)
+          {
+            var builtFloorDef = floorDef.entityDefToBuild as ThingDef ?? floorDef;
+            if (builtFloorDef != null && builtFloorDef.building != null && !builtFloorDef.building.canBuildNonEdificesUnder)
+            {
+              return true;
+            }
+          }
+          bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
+          if (isImpassable && attachmentType != RoofAttachmentType.Rooftop)
+          {
+            return true;
+          }
         }
       }
 
@@ -377,15 +432,36 @@ public static class RoofBuildings
 
       if (floorDef != null)
       {
-        bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
-        if (!isImpassable || attachmentType == RoofAttachmentType.Rooftop)
+        var roofExt = GetBuildableRoofExtension(floorDef);
+        if (roofExt != null)
         {
-          return false;
+          if (attachmentType == RoofAttachmentType.Hanging && !roofExt.allowHangingAttachments)
+          {
+            return false;
+          }
+          if (attachmentType == RoofAttachmentType.Rooftop && !roofExt.allowRooftopAttachments)
+          {
+            return false;
+          }
+          return true;
         }
         else
         {
-          return true;
+          if (attachmentType == RoofAttachmentType.Hanging)
+          {
+            var builtFloorDef = floorDef.entityDefToBuild as ThingDef ?? floorDef;
+            if (builtFloorDef != null && builtFloorDef.building != null && !builtFloorDef.building.canBuildNonEdificesUnder)
+            {
+              return false;
+            }
+          }
+          bool isImpassable = floorDef.IsEdifice() && (floorDef.passability == Traversability.Impassable || floorDef.Fillage == FillCategory.Full);
+          if (isImpassable && attachmentType != RoofAttachmentType.Rooftop)
+          {
+            return false;
+          }
         }
+        return true;
       }
     }
 
