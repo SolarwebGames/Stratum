@@ -230,9 +230,6 @@
     </costList>
     <uiOrder>2050</uiOrder>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
-    <researchPrerequisites>
-      <li>SolarPanels</li>
-    </researchPrerequisites>
   </ThingDef>
 
   <SolarWeb.Stratum.Defs.StratumRoofDef>
