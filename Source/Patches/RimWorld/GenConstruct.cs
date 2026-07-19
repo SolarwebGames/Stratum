@@ -56,8 +56,6 @@ public static class GenConstruct_Patch
   [HarmonyPostfix]
   public static void CanPlaceBlueprintOver_Postfix(BuildableDef newDef, ThingDef oldDef, ref bool __result)
   {
-    if (__result) return;
-
     var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.CanPlaceBlueprintOverHandler>(MapHookRegistry.HookId.CanPlaceBlueprintOver);
     if (globalHandlers != null)
     {
