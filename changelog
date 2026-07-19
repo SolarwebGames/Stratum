@@ -1,3 +1,9 @@
+0.11.18:
+Bug Fix: Removed outdated research requirements to avoid deprecated roofs showing up in research.
+Compatibility: Added compatibility for Better Architect Menu.
+Bug Fix: Added tickerType to rooftop solar generator and rotary turbine vent.
+Bug Fix: Adjusted rooftop and hanging building placement logic and compatibility checks.
+
 0.11.14:
 Bug Fix: Adjusted roof repair workgiver to Vanilla Repair job priority. Allow non-colonists to repair roofs.
 Bug Fix: Pawns need an unoccupied cell to greenhouse gaze.
