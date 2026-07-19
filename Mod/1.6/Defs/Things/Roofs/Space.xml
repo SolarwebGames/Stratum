@@ -147,7 +147,6 @@
           <texPath>Roofs/SolarReinforcedHullPlate</texPath>
           <color>(0.15, 0.15, 0.25)</color>
         </graphicData>
-        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
         <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
