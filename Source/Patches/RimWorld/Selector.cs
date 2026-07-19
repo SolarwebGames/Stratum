@@ -7,6 +7,8 @@ using Verse.Sound;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.UI;
 using SolarWeb.Stratum.WorldComponents;
+using SolarWeb.Stratum.Utilities;
+using SolarWeb.Stratum.DefModExtensions;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -15,8 +17,42 @@ public static class Selector_Patch
 {
   private static IEnumerable<object> YieldRoofAndOriginal(object roofObj, IEnumerable<object> original)
   {
-    yield return roofObj;
+    var rooftopBuildings = new List<object>();
+    var hangingBuildings = new List<object>();
+    var otherObjects = new List<object>();
+
     foreach (var obj in original)
+    {
+      if (obj is Thing t && RoofBuildings.IsRoofBuildingOrBlueprintOrFrame(t))
+      {
+        if (RoofBuildings.GetAttachmentType(t) == RoofAttachmentType.Rooftop)
+        {
+          rooftopBuildings.Add(obj);
+        }
+        else
+        {
+          hangingBuildings.Add(obj);
+        }
+      }
+      else
+      {
+        otherObjects.Add(obj);
+      }
+    }
+
+    foreach (var obj in rooftopBuildings)
+    {
+      yield return obj;
+    }
+
+    yield return roofObj;
+
+    foreach (var obj in hangingBuildings)
+    {
+      yield return obj;
+    }
+
+    foreach (var obj in otherObjects)
     {
       yield return obj;
     }
