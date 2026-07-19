@@ -37,7 +37,7 @@
     <label>repair custom roofs</label>
     <giverClass>SolarWeb.Stratum.AI.WorkGivers.RepairCustomRoof</giverClass>
     <workType>Construction</workType>
-    <priorityInType>100</priorityInType>
+    <priorityInType>40</priorityInType>
     <verb>repair roof</verb>
     <gerund>repairing roof</gerund>
     <scanThings>false</scanThings>
@@ -45,6 +45,7 @@
     <requiredCapacities>
       <li>Manipulation</li>
     </requiredCapacities>
+    <nonColonistsCanDo>true</nonColonistsCanDo>
     <canBeDoneByMechs>true</canBeDoneByMechs>
   </WorkGiverDef>
   
