@@ -131,6 +131,14 @@ public static class RoofGrid_Patch
       ___map.areaManager.BuildRoof[c] = false;
     }
 
+    if (currentRoof != null && currentRoof != __state && (RoofStatCache.IsCustomRoof(currentRoof) || currentRoof.defName == "RoofConstructed"))
+    {
+      if (Find.PlaySettings != null && Find.PlaySettings.autoHomeArea && ___map.areaManager.Home != null)
+      {
+        ___map.areaManager.Home[c] = true;
+      }
+    }
+
     if (___map.regionAndRoomUpdater != null && ___map.regionAndRoomUpdater.Enabled)
     {
       var room = c.GetRoom(___map);
