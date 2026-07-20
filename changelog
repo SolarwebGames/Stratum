@@ -1,3 +1,7 @@
+0.11.20:
+Bug Fix: Allowed custom placement checks to block blueprints when vanilla allows them.
+Bug Fix: Pre-spawned roofs were setting home area during map initialization.
+
 0.11.18:
 Bug Fix: Removed outdated research requirements to avoid deprecated roofs showing up in research.
 Compatibility: Added compatibility for Better Architect Menu.
