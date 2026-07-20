@@ -207,13 +207,6 @@ public class BuildCustomRoof : Designator_Build
 
   public override void DesignateSingleCell(IntVec3 c)
   {
-    if (DebugSettings.godMode)
-    {
-      Map.roofGrid.SetRoof(c, roofDef);
-      Map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(c, roofDef, StuffDef, selectedTint);
-      return;
-    }
-
     var tracker = Map.GetComponent<RoofConstructionTracker>();
     tracker.RemoveRecord(c);
     Map.areaManager.NoRoof[c] = false;
@@ -232,6 +225,7 @@ public class BuildCustomRoof : Designator_Build
     frame.glassTint = selectedTint;
     frame.SetFaction(Faction.OfPlayer);
     GenSpawn.Spawn(frame, c, Map);
+    tracker.CompleteConstruction(c);
   }
 
   public override void SelectedUpdate()

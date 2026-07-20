@@ -103,6 +103,12 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
       {
         map.roofGrid.SetRoof(cell, rec.roofDef);
       }
+      
+      if (Find.PlaySettings != null && Find.PlaySettings.autoHomeArea && map.areaManager.Home != null)
+      {
+        map.areaManager.Home[cell] = true;
+      }
+
       map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, rec.roofDef, rec.stuffDef, rec.glassTint);
 
       RemoveRecord(cell);
