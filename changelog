@@ -1,3 +1,6 @@
+0.11.21:
+Bug Fix: Roof construction was acting as if God Mode was always enabled.
+
 0.11.20:
 Bug Fix: Allowed custom placement checks to block blueprints when vanilla allows them.
 Bug Fix: Pre-spawned roofs were setting home area during map initialization.
