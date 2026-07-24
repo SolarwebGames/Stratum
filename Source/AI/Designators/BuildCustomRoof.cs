@@ -225,7 +225,10 @@ public class BuildCustomRoof : Designator_Build
     frame.glassTint = selectedTint;
     frame.SetFaction(Faction.OfPlayer);
     GenSpawn.Spawn(frame, c, Map);
-    tracker.CompleteConstruction(c);
+    if (DebugSettings.godMode)
+    {
+      tracker.CompleteConstruction(c);
+    }
   }
 
   public override void SelectedUpdate()
