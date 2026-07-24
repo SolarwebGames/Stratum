@@ -152,8 +152,16 @@ public class SkylightCoating(Map map) : MapComponent(map)
   {
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
-    snowLevels[idx] = Mathf.Clamp01(level);
-    NotifyCoatingChanged(cell);
+    float oldLevel = snowLevels[idx];
+    float newLevel = Mathf.Clamp01(level);
+    if (Mathf.Approximately(oldLevel, newLevel)) return;
+
+    snowLevels[idx] = newLevel;
+
+    if ((int)(oldLevel * 20f) != (int)(newLevel * 20f) || (oldLevel > 0f != newLevel > 0f))
+    {
+      NotifyCoatingChanged(cell);
+    }
   }
 
   public void ClearAllCoating()
