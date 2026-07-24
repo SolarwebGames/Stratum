@@ -91,6 +91,12 @@ public class SkylightCoating(Map map) : MapComponent(map)
     return dirtLevels[map.cellIndices.CellToIndex(cell)];
   }
 
+  public float GetDirtLevel(int idx)
+  {
+    if ((uint)idx >= (uint)dirtLevels.Length) return 0f;
+    return dirtLevels[idx];
+  }
+
   public Color GetDirtColor(IntVec3 cell)
   {
     if (!cell.InBounds(map)) return Color.white;
@@ -107,6 +113,33 @@ public class SkylightCoating(Map map) : MapComponent(map)
   {
     if (!cell.InBounds(map)) return 0f;
     return snowLevels[map.cellIndices.CellToIndex(cell)];
+  }
+
+  public float GetSnowLevel(int idx)
+  {
+    if ((uint)idx >= (uint)snowLevels.Length) return 0f;
+    return snowLevels[idx];
+  }
+
+  private float[]? snowNoiseCache;
+
+  public float GetOrComputeSnowNoise(int idx, IntVec3 c, SteadyEnvironmentEffects effects)
+  {
+    snowNoiseCache ??= new float[map.cellIndices.NumGridCells];
+    float val = snowNoiseCache[idx];
+    if (val <= 0f)
+    {
+      var snowNoise = Patches.SteadyEnvironmentEffects_Patch.SnowNoiseRef(effects);
+      if (snowNoise == null)
+      {
+        snowNoise = new Verse.Noise.Perlin(0.03999999910593033, 2.0, 0.5, 5, Rand.Range(0, 651431), Verse.Noise.QualityMode.Medium);
+        Patches.SteadyEnvironmentEffects_Patch.SnowNoiseRef(effects) = snowNoise;
+      }
+      val = snowNoise.GetValue(c);
+      val = Mathf.Max(0.5f, (val + 1f) * 0.5f);
+      snowNoiseCache[idx] = val;
+    }
+    return val;
   }
 
   public float GetCoatingOpacity(IntVec3 cell)
@@ -152,8 +185,22 @@ public class SkylightCoating(Map map) : MapComponent(map)
   {
     if (!cell.InBounds(map)) return;
     int idx = map.cellIndices.CellToIndex(cell);
-    snowLevels[idx] = Mathf.Clamp01(level);
-    NotifyCoatingChanged(cell);
+    SetSnowLevel(idx, cell, level);
+  }
+
+  public void SetSnowLevel(int idx, IntVec3 cell, float level)
+  {
+    if ((uint)idx >= (uint)snowLevels.Length) return;
+    float oldLevel = snowLevels[idx];
+    float newLevel = Mathf.Clamp01(level);
+    if (oldLevel == newLevel) return;
+
+    snowLevels[idx] = newLevel;
+
+    if ((int)(oldLevel * 20f) != (int)(newLevel * 20f) || (oldLevel > 0f != newLevel > 0f))
+    {
+      NotifyCoatingChanged(cell);
+    }
   }
 
   public void ClearAllCoating()
