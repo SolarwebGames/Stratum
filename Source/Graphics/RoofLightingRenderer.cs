@@ -7,24 +7,10 @@ using SolarWeb.Stratum.Stats;
 namespace SolarWeb.Stratum.Graphics;
 
 [StaticConstructorOnStartup]
-public class SectionLayer_RoofLightingAndShadows : SectionLayer
+public class RoofLightingRenderer : SectionLayer
 {
-  private static Material? roofOverlayMat;
   private static Material? skylightTintMat;
-
-  private static Material RoofOverlayMat
-  {
-    get
-    {
-      if (roofOverlayMat == null)
-      {
-        roofOverlayMat = new Material(MatBases.LightOverlay.shader);
-        roofOverlayMat.CopyPropertiesFromMaterial(MatBases.LightOverlay);
-        roofOverlayMat.renderQueue = 3161;
-      }
-      return roofOverlayMat;
-    }
-  }
+  private readonly Color32[] vertTintCache = new Color32[18 * 18];
 
   private static Material SkylightTintMat
   {
@@ -32,15 +18,17 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     {
       if (skylightTintMat == null)
       {
-        skylightTintMat = new Material(MatBases.LightOverlay.shader);
-        skylightTintMat.mainTexture = BaseContent.WhiteTex;
-        skylightTintMat.renderQueue = 3162;
+        skylightTintMat = new Material(MatBases.LightOverlay.shader)
+        {
+          mainTexture = BaseContent.WhiteTex,
+          renderQueue = 3162
+        };
       }
       return skylightTintMat;
     }
   }
 
-  public SectionLayer_RoofLightingAndShadows(Section section) : base(section)
+  public RoofLightingRenderer(Section section) : base(section)
   {
     relevantChangeTypes = MapMeshFlagDefOf.Roofs | MapMeshFlagDefOf.Buildings;
   }
@@ -49,10 +37,6 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
 
   public override void DrawLayer()
   {
-    if (roofOverlayMat != null)
-    {
-      roofOverlayMat.color = MatBases.LightOverlay.color;
-    }
     if (skylightTintMat != null)
     {
       skylightTintMat.color = MatBases.LightOverlay.color;
@@ -68,27 +52,41 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     if (map == null || map.roofGrid == null) return;
 
     RoofGrid roofGrid = map.roofGrid;
+    int mapSizeX = map.Size.x;
+    int mapSizeZ = map.Size.z;
     var coating = map.GetComponent<MapComponents.SkylightCoating>();
+    var integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
     LayerSubMesh tintMesh = GetSubMesh(SkylightTintMat);
     float y = AltitudeLayer.LightingOverlay.AltitudeFor() + 0.002f;
     CellRect rect = section.CellRect;
+
+    int vertWidth = rect.Width + 1;
+    int vertHeight = rect.Height + 1;
+    int reqLen = vertWidth * vertHeight;
+
+    System.Array.Clear(vertTintCache, 0, reqLen);
+
+    Color32 GetCachedVertexTint(int vx, int vz)
+    {
+      int index = (vz - rect.minZ) * vertWidth + (vx - rect.minX);
+      if (vertTintCache[index].a == 255) return vertTintCache[index];
+
+      Color32 color = GetTintVertexColorMultiplier(map, roofGrid, integrity, coating, vx, vz, mapSizeX, mapSizeZ);
+      vertTintCache[index] = color;
+      return color;
+    }
 
     for (int z = rect.minZ; z <= rect.maxZ; z++)
     {
       for (int x = rect.minX; x <= rect.maxX; x++)
       {
-        // The tint is the view through the glass: it may only ever be drawn on glass cells.
-        // Emitting quads on neighboring cells (because a shared corner carries tint) multiplies
-        // the surrounding floor by a partially-tinted color — a permanent shadow ring around
-        // every skylight. Corner colors feather to white at the boundary, so the mesh edge
-        // ending exactly at the glass edge leaves no seam.
         RoofDef roof = roofGrid.RoofAt(new IntVec3(x, 0, z));
         if (roof == null || !RoofStatCache.IsSkylight(roof)) continue;
 
-        Color32 cBL = GetTintVertexColor(map, roofGrid, coating, x, z);
-        Color32 cBR = GetTintVertexColor(map, roofGrid, coating, x + 1, z);
-        Color32 cTL = GetTintVertexColor(map, roofGrid, coating, x, z + 1);
-        Color32 cTR = GetTintVertexColor(map, roofGrid, coating, x + 1, z + 1);
+        Color32 cBL = GetCachedVertexTint(x, z);
+        Color32 cBR = GetCachedVertexTint(x + 1, z);
+        Color32 cTL = GetCachedVertexTint(x, z + 1);
+        Color32 cTR = GetCachedVertexTint(x + 1, z + 1);
 
         if (HasTint(cBL) || HasTint(cBR) || HasTint(cTL) || HasTint(cTR))
         {
@@ -106,7 +104,7 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
 
   private static bool HasTint(Color32 c) => c.r < 255 || c.g < 255 || c.b < 255;
 
-  private static Color32 GetTintVertexColor(Map map, RoofGrid roofGrid, MapComponents.SkylightCoating? coating, int vx, int vz)
+  private static Color32 GetTintVertexColorMultiplier(Map map, RoofGrid roofGrid, MapComponents.RoofIntegrityGrid? integrity, MapComponents.SkylightCoating? coating, int vx, int vz, int mapSizeX, int mapSizeZ)
   {
     // This mesh is a second multiplicative lighting pass, so "no tint" must be white with
     // alpha 255 (alpha 255 = fully roof-covered, which makes the shader use the vertex
@@ -118,17 +116,19 @@ public class SectionLayer_RoofLightingAndShadows : SectionLayer
     {
       for (int dz = -1; dz <= 0; dz++)
       {
-        IntVec3 c = new(vx + dx, 0, vz + dz);
-        if (!c.InBounds(map)) continue;
+        int cx = vx + dx;
+        int cz = vz + dz;
+        if ((uint)cx >= (uint)mapSizeX || (uint)cz >= (uint)mapSizeZ) continue;
 
         count++;
         float strength = 0f;
         Color tint = Color.white;
 
+        IntVec3 c = new(cx, 0, cz);
         RoofDef roof = roofGrid.RoofAt(c);
         if (roof != null && RoofStatCache.IsSkylight(roof))
         {
-          tint = RoofStatCache.GetGlassTint(roof, map, c);
+          tint = RoofStatCache.GetGlassTint(roof, integrity, c);
           if (tint != Color.white)
           {
             strength = RoofStatCache.GetEffectiveTransparency(roof, coating, c) * 0.70f;
