@@ -239,6 +239,7 @@
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
     <researchPrerequisites>
       <li>MicroelectronicsBasics</li>
+      <li>Fabrication</li>
     </researchPrerequisites>
   </ThingDef>
 
@@ -286,6 +287,7 @@
     <constructionSkillPrerequisite>4</constructionSkillPrerequisite>
     <researchPrerequisites>
       <li>MicroelectronicsBasics</li>
+      <li>Fabrication</li>
     </researchPrerequisites>
   </ThingDef>
 
@@ -373,5 +375,67 @@
       <li Class="CompProperties_Flickable" />
     </comps>
   </ThingDef>
+
+  <ThingDef ParentName="SolarWeb_Stratum_RoofBuildableBase">
+    <defName>SolarWeb-Stratum-SolarSkylight_Buildable</defName>
+    <label>solar skylight</label>
+    <description>An advanced skylight panel incorporating highly transparent photovoltaic micro-film within glass-composite plating. It generates clean electrical power while allowing ample natural sunlight to pass through for plant growth.</description>
+    <statBases>
+      <MaxHitPoints>200</MaxHitPoints>
+      <WorkToBuild>450</WorkToBuild>
+      <Beauty>1.0</Beauty>
+      <SolarWeb-Stratum-Insulation>0.90</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-SolarOutput>20</SolarWeb-Stratum-SolarOutput>
+      <SolarWeb-Stratum-Transparency>0.75</SolarWeb-Stratum-Transparency>
+      <SolarWeb-Stratum-ThermalConductivity>0.10</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>8</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.25</SolarWeb-Stratum-ArmorRating>
+    </statBases>
+    <costList>
+      <Steel>10</Steel>
+      <Plasteel>3</Plasteel>
+      <ComponentIndustrial>1</ComponentIndustrial>
+    </costList>
+    <uiOrder>2225</uiOrder>
+    <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
+    <researchPrerequisites>
+      <li>SolarPanels</li>
+      <li>AdvancedFabrication</li>
+    </researchPrerequisites>
+  </ThingDef>
+
+  <SolarWeb.Stratum.Defs.StratumRoofDef>
+    <defName>SolarWeb-Stratum-SolarSkylight</defName>
+    <label>solar skylight</label>
+    <description>An advanced skylight panel incorporating highly transparent photovoltaic micro-film within glass-composite plating. It generates clean electrical power while allowing ample natural sunlight to pass through for plant growth.</description>
+    <isThickRoof>false</isThickRoof>
+    <filthLeaving>Filth_RubbleBuilding</filthLeaving>
+    <soundPunchThrough>PunchThroughRoofMetal</soundPunchThrough>
+    <modExtensions>
+      <li Class="SolarWeb.Stratum.DefModExtensions.BuildableRoofExtension">
+        <buildableDef>SolarWeb-Stratum-SolarSkylight_Buildable</buildableDef>
+        <graphicData>
+          <texPath>Roofs/SolarReinforcedHullPlate</texPath>
+          <color>(0.15, 0.15, 0.25)</color>
+          <skylightFrameWidth>0.08</skylightFrameWidth>
+          <isSeamless>true</isSeamless>
+        </graphicData>
+        <designationCategory>SolarWeb-Stratum-Roofs</designationCategory>
+        <isSkylight>true</isSkylight>
+        <glassTint>(0.4, 0.7, 0.9)</glassTint>
+        <allowHangingAttachments>false</allowHangingAttachments>
+        <allowRooftopAttachments>false</allowRooftopAttachments>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Solar Skylight</Name>
+        <Properties>
+          <ThermalCapacity>1200</ThermalCapacity>
+          <ThermalConductivity>0.10</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <MaxPressureDeltaKpa>800</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
+    </modExtensions>
+  </SolarWeb.Stratum.Defs.StratumRoofDef>
 
 </Defs>
