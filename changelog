@@ -1,3 +1,7 @@
+0.11.25:
+Feature: Added solar skylights.
+Minor: Added the Fabrication research requirement to Retractable Roofs to match their console.
+
 0.11.23:
 Performance: Improvements to lighting and shadow rendering.
 
