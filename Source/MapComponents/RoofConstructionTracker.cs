@@ -43,6 +43,8 @@ public class RoofConstructionTracker(Map map) : MapComponent(map)
 
   public void RebuildRoof(IntVec3 cell, RoofDef roofDef, BuildableRoofExtension ext, ThingDef? stuff = null, UnityEngine.Color? glassTint = null)
   {
+    if (ext.buildableDef != null && !ext.buildableDef.IsResearchFinished) return;
+
     RemoveRecord(cell);
 
     float workToBuild = 1000f;
