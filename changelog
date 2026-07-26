@@ -1,3 +1,6 @@
+0.11.28:
+Performance: Improved roof generation time for pocket maps.
+
 0.11.27:
 Bug Fix: Roof Frames were attackable and destroyable.
 Bug Fix: Don't auto-rebuild if research is needed for a roof.
