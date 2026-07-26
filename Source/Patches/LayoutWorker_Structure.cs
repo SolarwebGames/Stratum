@@ -38,6 +38,8 @@ public static class LayoutWorker_Spawn_Patch
 
     if (defaultRoof == null) return; // No custom roof defined — leave vanilla behaviour
 
+    map.regionAndRoomUpdater?.TryRebuildDirtyRegionsAndRooms();
+
     // Apply to named rooms (per-room override takes priority)
     foreach (var room in layoutStructureSketch.structureLayout.Rooms)
     {
@@ -45,7 +47,7 @@ public static class LayoutWorker_Spawn_Patch
       RoofDef effectiveRoof = roomRoof ?? defaultRoof;
 
       foreach (var rect in room.rects)
-        ApplyRoofToRect(rect, map, effectiveRoof);
+        ApplyRoofToRect(rect, map, effectiveRoof, defaultStuff);
     }
 
     // Apply to corridor / container cells not yet covered by any room rect
@@ -53,6 +55,7 @@ public static class LayoutWorker_Spawn_Patch
     {
       if (!cell.InBounds(map)) continue;
       if (map.roofGrid.RoofAt(cell) != null) continue; // already set by room loop
+      if (!IsEnclosedOrWall(cell, map)) continue;
       if (!RoofCollapseUtility.WithinRangeOfRoofHolder(cell, map)) continue;
       map.roofGrid.SetRoof(cell, defaultRoof);
       map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, defaultRoof, defaultStuff);
@@ -67,15 +70,28 @@ public static class LayoutWorker_Spawn_Patch
     return null;
   }
 
-  private static void ApplyRoofToRect(CellRect rect, Map map, RoofDef roofDef)
+  private static void ApplyRoofToRect(CellRect rect, Map map, RoofDef roofDef, ThingDef? stuffDef)
   {
     foreach (var cell in rect.Cells)
     {
       if (!cell.InBounds(map)) continue;
+      if (!IsEnclosedOrWall(cell, map)) continue;
       if (!RoofCollapseUtility.WithinRangeOfRoofHolder(cell, map)) continue;
       var existing = map.roofGrid.RoofAt(cell);
       if (existing == null || existing == RoofDefOf.RoofConstructed)
+      {
         map.roofGrid.SetRoof(cell, roofDef);
+        map.GetComponent<RoofIntegrityGrid>()?.InitializeRoof(cell, roofDef, stuffDef);
+      }
     }
+  }
+
+  private static bool IsEnclosedOrWall(IntVec3 cell, Map map)
+  {
+    Building edifice = cell.GetEdifice(map);
+    if (edifice != null && edifice.def.holdsRoof) return true;
+
+    Room room = cell.GetRoom(map);
+    return room != null && !room.PsychologicallyOutdoors;
   }
 }

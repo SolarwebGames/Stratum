@@ -131,17 +131,8 @@ public static class RoofGrid_Patch
       ___map.areaManager.BuildRoof[c] = false;
     }
 
-    if (___map.regionAndRoomUpdater != null && ___map.regionAndRoomUpdater.Enabled)
-    {
-      var room = c.GetRoom(___map);
-      if (room != null)
-      {
-        foreach (var district in room.Districts)
-        {
-          district.Notify_RoofChanged();
-        }
-      }
-    }
+    var region = ___map.regionGrid?.GetValidRegionAt_NoRebuild(c);
+    region?.District?.Notify_RoofChanged();
 
     var integrity = ___map.GetComponent<RoofIntegrityGrid>();
     if (currentRoof != null && RoofStatCache.IsCustomRoof(currentRoof))
@@ -187,7 +178,7 @@ public static class RoofGrid_Patch
       integrity?.RemoveRoof(c);
     }
 
-    if (Find.Selector.SelectedObjects.Count > 0)
+    if (Find.Selector != null && Find.Selector.SelectedObjects != null && Find.Selector.SelectedObjects.Count > 0)
     {
       for (int i = Find.Selector.SelectedObjects.Count - 1; i >= 0; i--)
       {

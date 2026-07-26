@@ -92,11 +92,10 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
   public override void FinalizeInit()
   {
     base.FinalizeInit();
-    InitializeNaturalRoofsStuff();
 
     if (!hasScanned)
     {
-      ExecuteScan();
+      ExecuteScan(force: true);
     }
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
@@ -110,19 +109,31 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     }
   }
 
-  internal void InitializeNaturalRoofsStuff()
+  internal void InitializeNaturalRoofsStuff(bool forceReevaluate = false)
   {
     var numCells = map.cellIndices.NumGridCells;
     var roofGrid = map.roofGrid;
+    ThingDef fallbackStuff = GetFallbackStonyStuff(map);
+
     for (int i = 0; i < numCells; i++)
     {
+      if (stuffDefs[i] != null && !forceReevaluate) continue;
+
       var roof = roofGrid.RoofAt(i);
       if (roof != null && roof.isNatural)
       {
         var cell = map.cellIndices.IndexToCell(i);
-        if (stuffDefs[i] == null)
+        var stuff = GetStonyStuffForCell(roof, cell, map, fallbackStuff);
+        stuffDefs[i] = stuff;
+
+        short maxHP = (short)RoofStatCache.GetMaxHitPoints(roof, stuff);
+        if (!roofsNeedingRepair.Contains(i))
         {
-          stuffDefs[i] = GetStonyStuffForCell(roof, cell, map);
+          hitPoints[i] = maxHP;
+        }
+        else if (hitPoints[i] > maxHP)
+        {
+          hitPoints[i] = maxHP;
         }
       }
     }
@@ -130,9 +141,19 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
 
 
+  private static readonly Dictionary<ThingDef, ThingDef?> rockStuffCache = new();
+  private static readonly Dictionary<(RoofDef, TerrainDef), ThingDef?> terrainStuffCache = new();
+
+  public static void ClearCaches()
+  {
+    rockStuffCache.Clear();
+    terrainStuffCache.Clear();
+  }
+
   public override void MapRemoved()
   {
     base.MapRemoved();
+    ClearCaches();
     var registry = MapHookRegistry.Get(map);
     if (registry != null)
     {
@@ -172,20 +193,8 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       if (map.areaManager.BuildRoof != null) map.areaManager.BuildRoof[c] = false;
     }
 
-    if (map.regionAndRoomUpdater != null && map.regionAndRoomUpdater.Enabled)
-    {
-      var room = c.GetRoom(map);
-      if (room != null && room.Districts != null)
-      {
-        foreach (var district in room.Districts)
-        {
-          if (district != null)
-          {
-            district.Notify_RoofChanged();
-          }
-        }
-      }
-    }
+    var region = map.regionGrid?.GetValidRegionAt_NoRebuild(c);
+    region?.District?.Notify_RoofChanged();
 
     if (newRoof != null && RoofStatCache.IsCustomRoof(newRoof))
     {
@@ -252,7 +261,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     lock (scanLockInt)
     {
       if (hasScanned && !force) return;
-      InitializeNaturalRoofsStuff();
+      InitializeNaturalRoofsStuff(forceReevaluate: force || !hasScanned);
       hasScanned = true;
       ParallelMapScanner.ExecuteScan(this, force);
     }
@@ -455,16 +464,49 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
     }
   }
 
-  public static ThingDef GetStonyStuffForTerrain(RoofDef roof, TerrainDef floor)
+  public static ThingDef GetFallbackStonyStuff(Map map)
   {
-    if (floor == null || roof == null)
+    if (map != null)
     {
-      return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+      var tile = map.Tile;
+      var pocketParent = map.PocketMapParent;
+      if (!tile.Valid && pocketParent?.sourceMap != null)
+      {
+        tile = pocketParent.sourceMap.Tile;
+      }
+
+      if (tile.Valid)
+      {
+        var rockTypes = Find.World.NaturalRockTypesIn(tile);
+        if (rockTypes != null)
+        {
+          foreach (var rockDef in rockTypes)
+          {
+            var blocks = GetStonyStuffForRock(rockDef);
+            if (blocks != null) return blocks;
+          }
+        }
+      }
     }
 
-    var ext = roof.GetModExtension<BuildableRoofExtension>();
-    if (ext != null && ext.terrainToStuff.TryGetValue(floor, out var stuff))
+    return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+  }
+
+  public static ThingDef? GetStonyStuffForTerrain(RoofDef roof, TerrainDef floor)
+  {
+    if (floor == null || roof == null) return null;
+
+    var key = (roof, floor);
+    if (terrainStuffCache.TryGetValue(key, out var cached))
     {
+      return cached;
+    }
+
+    ThingDef? stuff = null;
+    var ext = roof.GetModExtension<BuildableRoofExtension>();
+    if (ext != null && ext.terrainToStuff.TryGetValue(floor, out stuff))
+    {
+      terrainStuffCache[key] = stuff;
       return stuff;
     }
 
@@ -474,14 +516,16 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
       var rExt = rDef.GetModExtension<BuildableRoofExtension>();
       if (rExt != null && rExt.terrainToStuff.TryGetValue(floor, out stuff))
       {
+        terrainStuffCache[key] = stuff;
         return stuff;
       }
     }
 
-    return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+    terrainStuffCache[key] = null;
+    return null;
   }
 
-  public static ThingDef GetStonyStuffForCell(RoofDef roof, IntVec3 cell, Map map)
+  public static ThingDef GetStonyStuffForCell(RoofDef roof, IntVec3 cell, Map map, ThingDef? fallbackStuff = null)
   {
     if (cell.InBounds(map))
     {
@@ -498,22 +542,47 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         var stuff = GetStonyStuffForTerrain(roof, floor);
         if (stuff != null) return stuff;
       }
+
+      foreach (var adj in GenRadial.RadialCellsAround(cell, 3f, useCenter: false))
+      {
+        if (!adj.InBounds(map)) continue;
+        var adjEdifice = adj.GetEdifice(map);
+        if (adjEdifice?.def.building?.isNaturalRock == true)
+        {
+          var blocksDef = GetStonyStuffForRock(adjEdifice.def);
+          if (blocksDef != null) return blocksDef;
+        }
+      }
     }
 
-    return DefDatabase<ThingDef>.GetNamed("BlocksGranite");
+    return fallbackStuff ?? GetFallbackStonyStuff(map);
   }
 
   private static ThingDef? GetStonyStuffForRock(ThingDef rockDef)
   {
+    if (rockStuffCache.TryGetValue(rockDef, out var cached))
+    {
+      return cached;
+    }
+
     ThingDef? blocks = GetStonyStuffFromButcherProducts(rockDef);
-    if (blocks != null) return blocks;
+    if (blocks != null)
+    {
+      rockStuffCache[rockDef] = blocks;
+      return blocks;
+    }
 
     if (rockDef.building?.mineableThing != null)
     {
       blocks = GetStonyStuffFromButcherProducts(rockDef.building.mineableThing);
-      if (blocks != null) return blocks;
+      if (blocks != null)
+      {
+        rockStuffCache[rockDef] = blocks;
+        return blocks;
+      }
     }
 
+    rockStuffCache[rockDef] = null;
     return null;
   }
 

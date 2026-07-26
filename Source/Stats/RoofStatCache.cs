@@ -132,6 +132,7 @@ public static class RoofStatCache
       glassTintByIndex[idx] = glassTintCache.TryGetValue(def.defNameHash, out var val) ? val : Color.white;
     }
 
+    MapComponents.RoofIntegrityGrid.ClearCaches();
     RoofAtlasManager.Initialize();
   }
 
