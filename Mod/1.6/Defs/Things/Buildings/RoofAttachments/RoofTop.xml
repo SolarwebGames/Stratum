@@ -86,6 +86,7 @@
         <basePowerConsumption>600</basePowerConsumption>
         <transmitsPower>true</transmitsPower>
       </li>
+      <li Class="CompProperties_Flickable" />
       <li Class="SolarWeb.Stratum.CompProperties.ScannerBooster">
         <compClass>SolarWeb.Stratum.ThingComps.ScannerBooster</compClass>
         <scanSpeedOffset>0.1</scanSpeedOffset>
