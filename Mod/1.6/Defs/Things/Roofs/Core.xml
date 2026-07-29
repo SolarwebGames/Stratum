@@ -111,10 +111,10 @@
       <WorkToBuild>100</WorkToBuild>
       <Beauty>0</Beauty>
       <Flammability>1.0</Flammability>
-      <SolarWeb-Stratum-Insulation>0.9</SolarWeb-Stratum-Insulation>
-      <SolarWeb-Stratum-ThermalConductivity>0.1</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-Insulation>0.75</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.25</SolarWeb-Stratum-ThermalConductivity>
       <SolarWeb-Stratum-DamageThreshold>3</SolarWeb-Stratum-DamageThreshold>
-      <SolarWeb-Stratum-ArmorRating>0.15</SolarWeb-Stratum-ArmorRating>
+      <SolarWeb-Stratum-ArmorRating>0.12</SolarWeb-Stratum-ArmorRating>
       <SolarWeb-Stratum-StuffArmorMultiplier>1.0</SolarWeb-Stratum-StuffArmorMultiplier>
     </statBases>
     <stuffCategories>
@@ -147,7 +147,7 @@
         <Name>Shingle Roof</Name>
         <Properties>
           <ThermalCapacity>1200</ThermalCapacity>
-          <ThermalConductivity>0.1</ThermalConductivity>
+          <ThermalConductivity>0.25</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
           <MaxPressureDeltaKpa>200</MaxPressureDeltaKpa>
         </Properties>
@@ -163,9 +163,10 @@
       <MaxHitPoints>50</MaxHitPoints>
       <WorkToBuild>250</WorkToBuild>
       <Beauty>2.0</Beauty>
-      <SolarWeb-Stratum-Insulation>0.2</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-Insulation>0.25</SolarWeb-Stratum-Insulation>
       <SolarWeb-Stratum-Transparency>0.8</SolarWeb-Stratum-Transparency>
-      <SolarWeb-Stratum-ThermalConductivity>0.8</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-ThermalConductivity>0.75</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>0</SolarWeb-Stratum-DamageThreshold>
       <SolarWeb-Stratum-ArmorRating>0.05</SolarWeb-Stratum-ArmorRating>
     </statBases>
     <costList>
@@ -201,7 +202,7 @@
         <Name>Glass Roof</Name>
         <Properties>
           <ThermalCapacity>500</ThermalCapacity>
-          <ThermalConductivity>0.8</ThermalConductivity>
+          <ThermalConductivity>0.75</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
           <MaxPressureDeltaKpa>50</MaxPressureDeltaKpa>
         </Properties>
@@ -217,11 +218,11 @@
       <MaxHitPoints>80</MaxHitPoints>
       <WorkToBuild>200</WorkToBuild>
       <Beauty>0.5</Beauty>
-      <SolarWeb-Stratum-Insulation>0.8</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-Insulation>0.70</SolarWeb-Stratum-Insulation>
       <SolarWeb-Stratum-SolarOutput>20</SolarWeb-Stratum-SolarOutput>
-      <SolarWeb-Stratum-ThermalConductivity>0.2</SolarWeb-Stratum-ThermalConductivity>
-      <SolarWeb-Stratum-DamageThreshold>4</SolarWeb-Stratum-DamageThreshold>
-      <SolarWeb-Stratum-ArmorRating>0.15</SolarWeb-Stratum-ArmorRating>
+      <SolarWeb-Stratum-ThermalConductivity>0.30</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>3</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.10</SolarWeb-Stratum-ArmorRating>
       <SolarWeb-Stratum-StuffArmorMultiplier>0.5</SolarWeb-Stratum-StuffArmorMultiplier>
     </statBases>
     <costList>
@@ -254,7 +255,7 @@
         <Name>Solar Shingles</Name>
         <Properties>
           <ThermalCapacity>1500</ThermalCapacity>
-          <ThermalConductivity>0.2</ThermalConductivity>
+          <ThermalConductivity>0.30</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
           <MaxPressureDeltaKpa>150</MaxPressureDeltaKpa>
         </Properties>
@@ -271,10 +272,10 @@
       <WorkToBuild>200</WorkToBuild>
       <Beauty>0.5</Beauty>
       <Flammability>1.0</Flammability>
-      <SolarWeb-Stratum-Insulation>0.88</SolarWeb-Stratum-Insulation>
-      <SolarWeb-Stratum-ThermalConductivity>0.12</SolarWeb-Stratum-ThermalConductivity>
-      <SolarWeb-Stratum-DamageThreshold>6</SolarWeb-Stratum-DamageThreshold>
-      <SolarWeb-Stratum-ArmorRating>0.25</SolarWeb-Stratum-ArmorRating>
+      <SolarWeb-Stratum-Insulation>0.92</SolarWeb-Stratum-Insulation>
+      <SolarWeb-Stratum-ThermalConductivity>0.08</SolarWeb-Stratum-ThermalConductivity>
+      <SolarWeb-Stratum-DamageThreshold>4</SolarWeb-Stratum-DamageThreshold>
+      <SolarWeb-Stratum-ArmorRating>0.15</SolarWeb-Stratum-ArmorRating>
       <SolarWeb-Stratum-StuffArmorMultiplier>1.2</SolarWeb-Stratum-StuffArmorMultiplier>
     </statBases>
     <costList>
@@ -313,7 +314,7 @@
         <Name>Composite Panel</Name>
         <Properties>
           <ThermalCapacity>2000</ThermalCapacity>
-          <ThermalConductivity>0.12</ThermalConductivity>
+          <ThermalConductivity>0.08</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
           <MaxPressureDeltaKpa>500</MaxPressureDeltaKpa>
         </Properties>
