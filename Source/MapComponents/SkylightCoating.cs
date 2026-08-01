@@ -240,6 +240,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
     Season season = GenLocalDate.Season(map);
     bool isPollenSeason = (season == Season.Spring || season == Season.Summer);
     float rate = Stratum.Settings.skylightDirtAccumulationRate;
+    float accumulation = 0.025f * rate;
 
     for (int k = 0; k < cellsToTick; k++)
     {
@@ -253,7 +254,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           float curPollen = pollenLevels[idx];
           if (curPollen < 1f)
           {
-            pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f * rate);
+            pollenLevels[idx] = Mathf.Min(1f, curPollen + accumulation);
             NotifyCoatingChanged(cell);
           }
         }
@@ -262,7 +263,7 @@ public class SkylightCoating(Map map) : MapComponent(map)
           float curDirt = dirtLevels[idx];
           if (curDirt < 1f)
           {
-            dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f * rate);
+            dirtLevels[idx] = Mathf.Min(1f, curDirt + accumulation);
             NotifyCoatingChanged(cell);
           }
         }
@@ -275,9 +276,9 @@ public class SkylightCoating(Map map) : MapComponent(map)
       float curDirt = dirtLevels[idx];
       if (curDirt > 0.01f && curDirt < 1f)
       {
-        if (Rand.Value < curDirt * 0.10f * rate)
+        if (Rand.Value < curDirt * 0.05f * rate)
         {
-          dirtLevels[idx] = Mathf.Min(1f, curDirt + 0.05f * rate);
+          dirtLevels[idx] = Mathf.Min(1f, curDirt + accumulation);
           NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
@@ -285,9 +286,9 @@ public class SkylightCoating(Map map) : MapComponent(map)
       float curPollen = pollenLevels[idx];
       if (curPollen > 0.01f && curPollen < 1f)
       {
-        if (Rand.Value < curPollen * 0.10f * rate)
+        if (Rand.Value < curPollen * 0.05f * rate)
         {
-          pollenLevels[idx] = Mathf.Min(1f, curPollen + 0.05f * rate);
+          pollenLevels[idx] = Mathf.Min(1f, curPollen + accumulation);
           NotifyCoatingChanged(map.cellIndices.IndexToCell(idx));
         }
       }
