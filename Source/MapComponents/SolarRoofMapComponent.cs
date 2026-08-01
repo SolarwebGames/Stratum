@@ -244,8 +244,11 @@ public class SolarRoofMapComponent : MapComponent
 
     isCalculating = true;
 
-    // Collect PowerNets on the main thread safely
+    // Collect PowerNets and coating levels on the main thread safely
     var cellToNetMap = new Dictionary<int, PowerNet>();
+    var cellToCoatingMap = new Dictionary<int, float>();
+    var coatingComp = map.GetComponent<SkylightCoating>();
+
     foreach (var net in snapshot)
     {
       foreach (var cellInfo in net.cells)
@@ -255,6 +258,10 @@ public class SolarRoofMapComponent : MapComponent
         if (pNet != null)
         {
           cellToNetMap[cellInfo.cellIdx] = pNet;
+        }
+        if (coatingComp != null && Stratum.Settings.enableSkylightCoating)
+        {
+          cellToCoatingMap[cellInfo.cellIdx] = coatingComp.GetCoatingOpacity(pos);
         }
       }
     }
@@ -285,6 +292,11 @@ public class SolarRoofMapComponent : MapComponent
               IntVec3 pos = map.cellIndices.IndexToCell(cellInfo.cellIdx);
               short hp = integrityGrid.GetHitPoints(pos);
               curOut *= (float)hp / cellInfo.maxHP;
+            }
+
+            if (cellToCoatingMap.TryGetValue(cellInfo.cellIdx, out float coatingOpacity))
+            {
+              curOut *= UnityEngine.Mathf.Clamp01(1f - coatingOpacity);
             }
 
             float cellCur = curOut * skyGlow;

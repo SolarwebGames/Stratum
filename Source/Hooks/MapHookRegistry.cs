@@ -31,7 +31,8 @@ public class MapHookRegistry : MapComponent
     RoofDamageThreshold,
     RoofArmorRating,
     GroundGlow,
-    ScanSpeed
+    ScanSpeed,
+    SkylightTransmission
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -290,6 +291,54 @@ public class MapHookRegistry : MapComponent
     return current;
   }
 
+  public static bool HasSkylightTransmissionHandlers(Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<SkylightTransmissionHandler>(HookId.SkylightTransmission);
+    if (globalHandlers != null && globalHandlers.Count > 0) return true;
+    var handlers = Get(map)?.GetHandlers<SkylightTransmissionHandler>(HookId.SkylightTransmission);
+    return handlers != null && handlers.Count > 0;
+  }
+
+  public static float GetCellSkylightTransmission(Map map, IntVec3 cell, float baseTransmission)
+  {
+    float current = baseTransmission;
+    var globalHandlers = GetGlobalHandlers<SkylightTransmissionHandler>(HookId.SkylightTransmission);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global SkylightTransmission handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<SkylightTransmissionHandler>(HookId.SkylightTransmission);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in SkylightTransmission handler: {ex}");
+          }
+        }
+      }
+    }
+    return Mathf.Clamp01(current);
+  }
+
   public static float GetScanSpeed(Thing scanner, float baseSpeed = 1f)
   {
     if (scanner == null) return baseSpeed;
@@ -366,4 +415,5 @@ public class MapHookRegistry : MapComponent
   public delegate float RoofArmorRatingHandler(Map map, IntVec3 cell, float baseArmor);
   public delegate bool GroundGlowHandler(GlowGrid instance, Map map, IntVec3 cell, bool ignoreCavePlants, bool ignoreSky, ref float result);
   public delegate float ScanSpeedHandler(Thing scanner, float currentSpeed);
+  public delegate float SkylightTransmissionHandler(Map map, IntVec3 cell, float baseTransmission);
 }

@@ -103,11 +103,10 @@ public class RoofCoatingRenderer : SectionLayer
       RoofDef roof = roofGrid.RoofAt(c);
       if (roof == null) continue;
 
-      if (RoofStatCache.IsSkylight(roof))
+      // Dirt and pollen sit on the glass, so a wall filling the cell hides them. Snow sits on top
+      // of the wall and still shows, so this must not skip the whole cell.
+      if (RoofStatCache.IsSkylight(roof) && !HasWall(map, c))
       {
-        Building edifice = c.GetEdifice(map);
-        if (edifice != null && edifice.def.staticSunShadowHeight > 0f) continue;
-
         if (Stratum.Settings.enableDirtGraphics)
         {
           float dirt = skylightDirt.GetDirtLevel(c);
@@ -185,6 +184,12 @@ public class RoofCoatingRenderer : SectionLayer
     }
 
     FinalizeMesh(MeshParts.All);
+  }
+
+  private static bool HasWall(Map map, IntVec3 c)
+  {
+    Building edifice = c.GetEdifice(map);
+    return edifice != null && edifice.def.staticSunShadowHeight > 0f;
   }
 
   private void DrawCoatingElement(IntVec3 c, float finalAltitude, Material mat, Color baseColor, float amount, int seedOffset)
