@@ -1,3 +1,10 @@
+0.11.36:
+Bug Fix: Snow was not rendering on skylights built over walls.
+Performance: Reduced the cost of skylight lighting and tint rendering, particularly on maps with many skylights.
+Performance: Reduced unnecessary map mesh rebuilds as snow, dirt, and pollen accumulate on roofs.
+API: Added a per-cell skylight transmission hook, allowing other mods to adjust how much light an individual skylight tile lets through.
+Bug Fix: Solar Skylight power generation wasn't affected by snow accumulation.
+
 0.11.31:
 Balance: Adjusted the rate dirt and pollen accumulate on skylights.
 
