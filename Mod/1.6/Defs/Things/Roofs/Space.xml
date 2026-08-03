@@ -49,6 +49,7 @@
           <ThermalCapacity>1500</ThermalCapacity>
           <ThermalConductivity>0.15</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.05</RadiativeConductivity>
           <MaxPressureDeltaKpa>1200</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -101,6 +102,7 @@
           <ThermalCapacity>3000</ThermalCapacity>
           <ThermalConductivity>0.12</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.04</RadiativeConductivity>
           <MaxPressureDeltaKpa>2000</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -151,6 +153,7 @@
           <ThermalCapacity>3500</ThermalCapacity>
           <ThermalConductivity>0.20</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.10</RadiativeConductivity>
           <MaxPressureDeltaKpa>2500</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -210,6 +213,7 @@
           <ThermalCapacity>1000</ThermalCapacity>
           <ThermalConductivity>0.55</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.75</RadiativeConductivity>
           <MaxPressureDeltaKpa>1000</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -262,6 +266,16 @@
         <allowHangingAttachments>false</allowHangingAttachments>
         <allowRooftopAttachments>false</allowRooftopAttachments>
       </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Heavy Retractable Canopy</Name>
+        <Properties>
+          <ThermalCapacity>2000</ThermalCapacity>
+          <ThermalConductivity>0.20</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.10</RadiativeConductivity>
+          <MaxPressureDeltaKpa>1500</MaxPressureDeltaKpa>
+        </Properties>
+      </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
 
@@ -309,6 +323,16 @@
         <isRetractable>true</isRetractable>
         <allowHangingAttachments>false</allowHangingAttachments>
         <allowRooftopAttachments>false</allowRooftopAttachments>
+      </li>
+      <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
+        <Name>Light Retractable Canopy</Name>
+        <Properties>
+          <ThermalCapacity>800</ThermalCapacity>
+          <ThermalConductivity>0.50</ThermalConductivity>
+          <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.60</RadiativeConductivity>
+          <MaxPressureDeltaKpa>600</MaxPressureDeltaKpa>
+        </Properties>
       </li>
     </modExtensions>
   </SolarWeb.Stratum.Defs.StratumRoofDef>
@@ -432,6 +456,7 @@
           <ThermalCapacity>1200</ThermalCapacity>
           <ThermalConductivity>0.45</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.75</RadiativeConductivity>
           <MaxPressureDeltaKpa>800</MaxPressureDeltaKpa>
         </Properties>
       </li>

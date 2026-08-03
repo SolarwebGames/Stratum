@@ -20,12 +20,11 @@ public static class BuildableRoofGenerator
     foreach (var roofDef in DefDatabase<RoofDef>.AllDefs)
     {
       var extension = roofDef.GetModExtension<BuildableRoofExtension>();
-      if (extension == null) continue;
+      if (extension?.designationCategory == null) continue;
 
       var designator = new BuildCustomRoof(roofDef, extension);
 
-      if (extension.designationCategory != null)
-        extension.designationCategory.AllResolvedDesignators.Add(designator);
+      extension.designationCategory.AllResolvedDesignators.Add(designator);
 
       RoofToDesignator[roofDef] = designator;
     }

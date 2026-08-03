@@ -55,6 +55,7 @@
           <ThermalCapacity>1500</ThermalCapacity>
           <ThermalConductivity>0.15</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.15</RadiativeConductivity>
           <MaxPressureDeltaKpa>1000</MaxPressureDeltaKpa>
         </Properties>
       </li>

@@ -42,6 +42,7 @@
           <ThermalCapacity>200</ThermalCapacity>
           <ThermalConductivity>0.3</ThermalConductivity>
           <FaceGasPermeability>0.8</FaceGasPermeability>
+          <RadiativeConductivity>0.90</RadiativeConductivity>
           <MaxPressureDeltaKpa>10</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -96,6 +97,7 @@
           <ThermalCapacity>400</ThermalCapacity>
           <ThermalConductivity>0.2</ThermalConductivity>
           <FaceGasPermeability>0.5</FaceGasPermeability>
+          <RadiativeConductivity>0.90</RadiativeConductivity>
           <MaxPressureDeltaKpa>25</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -149,6 +151,7 @@
           <ThermalCapacity>1200</ThermalCapacity>
           <ThermalConductivity>0.25</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.20</RadiativeConductivity>
           <MaxPressureDeltaKpa>200</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -204,6 +207,7 @@
           <ThermalCapacity>500</ThermalCapacity>
           <ThermalConductivity>0.75</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.85</RadiativeConductivity>
           <MaxPressureDeltaKpa>50</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -257,6 +261,7 @@
           <ThermalCapacity>1500</ThermalCapacity>
           <ThermalConductivity>0.30</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.85</RadiativeConductivity>
           <MaxPressureDeltaKpa>150</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -312,10 +317,12 @@
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Composite Panel</Name>
+        <SurfaceIndependentOfStuff>true</SurfaceIndependentOfStuff>
         <Properties>
           <ThermalCapacity>2000</ThermalCapacity>
           <ThermalConductivity>0.08</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.02</RadiativeConductivity>
           <MaxPressureDeltaKpa>500</MaxPressureDeltaKpa>
         </Properties>
       </li>

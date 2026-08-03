@@ -50,10 +50,12 @@
       </li>
       <li Class="SolarWeb.Kalyphos.DefModExtensions.StructuralProperties" MayRequire="SolarWeb.Kalyphos">
         <Name>Luxury Glass Panel</Name>
+        <SurfaceIndependentOfStuff>true</SurfaceIndependentOfStuff>
         <Properties>
           <ThermalCapacity>1200</ThermalCapacity>
           <ThermalConductivity>0.50</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <RadiativeConductivity>0.80</RadiativeConductivity>
           <MaxPressureDeltaKpa>1500</MaxPressureDeltaKpa>
         </Properties>
       </li>
@@ -108,6 +110,8 @@
           <ThermalCapacity>1500</ThermalCapacity>
           <ThermalConductivity>0.15</ThermalConductivity>
           <FaceGasPermeability>0</FaceGasPermeability>
+          <!-- Glazed ceramic tile: a moderate emitter, well above bare hull plate. -->
+          <RadiativeConductivity>0.20</RadiativeConductivity>
           <MaxPressureDeltaKpa>800</MaxPressureDeltaKpa>
         </Properties>
       </li>
