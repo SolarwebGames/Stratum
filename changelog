@@ -1,3 +1,6 @@
+0.11.37:
+Bug Fix: Some roofs that should have been unbuildable could be built via "Build Copy".
+
 0.11.36:
 Bug Fix: Snow was not rendering on skylights built over walls.
 Performance: Reduced the cost of skylight lighting and tint rendering, particularly on maps with many skylights.
