@@ -14,7 +14,9 @@ public static class SkylightOverlayCompositor
 {
   private static float[] cellLight = [];
   private static bool[] cellIsGlass = [];
-  private static bool[] cellIsSkylight = [];
+  // "Should this cell emit a tint quad", not "does it have a skylight roof" -- an open cell under
+  // a skylight on a level above qualifies too.
+  private static bool[] cellEmitsTint = [];
   private static bool[] cellInBounds = [];
   private static bool[] cellRoofed = [];
   private static Color[] cellTint = [];
@@ -44,7 +46,7 @@ public static class SkylightOverlayCompositor
     return anySkylight;
   }
 
-  public static bool IsSkylightCell(int x, int z) => cellIsSkylight[CellIndex(x, z)];
+  public static bool EmitsSkylightTint(int x, int z) => cellEmitsTint[CellIndex(x, z)];
 
   private static int CellIndex(int x, int z) => (z - sectionMinZ + 1) * gridWidth + (x - sectionMinX + 1);
 
@@ -56,7 +58,7 @@ public static class SkylightOverlayCompositor
     {
       cellLight = new float[cellCount];
       cellIsGlass = new bool[cellCount];
-      cellIsSkylight = new bool[cellCount];
+      cellEmitsTint = new bool[cellCount];
       cellInBounds = new bool[cellCount];
       cellRoofed = new bool[cellCount];
     }
@@ -88,6 +90,7 @@ public static class SkylightOverlayCompositor
     var coating = map.GetComponent<MapComponents.SkylightCoating>();
     var integrity = includeTint ? map.GetComponent<MapComponents.RoofIntegrityGrid>() : null;
     bool applyTransmissionHook = MapHookRegistry.HasSkylightTransmissionHandlers(map);
+    bool applyTintHook = includeTint && MapHookRegistry.HasSkylightTintHandlers(map);
 
     anyGlass = false;
     anySkylight = false;
@@ -102,7 +105,7 @@ public static class SkylightOverlayCompositor
 
         cellLight[i] = 0f;
         cellIsGlass[i] = false;
-        cellIsSkylight[i] = false;
+        cellEmitsTint[i] = false;
         cellRoofed[i] = false;
         if (includeTint) cellTint[i] = Color.white;
 
@@ -110,12 +113,13 @@ public static class SkylightOverlayCompositor
         if (!cellInBounds[i]) continue;
 
         RoofDef roof = roofGrid.RoofAt(cell);
+        bool isSkylightRoof = roof != null && RoofStatCache.IsSkylight(roof);
         cellRoofed[i] = roof != null;
-        cellIsSkylight[i] = roof != null && RoofStatCache.IsSkylight(roof);
-        if (cellIsSkylight[i]) anySkylight = true;
+        cellEmitsTint[i] = isSkylightRoof;
+        if (isSkylightRoof) anySkylight = true;
 
         float transmission = roof == null ? 1f
-          : cellIsSkylight[i] ? RoofStatCache.GetEffectiveTransparency(roof, coating, cell)
+          : isSkylightRoof ? RoofStatCache.GetEffectiveTransparency(roof, coating, cell)
           : 0f;
 
         if (applyTransmissionHook)
@@ -128,11 +132,35 @@ public static class SkylightOverlayCompositor
         // Only a roofed cell may count as glass. An open cell already transmits fully, and
         // flagging it here would let the overlay overwrite vanilla's half-cell shadow feather
         // at roof edges, turning every roof line into a sawtooth of shadow spikes.
-        if (roof == null || transmission <= 0f) continue;
+        if (roof == null)
+        {
+          // ...but an open cell can still sit under glass one or more levels up, and the light
+          // landing on it really is coloured by that glass. Carry the tint without ever setting
+          // cellIsGlass, so the tint pass paints it while the brightness pass stays untouched.
+          // includeTint is false for the brightness pass, so applyTintHook makes this dead there.
+          if (applyTintHook && transmission > 0f)
+          {
+            Color aboveTint = MapHookRegistry.GetCellSkylightTint(map, cell, Color.white);
+            if (aboveTint != Color.white)
+            {
+              cellTint[i] = aboveTint;
+              cellEmitsTint[i] = true;
+              anySkylight = true;
+            }
+          }
+          continue;
+        }
+
+        if (transmission <= 0f) continue;
 
         cellIsGlass[i] = true;
         anyGlass = true;
-        if (includeTint) cellTint[i] = RoofStatCache.GetGlassTint(roof, integrity, cell);
+        if (includeTint)
+        {
+          Color tint = RoofStatCache.GetGlassTint(roof, integrity, cell);
+          if (applyTintHook) tint = MapHookRegistry.GetCellSkylightTint(map, cell, tint);
+          cellTint[i] = tint;
+        }
       }
     }
   }

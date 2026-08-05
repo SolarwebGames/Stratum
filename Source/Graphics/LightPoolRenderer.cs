@@ -2,6 +2,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Hooks;
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.MapComponents;
 
@@ -72,6 +73,13 @@ public class LightPoolRenderer : SectionLayer
     LayerSubMesh subMesh = GetSubMesh(PoolMat);
     if (subMesh == null) return;
 
+    // Hoisted: the Map overload of GetEffectiveTransparency does a GetComponent list scan, and the
+    // Has*Handlers calls are two dictionary lookups each -- neither belongs in a per-cell loop.
+    var coating = map.GetComponent<MapComponents.SkylightCoating>();
+    var integrity = map.GetComponent<MapComponents.RoofIntegrityGrid>();
+    bool applyTransmissionHook = MapHookRegistry.HasSkylightTransmissionHandlers(map);
+    bool applyTintHook = MapHookRegistry.HasSkylightTintHandlers(map);
+
     foreach (IntVec3 c in cellRect)
     {
       if (isCutscene && captureBounds.Contains(c)) continue;
@@ -82,10 +90,22 @@ public class LightPoolRenderer : SectionLayer
       Building edifice = c.GetEdifice(map);
       if (edifice != null && edifice.def.staticSunShadowHeight > 0f) continue;
 
-      float transparency = RoofStatCache.GetEffectiveTransparency(roof, map, c);
+      float transparency = RoofStatCache.GetEffectiveTransparency(roof, coating, c);
       if (transparency <= 0f) continue;
 
-      Color glassColor = RoofStatCache.GetColor(roof);
+      // Identity base: the hook reports purely what the levels above do to this cell, so an
+      // unsubscribed map multiplies by exactly 1 and is unchanged.
+      if (applyTransmissionHook)
+      {
+        transparency *= MapHookRegistry.GetCellSkylightTransmission(map, c, 1f);
+        if (transparency <= 0.001f) continue;
+      }
+
+      // The pool is the light *through* the glass, so it takes the glass tint -- which also picks
+      // up a player-painted per-cell tint. Every other consumer already used GetGlassTint; this
+      // renderer was the one holdout on GetColor (the roof texture's colour).
+      Color glassColor = RoofStatCache.GetGlassTint(roof, integrity, c);
+      if (applyTintHook) glassColor *= MapHookRegistry.GetCellSkylightTint(map, c, Color.white);
 
       float alpha = transparency * 0.4f;
       Color32 finalColor = new(

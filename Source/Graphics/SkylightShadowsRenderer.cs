@@ -3,6 +3,7 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
+using SolarWeb.Stratum.Hooks;
 using SolarWeb.Stratum.Stats;
 
 namespace SolarWeb.Stratum.Graphics;
@@ -177,6 +178,7 @@ public class SkylightShadowsRenderer : SectionLayer_Dynamic
     }
 
     float baseAltitude = AltitudeLayer.Shadows.AltitudeFor() + 0.005f;
+    bool applyTransmissionHook = MapHookRegistry.HasSkylightTransmissionHandlers(map);
 
     foreach (IntVec3 c in cellRect)
     {
@@ -189,6 +191,12 @@ public class SkylightShadowsRenderer : SectionLayer_Dynamic
       Building edifice = c.GetEdifice(map);
       if (edifice != null && edifice.def.staticSunShadowHeight > 0f) continue;
 
+      // Identity base: 1f when nothing is stacked above, so single-level output is bit-identical.
+      float above = applyTransmissionHook
+        ? MapHookRegistry.GetCellSkylightTransmission(map, c, 1f)
+        : 1f;
+      if (above <= 0.001f) continue;
+
       IntVec3 landCell = new(Mathf.FloorToInt(c.x + 0.5f + offset.x), 0, Mathf.FloorToInt(c.z + 0.5f + offset.y));
       if (!landCell.InBounds(map) || !GenSight.LineOfSight(c, landCell, map, skipFirstCell: true))
       {
@@ -200,7 +208,7 @@ public class SkylightShadowsRenderer : SectionLayer_Dynamic
         float dirt = skylightDirt.GetDirtLevel(c);
         if (dirt > 0.01f)
         {
-          Color shadowCol = new(0f, 0f, 0f, dirt * 0.10f);
+          Color shadowCol = new(0f, 0f, 0f, dirt * 0.10f * above);
           Material dMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
           DrawShadowElement(c, baseAltitude + 0.001f, dMat, shadowCol, 3123512, offset);
         }
@@ -211,7 +219,7 @@ public class SkylightShadowsRenderer : SectionLayer_Dynamic
         float pollen = skylightDirt.GetPollenLevel(c);
         if (pollen > 0.01f)
         {
-          Color shadowCol = new(0f, 0f, 0f, pollen * 0.10f);
+          Color shadowCol = new(0f, 0f, 0f, pollen * 0.10f * above);
           Material pMat = DirtMats[Mathf.Abs(c.GetHashCode()) % DirtMats.Length];
           DrawShadowElement(c, baseAltitude + 0.002f, pMat, shadowCol, 9845123, offset);
         }
@@ -222,7 +230,7 @@ public class SkylightShadowsRenderer : SectionLayer_Dynamic
         float snow = skylightDirt.GetSnowLevel(c);
         if (snow > 0.01f)
         {
-          Color shadowCol = new(0f, 0f, 0f, snow * 0.30f);
+          Color shadowCol = new(0f, 0f, 0f, snow * 0.30f * above);
           DrawQuadCustom(new Vector3(c.x + 0.5f + offset.x, baseAltitude + 0.003f, c.z + 0.5f + offset.y), Vector2.one * 1.15f, SnowMat, shadowCol, Rot4.North);
         }
       }

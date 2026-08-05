@@ -59,7 +59,7 @@ public class RoofLightingRenderer : SectionLayer
     {
       for (int x = rect.minX; x <= rect.maxX; x++)
       {
-        if (!SkylightOverlayCompositor.IsSkylightCell(x, z)) continue;
+        if (!SkylightOverlayCompositor.EmitsSkylightTint(x, z)) continue;
 
         Color32 cBL = SkylightOverlayCompositor.GetCornerTint(x, z);
         Color32 cBR = SkylightOverlayCompositor.GetCornerTint(x + 1, z);

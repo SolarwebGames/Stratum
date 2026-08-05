@@ -201,6 +201,12 @@ public class RoofVFXMapComponent : MapComponent
       float spawnChancePerCell = 0.002f * sunGlow;
       int spawnedThisTick = 0;
 
+      // Hoisted out of the loop: two dictionary lookups each. The per-cell hook cost itself is a
+      // non-issue -- the Rand.Value gate below runs first and MaxFlecksPerTick caps this at a
+      // couple of dozen samples per second.
+      bool applyTransmissionHook = MapHookRegistry.HasSkylightTransmissionHandlers(map);
+      bool applyTintHook = MapHookRegistry.HasSkylightTintHandlers(map);
+
       int startIndex = Rand.Range(0, transparentCells.Count);
 
       for (int i = 0; i < transparentCells.Count; i++)
@@ -218,7 +224,16 @@ public class RoofVFXMapComponent : MapComponent
         float transparency = RoofStatCache.GetTransparency(roof);
         if (transparency <= 0f) continue;
 
+        // Identity base -- see the SkylightTintHandler docs. effectivePower below is derived from
+        // transparency, so occluded beams dim and vanish without any further change.
+        if (applyTransmissionHook)
+        {
+          transparency *= MapHookRegistry.GetCellSkylightTransmission(map, pos, 1f);
+          if (transparency <= 0.001f) continue;
+        }
+
         Color roofColor = RoofStatCache.GetGlassTint(roof, map, pos);
+        if (applyTintHook) roofColor *= MapHookRegistry.GetCellSkylightTint(map, pos, Color.white);
         Vector3 center = pos.ToVector3Shifted();
         center.y += 0.1f;
 
