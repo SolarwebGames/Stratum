@@ -1,3 +1,13 @@
+0.12.0:
+Compatibility: Added native compatibility for Telardo's MultiFloors.
+Compatibility: Light through stacked MultiFloors skylights now compounds, growing dimmer and taking on the colour of each pane it passes through.
+Bug Fix: Skylight light pools used the roof's texture colour rather than the skylight's glass tint, so tinted skylights cast uncoloured light.
+Minor Feature: Added a setting controlling whether unroofed cells lose sunlight when an upper level covers them.
+API: Added a per-cell skylight tint hook, allowing other mods to adjust the colour of light passing through a skylight.
+API: Expanded MapHookRegistry with global hook handlers and centralized hook invocation dispatchers.
+Graphics: Restricted roof and rooftop building rendering to the active map.
+Refactor: Extracted roof cell painting logic into RoofCellPainter.
+
 0.11.37:
 Bug Fix: Some roofs that should have been unbuildable could be built via "Build Copy".
 
