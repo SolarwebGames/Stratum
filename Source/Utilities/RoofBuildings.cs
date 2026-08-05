@@ -51,31 +51,11 @@ public static class RoofBuildings
 
   public static bool ShouldRenderRoofBuilding(Thing t)
   {
-    if (t == null || t.def == null) return false;
+    if (t == null || t.def == null || t.Map == null) return false;
     var map = t.Map;
-    if (map != null)
-    {
-      var registry = MapHookRegistry.Get(map);
-      if (registry != null)
-      {
-        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingRenderCheckHandler>(MapHookRegistry.HookId.RoofBuildingRenderCheck);
-        if (handlers != null)
-        {
-          for (int i = 0; i < handlers.Count; i++)
-          {
-            try
-            {
-              var res = handlers[i](t);
-              if (res.HasValue) return res.Value;
-            }
-            catch (System.Exception ex)
-            {
-              StratumLog.Error($"Error in RoofBuildingRenderCheck subscriber: {ex}");
-            }
-          }
-        }
-      }
-    }
+    if (Find.CurrentMap != null && map != Find.CurrentMap) return false;
+    var hookResult = MapHookRegistry.CheckRoofBuildingRender(t, map);
+    if (hookResult.HasValue) return hookResult.Value;
 
     var attachmentType = GetAttachmentType(t);
     if (attachmentType == RoofAttachmentType.Rooftop)

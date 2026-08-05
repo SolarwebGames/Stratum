@@ -379,18 +379,7 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
 
     float effectiveDamage = amount;
 
-    bool handled = false;
-    if (MapHookRegistry.Get(map)?.GetHandlers<MapHookRegistry.RoofDamageCalculationHandler>(MapHookRegistry.HookId.RoofDamageCalculation) is List<MapHookRegistry.RoofDamageCalculationHandler> handlers)
-    {
-      foreach (var handler in handlers)
-      {
-        if (handler(roof, stuff, amount, penetration, dinfo, ref effectiveDamage))
-        {
-          handled = true;
-          break;
-        }
-      }
-    }
+    bool handled = MapHookRegistry.TryCalculateRoofDamage(map, roof, stuff, amount, penetration, dinfo, ref effectiveDamage);
 
     if (!handled)
     {

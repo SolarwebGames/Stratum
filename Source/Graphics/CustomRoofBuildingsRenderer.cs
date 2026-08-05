@@ -1,9 +1,7 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
-using System.Collections.Generic;
 
-using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Utilities;
 
 namespace SolarWeb.Stratum.Graphics;
@@ -20,7 +18,7 @@ public class CustomRoofBuildingsRenderer : SectionLayer
 
   public override void DrawLayer()
   {
-    if (Find.PlaySettings.showRoofOverlay)
+    if (Find.PlaySettings.showRoofOverlay && base.Map == Find.CurrentMap)
     {
       base.DrawLayer();
     }

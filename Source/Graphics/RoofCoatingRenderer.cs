@@ -56,7 +56,7 @@ public class RoofCoatingRenderer : SectionLayer
 
   public override void DrawLayer()
   {
-    if (Find.PlaySettings.showRoofOverlay)
+    if (Find.PlaySettings.showRoofOverlay && base.Map == Find.CurrentMap)
     {
       base.DrawLayer();
     }

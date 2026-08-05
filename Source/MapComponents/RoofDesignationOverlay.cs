@@ -1,6 +1,6 @@
-using RimWorld;
 using UnityEngine;
 using Verse;
+
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Graphics;
 
@@ -14,7 +14,7 @@ public class RoofDesignationOverlay(Map map) : MapComponent(map)
 
   public override void MapComponentOnGUI()
   {
-    if (!Find.PlaySettings.showRoofOverlay) return;
+    if (!Find.PlaySettings.showRoofOverlay || map != Find.CurrentMap) return;
     if (map.areaManager == null || map.roofGrid == null) return;
 
     var noRoof = map.areaManager.NoRoof;
