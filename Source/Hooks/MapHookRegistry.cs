@@ -33,6 +33,7 @@ public class MapHookRegistry : MapComponent
     GroundGlow,
     ScanSpeed,
     SkylightTransmission,
+    SkylightTint,
     SkyGlowMultiplier,
     SolarPowerOutputFactor,
     DropPodRoofInterception
@@ -342,6 +343,63 @@ public class MapHookRegistry : MapComponent
     return Mathf.Clamp01(current);
   }
 
+  public static bool HasSkylightTintHandlers(Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<SkylightTintHandler>(HookId.SkylightTint);
+    if (globalHandlers != null && globalHandlers.Count > 0) return true;
+    var handlers = Get(map)?.GetHandlers<SkylightTintHandler>(HookId.SkylightTint);
+    return handlers != null && handlers.Count > 0;
+  }
+
+  public static Color GetCellSkylightTint(Map map, IntVec3 cell, Color baseTint)
+  {
+    Color current = baseTint;
+    var globalHandlers = GetGlobalHandlers<SkylightTintHandler>(HookId.SkylightTint);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (System.Exception ex)
+        {
+          StratumLog.Error($"Error in global SkylightTint handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<SkylightTintHandler>(HookId.SkylightTint);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (System.Exception ex)
+          {
+            StratumLog.Error($"Error in SkylightTint handler: {ex}");
+          }
+        }
+      }
+    }
+    // Alpha is meaningless here -- every consumer treats this as a multiplicative RGB filter.
+    return new Color(Mathf.Clamp01(current.r), Mathf.Clamp01(current.g), Mathf.Clamp01(current.b), 1f);
+  }
+
+  public static bool HasSkyGlowMultiplierHandlers(Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<SkyGlowMultiplierHandler>(HookId.SkyGlowMultiplier);
+    if (globalHandlers != null && globalHandlers.Count > 0) return true;
+    var handlers = Get(map)?.GetHandlers<SkyGlowMultiplierHandler>(HookId.SkyGlowMultiplier);
+    return handlers != null && handlers.Count > 0;
+  }
+
   public static float GetScanSpeed(Thing scanner, float baseSpeed = 1f)
   {
     if (scanner == null) return baseSpeed;
@@ -423,6 +481,18 @@ public class MapHookRegistry : MapComponent
   public delegate bool GroundGlowHandler(GlowGrid instance, Map map, IntVec3 cell, bool ignoreCavePlants, bool ignoreSky, ref float result);
   public delegate float ScanSpeedHandler(Thing scanner, float currentSpeed);
   public delegate float SkylightTransmissionHandler(Map map, IntVec3 cell, float baseTransmission);
+
+  /// <summary>
+  /// Adjusts the colour of the light reaching <paramref name="cell"/> through skylight glass.
+  /// </summary>
+  /// <remarks>
+  /// Handlers must <em>scale</em> <paramref name="baseTint"/> componentwise (Unity's
+  /// <c>Color * Color</c>), never replace it. Consumers outside the overlay compositor rely on
+  /// passing <see cref="Color.white"/> to obtain the handlers' contribution in isolation, which is
+  /// also what makes an unsubscribed map provably identical to stock behaviour.
+  /// The alpha channel is ignored -- this is a multiplicative RGB filter.
+  /// </remarks>
+  public delegate Color SkylightTintHandler(Map map, IntVec3 cell, Color baseTint);
   public delegate float SkyGlowMultiplierHandler(Map map, IntVec3 cell, float baseMultiplier);
   public delegate float SolarPowerOutputFactorHandler(Map map, IntVec3 cell, float baseFactor);
   public delegate bool DropPodRoofInterceptionHandler(Map map, IntVec3 cell, int damageAmount, ref int effectiveHitPoints);
