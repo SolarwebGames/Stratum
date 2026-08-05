@@ -16,29 +16,11 @@ public static class GenConstruct_Patch
     var map = constructible.Map ?? t.Map;
     if (map != null)
     {
-      var registry = MapHookRegistry.Get(map);
-      if (registry != null)
+      var hookResult = MapHookRegistry.CheckBlocksConstruction(constructible, t, map);
+      if (hookResult.HasValue)
       {
-        var handlers = registry.GetHandlers<MapHookRegistry.BlocksConstructionHandler>(MapHookRegistry.HookId.BlocksConstruction);
-        if (handlers != null)
-        {
-          for (int i = 0; i < handlers.Count; i++)
-          {
-            try
-            {
-              var val = handlers[i](constructible, t);
-              if (val.HasValue)
-              {
-                __result = val.Value;
-                return false;
-              }
-            }
-            catch (System.Exception ex)
-            {
-              StratumLog.Error($"Error in BlocksConstruction subscriber: {ex}");
-            }
-          }
-        }
+        __result = hookResult.Value;
+        return false;
       }
     }
 

@@ -1,8 +1,9 @@
 using HarmonyLib;
 using RimWorld;
+using Verse;
+
 using SolarWeb.Stratum.DefModExtensions;
 using SolarWeb.Stratum.MapComponents;
-using Verse;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -22,6 +23,26 @@ public static class Skyfaller_Patch
 
     var pos = __instance.Position;
     var skyfallerHealth = __instance.def.BaseMaxHitPoints;
+
+    int effectiveHp = 0;
+    bool intercepted = Hooks.MapHookRegistry.InterceptDropPodByRoof(map, pos, skyfallerHealth, ref effectiveHp);
+
+    if (intercepted)
+    {
+      if (effectiveHp > 0)
+      {
+        for (int i = 0; i < 6; i++)
+        {
+          FleckMaker.ThrowDustPuff(pos.ToVector3Shifted() + Gen.RandomHorizontalVector(1f), map, 1.2f);
+        }
+        FleckMaker.ThrowLightningGlow(pos.ToVector3Shifted(), map, 2f);
+        GenClamor.DoClamor(__instance, 15f, ClamorDefOf.Impact);
+
+        __instance.Destroy();
+
+        return false;
+      }
+    }
 
     CellRect cr = __instance.OccupiedRect();
     CellRect cellRect = cr.ExpandedBy((!__instance.def.skyfaller.minimalRoofDestruction) ? 1 : 0).ClipInsideMap(map);

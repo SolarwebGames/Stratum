@@ -1,4 +1,3 @@
-using System;
 using Verse;
 
 using SolarWeb.Stratum.DefModExtensions;
@@ -13,26 +12,11 @@ public class OnRoof : PlaceWorker
   {
     if (checkingDef == null || map == null || map.roofGrid == null) return false;
 
-    var registry = MapHookRegistry.Get(map);
-    if (registry != null)
-    {
-      var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingPlacementCheckHandler>(MapHookRegistry.HookId.RoofBuildingPlacementCheck);
-      if (handlers != null)
-      {
-        for (int i = 0; i < handlers.Count; i++)
-        {
-          try
-          {
-            var res = handlers[i](checkingDef, loc, map);
-            if (res.HasValue) return res.Value;
-          }
-          catch (Exception ex)
-          {
-            StratumLog.Error($"Error in RoofBuildingPlacementCheck subscriber: {ex}");
-          }
-        }
-      }
-    }
+    // Goes through the registry helper so global subscribers are consulted too. Walking only the
+    // per-map handler list here meant compatibility modules -- which have no per-map hook point and
+    // so always register globally -- were silently skipped.
+    var hookResult = MapHookRegistry.CheckRoofBuildingPlacement(checkingDef, loc, rot, map);
+    if (hookResult.HasValue) return hookResult.Value;
 
     var attachmentType = RoofBuildings.GetAttachmentType(checkingDef);
     var rect = GenAdj.OccupiedRect(loc, rot, checkingDef.Size);

@@ -1,8 +1,7 @@
-using System;
 using HarmonyLib;
 using UnityEngine;
 using Verse;
-using SolarWeb.Stratum.DefModExtensions;
+
 using SolarWeb.Stratum.Hooks;
 using SolarWeb.Stratum.Utilities;
 
@@ -19,29 +18,11 @@ public static class Thing_Patch
     var map = __instance.Map;
     if (map != null)
     {
-      var registry = MapHookRegistry.Get(map);
-      if (registry != null)
+      var hookResult = MapHookRegistry.GetRoofBuildingDrawPos(__instance, __result, map);
+      if (hookResult.HasValue)
       {
-        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingDrawPosHandler>(MapHookRegistry.HookId.RoofBuildingDrawPos);
-        if (handlers != null)
-        {
-          for (int i = 0; i < handlers.Count; i++)
-          {
-            try
-            {
-              var res = handlers[i](__instance, __result);
-              if (res.HasValue)
-              {
-                __result = res.Value;
-                return;
-              }
-            }
-            catch (Exception ex)
-            {
-              StratumLog.Error($"Error in RoofBuildingDrawPos subscriber: {ex}");
-            }
-          }
-        }
+        __result = hookResult.Value;
+        return;
       }
     }
 

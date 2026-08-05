@@ -32,7 +32,10 @@ public class MapHookRegistry : MapComponent
     RoofArmorRating,
     GroundGlow,
     ScanSpeed,
-    SkylightTransmission
+    SkylightTransmission,
+    SkyGlowMultiplier,
+    SolarPowerOutputFactor,
+    DropPodRoofInterception
   }
 
   private static readonly Dictionary<Map, MapHookRegistry> cache = [];
@@ -402,7 +405,11 @@ public class MapHookRegistry : MapComponent
   public delegate void PowerNetEnergyGainHandler(RimWorld.PowerNet net, ref float energyGainRate);
   public delegate bool? RoofBuildingRenderCheckHandler(Thing thing);
   public delegate bool? RoofBuildingSelectableCheckHandler(Thing thing);
-  public delegate bool? RoofBuildingPlacementCheckHandler(BuildableDef def, IntVec3 cell, Map map);
+  // Returns null to defer to the next handler / the default checks, or a report to decide the
+  // placement. AcceptanceReport rather than bool? so a subscriber can explain the refusal --
+  // AcceptanceReport implicitly converts to bool, so a bool? return type silently discarded the
+  // reason text and left the player with an unexplained rejection.
+  public delegate AcceptanceReport? RoofBuildingPlacementCheckHandler(BuildableDef def, IntVec3 cell, Rot4 rot, Map map);
   public delegate Vector3? RoofBuildingDrawPosHandler(Thing thing, Vector3 originalDrawPos);
   public delegate Vector3? RoofBuildingTrueCenterHandler(Thing thing, Vector3 originalTrueCenter);
   public delegate bool? BlocksConstructionHandler(Thing constructible, Thing existingThing);
@@ -416,4 +423,535 @@ public class MapHookRegistry : MapComponent
   public delegate bool GroundGlowHandler(GlowGrid instance, Map map, IntVec3 cell, bool ignoreCavePlants, bool ignoreSky, ref float result);
   public delegate float ScanSpeedHandler(Thing scanner, float currentSpeed);
   public delegate float SkylightTransmissionHandler(Map map, IntVec3 cell, float baseTransmission);
+  public delegate float SkyGlowMultiplierHandler(Map map, IntVec3 cell, float baseMultiplier);
+  public delegate float SolarPowerOutputFactorHandler(Map map, IntVec3 cell, float baseFactor);
+  public delegate bool DropPodRoofInterceptionHandler(Map map, IntVec3 cell, int damageAmount, ref int effectiveHitPoints);
+
+  /// <summary>
+  /// Runs the RoofBuildingPlacementCheck subscribers, returning the first decisive report or
+  /// <c>null</c> to fall through to the default placement rules.
+  /// </summary>
+  /// <remarks>
+  /// Folds global subscribers as well as per-map ones. Compatibility modules register globally
+  /// (they have no per-map hook point), so a consumer that only walks the instance list never sees
+  /// them at all.
+  /// </remarks>
+  public static AcceptanceReport? CheckRoofBuildingPlacement(BuildableDef def, IntVec3 cell, Rot4 rot, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofBuildingPlacementCheckHandler>(HookId.RoofBuildingPlacementCheck);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](def, cell, rot, map);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofBuildingPlacementCheck handler: {ex}");
+        }
+      }
+    }
+
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<RoofBuildingPlacementCheckHandler>(HookId.RoofBuildingPlacementCheck);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            var result = handlers[i](def, cell, rot, map);
+            if (result.HasValue) return result;
+          }
+          catch (Exception ex)
+          {
+            StratumLog.Error($"Error in RoofBuildingPlacementCheck handler: {ex}");
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>Notifies every RoofChanged subscriber that a cell's roof changed.</summary>
+  public static void NotifyRoofChanged(Map map, IntVec3 cell, RoofDef? oldRoof, RoofDef? newRoof)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofChangedHandler>(HookId.RoofChanged);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          globalHandlers[i](map, cell, oldRoof, newRoof);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofChanged handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofChangedHandler>(HookId.RoofChanged);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          handlers[i](map, cell, oldRoof, newRoof);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofChanged handler: {ex}");
+        }
+      }
+    }
+  }
+
+  /// <summary>Runs every BeforeSetRoof subscriber, letting each adjust the roof or veto the change.</summary>
+  public static void InvokeBeforeSetRoof(Map map, IntVec3 cell, RoofDef? oldRoof, ref RoofDef? newRoof, ref bool allow)
+  {
+    var globalHandlers = GetGlobalHandlers<BeforeSetRoofHandler>(HookId.BeforeSetRoof);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          globalHandlers[i](map, cell, oldRoof, ref newRoof, ref allow);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global BeforeSetRoof handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<BeforeSetRoofHandler>(HookId.BeforeSetRoof);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          handlers[i](map, cell, oldRoof, ref newRoof, ref allow);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in BeforeSetRoof handler: {ex}");
+        }
+      }
+    }
+  }
+
+  /// <summary>Runs every PowerNetEnergyGain subscriber against the net's gain rate.</summary>
+  public static void ApplyPowerNetEnergyGain(RimWorld.PowerNet net, Map map, ref float energyGainRate)
+  {
+    var globalHandlers = GetGlobalHandlers<PowerNetEnergyGainHandler>(HookId.PowerNetEnergyGain);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          globalHandlers[i](net, ref energyGainRate);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global PowerNetEnergyGain handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<PowerNetEnergyGainHandler>(HookId.PowerNetEnergyGain);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          handlers[i](net, ref energyGainRate);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in PowerNetEnergyGain handler: {ex}");
+        }
+      }
+    }
+  }
+
+  /// <summary>
+  /// Runs the RoofDamageCalculation subscribers. Returns <c>true</c> once one claims the
+  /// calculation, meaning the caller should skip its own threshold/armour maths.
+  /// </summary>
+  public static bool TryCalculateRoofDamage(Map map, RoofDef roofDef, ThingDef? stuffDef, float baseDamage,
+                                            float penetration, DamageInfo? damageInfo, ref float effectiveDamage)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofDamageCalculationHandler>(HookId.RoofDamageCalculation);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          if (globalHandlers[i](roofDef, stuffDef, baseDamage, penetration, damageInfo, ref effectiveDamage)) return true;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofDamageCalculation handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofDamageCalculationHandler>(HookId.RoofDamageCalculation);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          if (handlers[i](roofDef, stuffDef, baseDamage, penetration, damageInfo, ref effectiveDamage)) return true;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofDamageCalculation handler: {ex}");
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// <summary>Runs the RoofBuildingRenderCheck subscribers; first decisive answer wins.</summary>
+  public static bool? CheckRoofBuildingRender(Thing thing, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofBuildingRenderCheckHandler>(HookId.RoofBuildingRenderCheck);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](thing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofBuildingRenderCheck handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofBuildingRenderCheckHandler>(HookId.RoofBuildingRenderCheck);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          var result = handlers[i](thing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofBuildingRenderCheck handler: {ex}");
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>Runs the RoofBuildingSelectableCheck subscribers; first decisive answer wins.</summary>
+  public static bool? CheckRoofBuildingSelectable(Thing thing, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofBuildingSelectableCheckHandler>(HookId.RoofBuildingSelectableCheck);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](thing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofBuildingSelectableCheck handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofBuildingSelectableCheckHandler>(HookId.RoofBuildingSelectableCheck);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          var result = handlers[i](thing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofBuildingSelectableCheck handler: {ex}");
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>Runs the RoofBuildingDrawPos subscribers; first decisive answer wins.</summary>
+  public static Vector3? GetRoofBuildingDrawPos(Thing thing, Vector3 originalDrawPos, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofBuildingDrawPosHandler>(HookId.RoofBuildingDrawPos);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](thing, originalDrawPos);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofBuildingDrawPos handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofBuildingDrawPosHandler>(HookId.RoofBuildingDrawPos);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          var result = handlers[i](thing, originalDrawPos);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofBuildingDrawPos handler: {ex}");
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>Runs the RoofBuildingTrueCenter subscribers; first decisive answer wins.</summary>
+  public static Vector3? GetRoofBuildingTrueCenter(Thing thing, Vector3 originalTrueCenter, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<RoofBuildingTrueCenterHandler>(HookId.RoofBuildingTrueCenter);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](thing, originalTrueCenter);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global RoofBuildingTrueCenter handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<RoofBuildingTrueCenterHandler>(HookId.RoofBuildingTrueCenter);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          var result = handlers[i](thing, originalTrueCenter);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in RoofBuildingTrueCenter handler: {ex}");
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /// <summary>Runs the BlocksConstruction subscribers; first decisive answer wins.</summary>
+  public static bool? CheckBlocksConstruction(Thing constructible, Thing existingThing, Map map)
+  {
+    var globalHandlers = GetGlobalHandlers<BlocksConstructionHandler>(HookId.BlocksConstruction);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          var result = globalHandlers[i](constructible, existingThing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global BlocksConstruction handler: {ex}");
+        }
+      }
+    }
+
+    var handlers = Get(map)?.GetHandlers<BlocksConstructionHandler>(HookId.BlocksConstruction);
+    if (handlers != null)
+    {
+      for (int i = 0; i < handlers.Count; i++)
+      {
+        try
+        {
+          var result = handlers[i](constructible, existingThing);
+          if (result.HasValue) return result;
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in BlocksConstruction handler: {ex}");
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public static float GetCellSkyGlowMultiplier(Map map, IntVec3 cell, float baseMultiplier)
+  {
+    float current = baseMultiplier;
+    var globalHandlers = GetGlobalHandlers<SkyGlowMultiplierHandler>(HookId.SkyGlowMultiplier);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global SkyGlowMultiplier handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<SkyGlowMultiplierHandler>(HookId.SkyGlowMultiplier);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (Exception ex)
+          {
+            StratumLog.Error($"Error in SkyGlowMultiplier handler: {ex}");
+          }
+        }
+      }
+    }
+    return Mathf.Clamp01(current);
+  }
+
+  public static float GetCellSolarPowerOutputFactor(Map map, IntVec3 cell, float baseFactor)
+  {
+    float current = baseFactor;
+    var globalHandlers = GetGlobalHandlers<SolarPowerOutputFactorHandler>(HookId.SolarPowerOutputFactor);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          current = globalHandlers[i](map, cell, current);
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global SolarPowerOutputFactor handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<SolarPowerOutputFactorHandler>(HookId.SolarPowerOutputFactor);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            current = handlers[i](map, cell, current);
+          }
+          catch (Exception ex)
+          {
+            StratumLog.Error($"Error in SolarPowerOutputFactor handler: {ex}");
+          }
+        }
+      }
+    }
+    return Mathf.Clamp01(current);
+  }
+
+  public static bool InterceptDropPodByRoof(Map map, IntVec3 cell, int damageAmount, ref int effectiveHitPoints)
+  {
+    bool intercepted = false;
+    var globalHandlers = GetGlobalHandlers<DropPodRoofInterceptionHandler>(HookId.DropPodRoofInterception);
+    if (globalHandlers != null)
+    {
+      for (int i = 0; i < globalHandlers.Count; i++)
+      {
+        try
+        {
+          if (globalHandlers[i](map, cell, damageAmount, ref effectiveHitPoints))
+          {
+            intercepted = true;
+          }
+        }
+        catch (Exception ex)
+        {
+          StratumLog.Error($"Error in global DropPodRoofInterception handler: {ex}");
+        }
+      }
+    }
+    var registry = Get(map);
+    if (registry != null)
+    {
+      var handlers = registry.GetHandlers<DropPodRoofInterceptionHandler>(HookId.DropPodRoofInterception);
+      if (handlers != null)
+      {
+        for (int i = 0; i < handlers.Count; i++)
+        {
+          try
+          {
+            if (handlers[i](map, cell, damageAmount, ref effectiveHitPoints))
+            {
+              intercepted = true;
+            }
+          }
+          catch (Exception ex)
+          {
+            StratumLog.Error($"Error in DropPodRoofInterception handler: {ex}");
+          }
+        }
+      }
+    }
+    return intercepted;
+  }
 }

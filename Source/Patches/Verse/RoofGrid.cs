@@ -49,26 +49,10 @@ public static class RoofGrid_Patch
     var oldRoof = ___map.roofGrid.RoofAt(c);
     __state = oldRoof;
 
-    var registry = MapHookRegistry.Get(___map);
-    if (registry != null)
     {
       bool allow = true;
       RoofDef? newRoof = def;
-      var handlers = registry.GetHandlers<MapHookRegistry.BeforeSetRoofHandler>(MapHookRegistry.HookId.BeforeSetRoof);
-      if (handlers != null)
-      {
-        for (int i = 0; i < handlers.Count; i++)
-        {
-          try
-          {
-            handlers[i](___map, c, oldRoof, ref newRoof, ref allow);
-          }
-          catch (System.Exception ex)
-          {
-            StratumLog.Error($"Error in BeforeSetRoof subscriber: {ex}");
-          }
-        }
-      }
+      MapHookRegistry.InvokeBeforeSetRoof(___map, c, oldRoof, ref newRoof, ref allow);
       def = newRoof!;
       if (!allow)
       {
@@ -86,41 +70,7 @@ public static class RoofGrid_Patch
     var currentRoof = ___map.roofGrid.RoofAt(c);
     if (currentRoof == __state) return;
 
-    var globalHandlers = MapHookRegistry.GetGlobalHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
-    if (globalHandlers != null)
-    {
-      for (int i = 0; i < globalHandlers.Count; i++)
-      {
-        try
-        {
-          globalHandlers[i](___map, c, __state, currentRoof);
-        }
-        catch (System.Exception ex)
-        {
-          StratumLog.Error($"Error in global RoofChanged subscriber: {ex}");
-        }
-      }
-    }
-
-    var registry = MapHookRegistry.Get(___map);
-    if (registry != null)
-    {
-      var handlers = registry.GetHandlers<MapHookRegistry.RoofChangedHandler>(MapHookRegistry.HookId.RoofChanged);
-      if (handlers != null)
-      {
-        for (int i = 0; i < handlers.Count; i++)
-        {
-          try
-          {
-            handlers[i](___map, c, __state, currentRoof);
-          }
-          catch (System.Exception ex)
-          {
-            StratumLog.Error($"Error in RoofChanged subscriber: {ex}");
-          }
-        }
-      }
-    }
+    MapHookRegistry.NotifyRoofChanged(___map, c, __state, currentRoof);
 
     if (___map.areaManager.NoRoof != null)
     {

@@ -4,7 +4,6 @@ using Verse;
 
 using SolarWeb.Stratum.Stats;
 using SolarWeb.Stratum.Hooks;
-using SolarWeb.Stratum.MapComponents;
 
 namespace SolarWeb.Stratum.Patches;
 
@@ -50,7 +49,8 @@ public static class GlowGrid_Patch
       float transparency = RoofStatCache.GetEffectiveTransparency(roof, ___map, c);
       if (transparency > 0f)
       {
-        float skyGlow = ___map.skyManager.CurSkyGlow * transparency;
+        float skyMultiplier = MapHookRegistry.GetCellSkyGlowMultiplier(___map, c, 1f);
+        float skyGlow = ___map.skyManager.CurSkyGlow * transparency * skyMultiplier;
         if (skyGlow >= 1f)
         {
           __result = 1f;

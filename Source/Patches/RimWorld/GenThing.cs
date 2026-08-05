@@ -19,29 +19,11 @@ public static class GenThing_Patch
     var map = t.Map;
     if (map != null)
     {
-      var registry = MapHookRegistry.Get(map);
-      if (registry != null)
+      var hookResult = MapHookRegistry.GetRoofBuildingTrueCenter(t, __result, map);
+      if (hookResult.HasValue)
       {
-        var handlers = registry.GetHandlers<MapHookRegistry.RoofBuildingTrueCenterHandler>(MapHookRegistry.HookId.RoofBuildingTrueCenter);
-        if (handlers != null)
-        {
-          for (int i = 0; i < handlers.Count; i++)
-          {
-            try
-            {
-              var res = handlers[i](t, __result);
-              if (res.HasValue)
-              {
-                __result = res.Value;
-                return;
-              }
-            }
-            catch (System.Exception ex)
-            {
-              StratumLog.Error($"Error in RoofBuildingTrueCenter subscriber: {ex}");
-            }
-          }
-        }
+        __result = hookResult.Value;
+        return;
       }
     }
     
