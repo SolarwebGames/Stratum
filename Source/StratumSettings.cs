@@ -16,6 +16,10 @@ public class StratumSettings : ModSettings
   public bool enablePollenGraphics = true;
   public bool enableSnowGraphics = true;
   public bool enableRoofDamageScratches = true;
+  // Only consulted when a vertical-levels mod reports something stacked above an open cell; with
+  // no such mod present this changes nothing. Turn off to restore vanilla sunlight for cells that
+  // have no roof of their own regardless of what sits above them.
+  public bool enableUpperLevelSkyOcclusion = true;
 
   public override void ExposeData()
   {
@@ -32,5 +36,6 @@ public class StratumSettings : ModSettings
     Scribe_Values.Look(ref enablePollenGraphics, "enablePollenGraphics", true);
     Scribe_Values.Look(ref enableSnowGraphics, "enableSnowGraphics", true);
     Scribe_Values.Look(ref enableRoofDamageScratches, "enableRoofDamageScratches", true);
+    Scribe_Values.Look(ref enableUpperLevelSkyOcclusion, "enableUpperLevelSkyOcclusion", true);
   }
 }
