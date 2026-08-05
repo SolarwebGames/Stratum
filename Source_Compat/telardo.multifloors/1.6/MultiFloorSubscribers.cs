@@ -13,16 +13,34 @@ internal static class MultiFloorSubscribers
 {
   public static void Register()
   {
-    // Sky glow and solar output ask the same physical question -- is anything solid stacked above
-    // this cell -- so both delegate to the same check.
+    // Everything below scales its base value by what the levels above transmit, so an unsubscribed
+    // or single-level map multiplies by exactly 1 and is indistinguishable from stock Stratum.
+
+    // Drives the ground tint pass, the lighting-overlay brightness, the light pools, the sunbeam
+    // flecks and the skylight shadows.
+    MapHookRegistry.RegisterGlobal<MapHookRegistry.SkylightTransmissionHandler>(
+      MapHookRegistry.HookId.SkylightTransmission,
+      (map, cell, baseTransmission) => baseTransmission <= 0f
+        ? baseTransmission
+        : baseTransmission * SkyOcclusionSampler.Sample(map, cell).Transmission
+    );
+
+    // Compounds the colour of every pane between this cell and the sky.
+    MapHookRegistry.RegisterGlobal<MapHookRegistry.SkylightTintHandler>(
+      MapHookRegistry.HookId.SkylightTint,
+      (map, cell, baseTint) => baseTint * SkyOcclusionSampler.Sample(map, cell).Tint
+    );
+
+    // The real light level, and solar output. Both were previously all-or-nothing; they now scale
+    // with the panes overhead, so a skylight above dims rather than doing nothing.
     MapHookRegistry.RegisterGlobal<MapHookRegistry.SkyGlowMultiplierHandler>(
       MapHookRegistry.HookId.SkyGlowMultiplier,
-      (map, cell, baseMultiplier) => IsOccludedFromAbove(map, cell) ? 0f : baseMultiplier
+      (map, cell, baseMultiplier) => baseMultiplier * SkyOcclusionSampler.Sample(map, cell).Transmission
     );
 
     MapHookRegistry.RegisterGlobal<MapHookRegistry.SolarPowerOutputFactorHandler>(
       MapHookRegistry.HookId.SolarPowerOutputFactor,
-      (map, cell, baseFactor) => IsOccludedFromAbove(map, cell) ? 0f : baseFactor
+      (map, cell, baseFactor) => baseFactor * SkyOcclusionSampler.Sample(map, cell).Transmission
     );
 
     MapHookRegistry.RegisterGlobal<MapHookRegistry.DropPodRoofInterceptionHandler>(
@@ -90,35 +108,9 @@ internal static class MultiFloorSubscribers
     );
   }
 
-  /// <summary>
-  /// Walks the MultiFloors level stack above <paramref name="cell"/> and reports whether any level
-  /// blocks sunlight, either with an opaque roof or with non-transparent floor terrain.
-  /// </summary>
-  private static bool IsOccludedFromAbove(Map map, IntVec3 cell)
-  {
-    if (map == null || !cell.InBounds(map)) return false;
-
-    // Fast path for the common single-level case. UpperMap is a Prepatcher field accessor, so
-    // this costs one field read on maps that have no level above them.
-    Map upper = map.UpperMap();
-    if (upper == null) return false;
-
-    while (upper != null)
-    {
-      if (cell.InBounds(upper))
-      {
-        var roof = upper.roofGrid?.RoofAt(cell);
-        if (roof != null && !RoofStatCache.IsSkylight(roof)) return true;
-
-        var terrain = upper.terrainGrid?.TerrainAt(cell);
-        if (terrain != null && !terrain.IsTransparent()) return true;
-      }
-      upper = upper.UpperMap();
-    }
-
-    return false;
-  }
-
+  // Light-related occlusion now lives in SkyOcclusionSampler, which reports a scalar and a colour
+  // rather than a boolean. This remains only for the placement check, which really is a yes/no
+  // question about physical obstruction.
   private static bool IsTransparent(this TerrainDef terrain)
   {
     return terrain != null && global::MultiFloors.MiscDefOfs.MF_UpperLevelSettings.IsTransparentTerrain(terrain);
