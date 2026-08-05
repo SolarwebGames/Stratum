@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
@@ -26,6 +26,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.6", "1.6", "{07A456F7-78F2-6891-E38C-262ABEA63199}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stratum_TiltThePlanet", "Source_Compat\sjaandi.realtiltmod\1.6\Stratum_TiltThePlanet.csproj", "{2D153FF6-2E44-4988-B8DE-475333ACEBEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "telardo.multifloors", "telardo.multifloors", "{5E3C712A-18A1-4F44-963C-891E72A819F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.6", "1.6", "{3D90A812-4C1F-431A-9812-9214A36B0001}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stratum_MultiFloors", "Source_Compat\telardo.multifloors\1.6\Stratum_MultiFloors.csproj", "{A81F2B4D-7E8A-421B-B65A-340D4E729F11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +103,18 @@ Global
 		{2D153FF6-2E44-4988-B8DE-475333ACEBEF}.Release|x64.Build.0 = Release|Any CPU
 		{2D153FF6-2E44-4988-B8DE-475333ACEBEF}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D153FF6-2E44-4988-B8DE-475333ACEBEF}.Release|x86.Build.0 = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|x64.Build.0 = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Debug|x86.Build.0 = Debug|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|x64.ActiveCfg = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|x64.Build.0 = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|x86.ActiveCfg = Release|Any CPU
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +130,9 @@ Global
 		{62C57815-108B-A95E-9D73-458D69D07988} = {21FFD3C1-EE46-F538-0E2F-9AB282964A95}
 		{07A456F7-78F2-6891-E38C-262ABEA63199} = {62C57815-108B-A95E-9D73-458D69D07988}
 		{2D153FF6-2E44-4988-B8DE-475333ACEBEF} = {07A456F7-78F2-6891-E38C-262ABEA63199}
+		{5E3C712A-18A1-4F44-963C-891E72A819F0} = {21FFD3C1-EE46-F538-0E2F-9AB282964A95}
+		{3D90A812-4C1F-431A-9812-9214A36B0001} = {5E3C712A-18A1-4F44-963C-891E72A819F0}
+		{A81F2B4D-7E8A-421B-B65A-340D4E729F11} = {3D90A812-4C1F-431A-9812-9214A36B0001}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6271CF5C-6679-42C7-93BD-436EA57AE909}
