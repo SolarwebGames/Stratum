@@ -122,18 +122,12 @@ public class GreenhouseGaze : JobDriver
 
   private bool HasPlants(Room room)
   {
-    var map = room.Map;
-    if (map == null) return false;
-
-    foreach (var cell in room.Cells)
+    var containedThings = room.ContainedAndAdjacentThings;
+    for (int i = 0; i < containedThings.Count; i++)
     {
-      List<Thing> things = cell.GetThingList(map);
-      for (int i = 0; i < things.Count; i++)
+      if (containedThings[i] is Plant)
       {
-        if (things[i] is Plant)
-        {
-          return true;
-        }
+        return true;
       }
     }
 

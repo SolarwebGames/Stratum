@@ -52,7 +52,6 @@ public class GreenhouseGaze : JoyGiver
             if (adjCell.InBounds(map) &&
                 adjCell.Walkable(map) &&
                 !adjCell.IsForbidden(pawn) &&
-                pawn.CanReach(adjCell, PathEndMode.OnCell, Danger.None) &&
                 adjCell.GetRoom(map) == room &&
                 !IsCellOccupied(adjCell, map))
             {
@@ -68,19 +67,26 @@ public class GreenhouseGaze : JoyGiver
             }
           }
 
-          IntVec3 targetAdjCell = IntVec3.Invalid;
-          if (adjCandidates.Count > 0)
+          while (adjCandidates.Count > 0)
           {
-            targetAdjCell = adjCandidates.RandomElement();
-          }
-          else if (adjFallback.Count > 0)
-          {
-            targetAdjCell = adjFallback.RandomElement();
+            int index = Rand.Range(0, adjCandidates.Count);
+            IntVec3 cell = adjCandidates[index];
+            if (pawn.CanReach(cell, PathEndMode.OnCell, Danger.None))
+            {
+              return JobMaker.MakeJob(def.jobDef, cell);
+            }
+            adjCandidates.RemoveAt(index);
           }
 
-          if (targetAdjCell.IsValid)
+          while (adjFallback.Count > 0)
           {
-            return JobMaker.MakeJob(def.jobDef, targetAdjCell);
+            int index = Rand.Range(0, adjFallback.Count);
+            IntVec3 cell = adjFallback[index];
+            if (pawn.CanReach(cell, PathEndMode.OnCell, Danger.None))
+            {
+              return JobMaker.MakeJob(def.jobDef, cell);
+            }
+            adjFallback.RemoveAt(index);
           }
         }
       }
@@ -96,7 +102,6 @@ public class GreenhouseGaze : JoyGiver
     {
       if (cell.Walkable(map) &&
           !cell.IsForbidden(pawn) &&
-          pawn.CanReach(cell, PathEndMode.OnCell, Danger.None) &&
           !IsCellOccupied(cell, map))
       {
         var roof = map.roofGrid.RoofAt(cell);
@@ -111,38 +116,39 @@ public class GreenhouseGaze : JoyGiver
       }
     }
 
-    IntVec3 targetCell = IntVec3.Invalid;
-    if (candidateCells.Count > 0)
+    while (candidateCells.Count > 0)
     {
-      targetCell = candidateCells.RandomElement();
-    }
-    else if (fallbackCells.Count > 0)
-    {
-      targetCell = fallbackCells.RandomElement();
-    }
-
-    if (!targetCell.IsValid)
-    {
-      return null!;
+      int index = Rand.Range(0, candidateCells.Count);
+      IntVec3 cell = candidateCells[index];
+      if (pawn.CanReach(cell, PathEndMode.OnCell, Danger.None))
+      {
+        return JobMaker.MakeJob(def.jobDef, cell);
+      }
+      candidateCells.RemoveAt(index);
     }
 
-    return JobMaker.MakeJob(def.jobDef, targetCell);
+    while (fallbackCells.Count > 0)
+    {
+      int index = Rand.Range(0, fallbackCells.Count);
+      IntVec3 cell = fallbackCells[index];
+      if (pawn.CanReach(cell, PathEndMode.OnCell, Danger.None))
+      {
+        return JobMaker.MakeJob(def.jobDef, cell);
+      }
+      fallbackCells.RemoveAt(index);
+    }
+
+    return null!;
   }
 
   private bool HasPlants(Room room)
   {
-    var map = room.Map;
-    if (map == null) return false;
-
-    foreach (var cell in room.Cells)
+    var containedThings = room.ContainedAndAdjacentThings;
+    for (int i = 0; i < containedThings.Count; i++)
     {
-      List<Thing> things = cell.GetThingList(map);
-      for (int i = 0; i < things.Count; i++)
+      if (containedThings[i] is Plant)
       {
-        if (things[i] is Plant)
-        {
-          return true;
-        }
+        return true;
       }
     }
 

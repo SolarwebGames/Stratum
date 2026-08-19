@@ -18,24 +18,29 @@ public static class Plant_Patch
     var tracker = __instance.Map.GetComponent<GrowthBoosterTracker>();
     if (tracker == null || tracker.boosters.Count == 0) return;
 
-    Room room = __instance.GetRoom();
-    if (room == null) return;
-
+    var plantPos = __instance.Position;
+    Room? room = null;
     float bestFactor = 1f;
 
     foreach (var booster in tracker.boosters)
     {
       if (booster.IsActive && booster.Props != null)
       {
-        if (!booster.Props.roomRestricted || booster.parent.GetRoom() == room)
+        var props = booster.Props;
+        if (props.growthRateFactor <= bestFactor) continue;
+
+        var boosterPos = booster.parent.Position;
+        float radius = props.radius;
+        int dx = plantPos.x - boosterPos.x;
+        int dz = plantPos.z - boosterPos.z;
+        if (dx * dx + dz * dz > radius * radius) continue;
+
+        room ??= __instance.GetRoom();
+        if (room == null) return;
+
+        if (!props.roomRestricted || booster.parent.GetRoom() == room)
         {
-          if (__instance.Position.DistanceTo(booster.parent.Position) <= booster.Props.radius)
-          {
-            if (booster.Props.growthRateFactor > bestFactor)
-            {
-              bestFactor = booster.Props.growthRateFactor;
-            }
-          }
+          bestFactor = props.growthRateFactor;
         }
       }
     }
@@ -52,9 +57,8 @@ public static class Plant_Patch
     var tracker = __instance.Map.GetComponent<GrowthBoosterTracker>();
     if (tracker == null || tracker.boosters.Count == 0) return;
 
-    Room room = __instance.GetRoom();
-    if (room == null) return;
-
+    var plantPos = __instance.Position;
+    Room? room = null;
     GrowthBooster? bestBooster = null;
     float bestFactor = 1f;
 
@@ -62,16 +66,22 @@ public static class Plant_Patch
     {
       if (booster.IsActive && booster.Props != null)
       {
-        if (!booster.Props.roomRestricted || booster.parent.GetRoom() == room)
+        var props = booster.Props;
+        if (props.growthRateFactor <= bestFactor) continue;
+
+        var boosterPos = booster.parent.Position;
+        float radius = props.radius;
+        int dx = plantPos.x - boosterPos.x;
+        int dz = plantPos.z - boosterPos.z;
+        if (dx * dx + dz * dz > radius * radius) continue;
+
+        room ??= __instance.GetRoom();
+        if (room == null) return;
+
+        if (!props.roomRestricted || booster.parent.GetRoom() == room)
         {
-          if (__instance.Position.DistanceTo(booster.parent.Position) <= booster.Props.radius)
-          {
-            if (booster.Props.growthRateFactor > bestFactor)
-            {
-              bestFactor = booster.Props.growthRateFactor;
-              bestBooster = booster;
-            }
-          }
+          bestFactor = props.growthRateFactor;
+          bestBooster = booster;
         }
       }
     }

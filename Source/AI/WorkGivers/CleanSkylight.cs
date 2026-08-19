@@ -26,15 +26,15 @@ public class CleanSkylight : WorkGiver_Scanner
     var dirt = map.GetComponent<SkylightCoating>();
     if (dirt == null) yield break;
 
-    foreach (var cell in map.areaManager.Home.ActiveCells)
+    var home = map.areaManager.Home;
+    var indices = map.cellIndices;
+
+    foreach (int idx in dirt.ActiveSkylightCells)
     {
-      var roof = map.roofGrid.RoofAt(cell);
-      if (roof != null && Stats.RoofStatCache.IsSkylight(roof))
+      IntVec3 cell = indices.IndexToCell(idx);
+      if (home[cell] && dirt.GetCoatingOpacity(cell) > SkylightCoating.CleanThreshold)
       {
-        if (dirt.GetCoatingOpacity(cell) > SkylightCoating.CleanThreshold)
-        {
-          yield return cell;
-        }
+        yield return cell;
       }
     }
   }

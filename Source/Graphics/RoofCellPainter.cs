@@ -269,34 +269,28 @@ public static class RoofCellPainter
     bool hasSE = HasRoofAt(map, c.x + 1, c.z - 1);
     bool hasNE = HasRoofAt(map, c.x + 1, c.z + 1);
 
-    Color[,] colors = new Color[4, 4];
-    for (int i = 0; i < 4; i++)
-    {
-      for (int j = 0; j < 4; j++)
-      {
-        colors[i, j] = roofColor;
-      }
-    }
+    System.Span<Color> colors = stackalloc Color[16];
+    colors.Fill(roofColor);
 
-    colors[0, 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), !hasW);
-    colors[0, 2] = colors[0, 1];
+    colors[0 * 4 + 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), !hasW);
+    colors[0 * 4 + 2] = colors[0 * 4 + 1];
 
-    colors[3, 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), !hasE);
-    colors[3, 2] = colors[3, 1];
+    colors[3 * 4 + 1] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), !hasE);
+    colors[3 * 4 + 2] = colors[3 * 4 + 1];
 
-    colors[1, 0] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z - 1), !hasS);
-    colors[2, 0] = colors[1, 0];
+    colors[1 * 4 + 0] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z - 1), !hasS);
+    colors[2 * 4 + 0] = colors[1 * 4 + 0];
 
-    colors[1, 3] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z + 1), !hasN);
-    colors[2, 3] = colors[1, 3];
+    colors[1 * 4 + 3] = GetEdgeColor(map, integrityGrid, roofColor, new IntVec3(c.x, 0, c.z + 1), !hasN);
+    colors[2 * 4 + 3] = colors[1 * 4 + 3];
 
-    colors[0, 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x - 1, 0, c.z - 1), !(hasW && hasS && hasSW));
-    colors[0, 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x - 1, 0, c.z + 1), !(hasW && hasN && hasNW));
-    colors[3, 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x + 1, 0, c.z - 1), !(hasE && hasS && hasSE));
-    colors[3, 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x + 1, 0, c.z + 1), !(hasE && hasN && hasNE));
+    colors[0 * 4 + 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x - 1, 0, c.z - 1), !(hasW && hasS && hasSW));
+    colors[0 * 4 + 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x - 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x - 1, 0, c.z + 1), !(hasW && hasN && hasNW));
+    colors[3 * 4 + 0] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z - 1), new IntVec3(c.x + 1, 0, c.z - 1), !(hasE && hasS && hasSE));
+    colors[3 * 4 + 3] = GetCornerColor(map, integrityGrid, roofColor, new IntVec3(c.x + 1, 0, c.z), new IntVec3(c.x, 0, c.z + 1), new IntVec3(c.x + 1, 0, c.z + 1), !(hasE && hasN && hasNE));
 
     float f = 0.25f;
-    float[] p = [0f, f, 1f - f, 1f];
+    System.ReadOnlySpan<float> p = stackalloc float[] { 0f, f, 1f - f, 1f };
 
     Vector3 basePos = new(c.x, altitude, c.z);
     Vector2 bl = uv[0], tl = uv[1], tr = uv[2], br = uv[3];
@@ -308,6 +302,9 @@ public static class RoofCellPainter
       return Vector2.Lerp(bottom, top, pz);
     }
 
+    System.Span<Vector2> qUv = stackalloc Vector2[4];
+    System.Span<Color> qColors = stackalloc Color[4];
+
     for (int x = 0; x < 3; x++)
     {
       for (int z = 0; z < 3; z++)
@@ -315,8 +312,16 @@ public static class RoofCellPainter
         Vector3 qCenter = basePos + new Vector3((p[x] + p[x + 1]) / 2f, 0, (p[z] + p[z + 1]) / 2f);
         Vector2 qSize = new(p[x + 1] - p[x], p[z + 1] - p[z]);
 
-        Vector2[] qUv = [GetUv(p[x], p[z]), GetUv(p[x], p[z + 1]), GetUv(p[x + 1], p[z + 1]), GetUv(p[x + 1], p[z])];
-        Color[] qColors = [colors[x, z], colors[x, z + 1], colors[x + 1, z + 1], colors[x + 1, z]];
+        qUv[0] = GetUv(p[x], p[z]);
+        qUv[1] = GetUv(p[x], p[z + 1]);
+        qUv[2] = GetUv(p[x + 1], p[z + 1]);
+        qUv[3] = GetUv(p[x + 1], p[z]);
+
+        qColors[0] = colors[x * 4 + z];
+        qColors[1] = colors[x * 4 + (z + 1)];
+        qColors[2] = colors[(x + 1) * 4 + (z + 1)];
+        qColors[3] = colors[(x + 1) * 4 + z];
+
         PrintQuad(layer, qCenter, qSize, mat, roofColor, 0f, qUv, qColors);
       }
     }
@@ -400,7 +405,7 @@ public static class RoofCellPainter
   /// <summary>Appends a single quad to <paramref name="layer"/>'s submesh for <paramref name="mat"/>.</summary>
   public static void PrintQuad(MapDrawLayer layer, Vector3 center, Vector2 size, Material mat, Color color,
                                float angle = 0f, System.ReadOnlySpan<Vector2> uvArray = default,
-                               Color[]? vertexColors = null)
+                               System.ReadOnlySpan<Color> vertexColors = default)
   {
     LayerSubMesh subMesh = layer.GetSubMesh(mat);
     if (subMesh == null) return;
@@ -426,7 +431,7 @@ public static class RoofCellPainter
     subMesh.verts.Add(v3 + center);
     subMesh.verts.Add(v4 + center);
 
-    if (vertexColors != null && vertexColors.Length >= 4)
+    if (vertexColors.Length >= 4)
     {
       for (int i = 0; i < 4; i++) subMesh.colors.Add(vertexColors[i]);
     }

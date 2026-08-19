@@ -569,8 +569,10 @@ public class RoofIntegrityGrid(Map map) : MapComponent(map)
         if (stuff != null) return stuff;
       }
 
-      foreach (var adj in GenRadial.RadialCellsAround(cell, 3f, useCenter: false))
+      int numRadialCells = GenRadial.NumCellsInRadius(3f);
+      for (int i = 1; i < numRadialCells; i++)
       {
+        IntVec3 adj = cell + GenRadial.RadialPattern[i];
         if (!adj.InBounds(map)) continue;
         var adjEdifice = adj.GetEdifice(map);
         if (adjEdifice?.def.building?.isNaturalRock == true)

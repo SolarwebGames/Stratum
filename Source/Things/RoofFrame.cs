@@ -132,8 +132,10 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
   public int GetSpaceRemainingWithEnroute(ThingDef stuff, Pawn haulingPawn)
   {
     int space = SpaceRemainingFor(stuff);
-    foreach (var pawn in Map.mapPawns.AllPawnsSpawned)
+    var pawns = Map.mapPawns.AllPawnsSpawned;
+    for (int pIdx = 0; pIdx < pawns.Count; pIdx++)
     {
+      var pawn = pawns[pIdx];
       if (pawn == haulingPawn || pawn.jobs?.curJob == null) continue;
       var job = pawn.jobs.curJob;
 
@@ -142,9 +144,10 @@ public class RoofFrame : Building, IThingHolder, IConstructible, IHaulEnroute, I
         bool isTarget = job.targetB.Thing == this;
         if (!isTarget && job.targetQueueB != null)
         {
-          foreach (var t in job.targetQueueB)
+          var queueB = job.targetQueueB;
+          for (int qIdx = 0; qIdx < queueB.Count; qIdx++)
           {
-            if (t.Thing == this) { isTarget = true; break; }
+            if (queueB[qIdx].Thing == this) { isTarget = true; break; }
           }
         }
 

@@ -16,6 +16,15 @@ public class SkylightCoating(Map map) : MapComponent(map)
   private readonly HashSet<int> activeSkylightCells = [];
   private readonly HashSet<int> activeVisibleRoofedCells = [];
 
+  public IReadOnlyCollection<int> ActiveSkylightCells
+  {
+    get
+    {
+      if (!hasScanned) ExecuteScan();
+      return activeSkylightCells;
+    }
+  }
+
   private Dictionary<int, float>? loadedDirtLevels;
   private Dictionary<int, Color>? loadedDirtColors;
   private Dictionary<int, float>? loadedPollenLevels;

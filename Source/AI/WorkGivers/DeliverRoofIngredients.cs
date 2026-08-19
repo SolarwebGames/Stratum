@@ -110,8 +110,17 @@ public class DeliverRoofIngredients : WorkGiver_Scanner
       stacks.RemoveRange(keepCount, stacks.Count - keepCount);
 
       var allNeeders = new List<RoofFrame>(nearbyNeeders) { frame };
-      RoofFrame primaryNeeder = allNeeders.MinBy(
-        f => IntVec3Utility.ManhattanDistanceFlat(firstStack.Position, f.Position));
+      RoofFrame primaryNeeder = allNeeders[0];
+      int minDistance = IntVec3Utility.ManhattanDistanceFlat(firstStack.Position, primaryNeeder.Position);
+      for (int i = 1; i < allNeeders.Count; i++)
+      {
+        int dist = IntVec3Utility.ManhattanDistanceFlat(firstStack.Position, allNeeders[i].Position);
+        if (dist < minDistance)
+        {
+          minDistance = dist;
+          primaryNeeder = allNeeders[i];
+        }
+      }
       allNeeders.Remove(primaryNeeder);
 
       var job = JobMaker.MakeJob(DefOf.JobDefOf.DeliverRoofIngredients, firstStack, primaryNeeder);
@@ -119,12 +128,22 @@ public class DeliverRoofIngredients : WorkGiver_Scanner
 
       if (stacks.Count > 1)
       {
-        job.targetQueueA = [.. stacks.Skip(1)];
+        var targetQueueA = new List<LocalTargetInfo>(stacks.Count - 1);
+        for (int i = 1; i < stacks.Count; i++)
+        {
+          targetQueueA.Add(stacks[i]);
+        }
+        job.targetQueueA = targetQueueA;
       }
 
       if (allNeeders.Count > 0)
       {
-        job.targetQueueB = [.. allNeeders];
+        var targetQueueB = new List<LocalTargetInfo>(allNeeders.Count);
+        for (int i = 0; i < allNeeders.Count; i++)
+        {
+          targetQueueB.Add(allNeeders[i]);
+        }
+        job.targetQueueB = targetQueueB;
       }
 
       return job;
